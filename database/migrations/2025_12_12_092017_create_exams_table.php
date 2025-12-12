@@ -13,7 +13,16 @@ return new class extends Migration
     {
         Schema::create('exams', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('title');
+            $table->text('description')->nullable();
+            $table->string('layout_template')->default('default');
+            $table->json('header_config')->nullable();
+            $table->json('footer_config')->nullable();
+            $table->date('exam_date')->nullable();
+            $table->integer('total_points')->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -13,7 +13,18 @@ return new class extends Migration
     {
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('subject_id')->constrained()->onDelete('cascade');
+            $table->foreignId('topic_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('question_type_id')->constrained()->onDelete('cascade');
+            $table->foreignId('document_id')->nullable()->constrained()->onDelete('set null');
+            $table->text('statement');
+            $table->text('explanation')->nullable();
+            $table->enum('difficulty_level', ['easy', 'medium', 'hard'])->default('medium');
+            $table->integer('points')->default(1);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

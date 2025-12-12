@@ -6,26 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('question_alternatives', function (Blueprint $table) {
+        Schema::create('exam_questions', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('exam_id')->constrained()->onDelete('cascade');
             $table->foreignId('question_id')->constrained()->onDelete('cascade');
-            $table->text('content');
-            $table->boolean('is_correct')->default(false);
             $table->integer('order')->default(0);
+            $table->integer('points_override')->nullable();
             $table->timestamps();
+            
+            $table->unique(['exam_id', 'question_id']);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('question_alternatives');
+        Schema::dropIfExists('exam_questions');
     }
 };

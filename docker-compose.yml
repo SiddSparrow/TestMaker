@@ -11,13 +11,13 @@ services:
     volumes:
       - .:/var/www/html
     ports:
-      - "8000:8000"  # IMPORTANTE: Adicione esta linha
+      - "8000:8000"  
     networks:
       - laravel-network
     depends_on:
       - postgres
       - redis
-    command: php artisan serve --host=0.0.0.0 --port=8000  # E esta linha
+    command: php artisan serve --host=0.0.0.0 --port=8000  
 
   
 
@@ -36,15 +36,34 @@ services:
     networks:
       - laravel-network
 
+
   redis:
-    image: redis:alpine
+    image: redis:7-alpine
     container_name: test-maker-redis
     restart: unless-stopped
-    command: redis-server --appendonly yes
+    command: >
+      redis-server 
+      --appendonly yes 
+      --maxmemory 256mb  
+      --maxmemory-policy allkeys-lru  
+      --save 900 1      
+      --save 300 10     
+      --save 60 10000   
     ports:
-      - "6379:6379"  # Adicione esta linha
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
     networks:
       - laravel-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-secret}  
+
 
   mailhog:
     image: mailhog/mailhog:latest
@@ -57,6 +76,8 @@ services:
 
 volumes:
   postgres_data:
+  redis_data:
+    driver: local
 
 networks:
   laravel-network:

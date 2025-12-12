@@ -1,26 +1,31 @@
+<template>
+    <Link :href="href" 
+          :class="[
+              'group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors',
+              active 
+                ? 'bg-primary-50 text-primary-700 border-l-4 border-primary-600 pl-2.5' 
+                : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+          ]">
+        <slot name="icon" v-if="$slots.icon">
+            <div class="mr-3 flex-shrink-0">
+                <slot name="icon" />
+            </div>
+        </slot>
+        <span class="truncate"><slot /></span>
+    </Link>
+</template>
+
 <script setup>
-import { computed } from 'vue';
 import { Link } from '@inertiajs/vue3';
 
-const props = defineProps({
+defineProps({
     href: {
         type: String,
-        required: true,
+        required: true
     },
     active: {
         type: Boolean,
-    },
+        default: false
+    }
 });
-
-const classes = computed(() =>
-    props.active
-        ? 'inline-flex items-center px-1 pt-1 border-b-2 border-indigo-400 text-sm font-medium leading-5 text-gray-900 focus:outline-none focus:border-indigo-700 transition duration-150 ease-in-out'
-        : 'inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out',
-);
 </script>
-
-<template>
-    <Link :href="href" :class="classes">
-        <slot />
-    </Link>
-</template>

@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 class Question extends Model
 {
     use HasFactory, SoftDeletes;
@@ -29,6 +30,52 @@ class Question extends Model
     protected $casts = [
         'is_active' => 'boolean',
     ];
+
+    /**
+     * Boot the model
+     */
+    protected static function booted()
+    {
+        // Limpa cache quando uma questão é criada, atualizada ou deletada
+        static::saved(function ($question) {
+            $question->clearCache();
+        });
+
+        static::deleted(function ($question) {
+            $question->clearCache();
+        });
+    }
+
+    /**
+     * Clear cache related to this question
+     */
+    public function clearCache(): void
+    {
+        $tags = ['questions', "question_{$this->id}"];
+        
+        Cache::tags($tags)->flush();
+        
+        // Limpa estatísticas
+        Cache::forget('questions_stats');
+        Cache::forget('questions_count_total');
+        Cache::forget('questions_count_active');
+        Cache::forget('questions_count_inactive');
+        Cache::forget('questions_by_difficulty');
+    }
+
+    /**
+     * Get cached paginator from array
+     */
+    public static function hydratePaginator(array $data): LengthAwarePaginator
+    {
+        return \App\Helpers\CacheHelper::arrayToPaginator(
+            $data['data'],
+            $data['per_page'],
+            $data['current_page'],
+            $data['total'],
+            ['path' => $data['path'] ?? url()->current()]
+        );
+    }
 
     public function user(): BelongsTo
     {

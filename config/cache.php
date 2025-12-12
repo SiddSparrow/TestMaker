@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('CACHE_STORE', 'database'),
+    'default' => env('CACHE_STORE', 'redis'),  // ← Altere para 'redis'
 
     /*
     |--------------------------------------------------------------------------
@@ -112,6 +112,41 @@ return [
     |
     */
 
-    'prefix' => env('CACHE_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')).'-cache-'),
+    'prefix' => env('CACHE_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')).'_cache_'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cache Connections
+    |--------------------------------------------------------------------------
+    |
+    | Here you may define the connections for each cache store. This allows
+    | you to have separate cache stores for different parts of your app.
+    |
+    */
+    'connections' => [
+        
+        'cache' => [
+            'host' => env('REDIS_HOST', '127.0.0.1'),
+            'password' => env('REDIS_PASSWORD', null),
+            'port' => env('REDIS_PORT', 6379),
+            'database' => env('REDIS_CACHE_DB', 1),  // DB separada para cache
+            'timeout' => 0.1,
+            'read_timeout' => 60,
+            'persistent' => false,
+            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_cache_'),
+        ],
+        
+        'default' => [
+            'host' => env('REDIS_HOST', '127.0.0.1'),
+            'password' => env('REDIS_PASSWORD', null),
+            'port' => env('REDIS_PORT', 6379),
+            'database' => env('REDIS_DB', 0),  // DB padrão
+            'timeout' => 0.1,
+            'read_timeout' => 60,
+            'persistent' => false,
+            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'),
+        ],
+        
+    ],
 
 ];

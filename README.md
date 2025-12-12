@@ -1,59 +1,189 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<div id="top">
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+<!-- HEADER STYLE: CLASSIC -->
+<div align="center">
 
-## About Laravel
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+# TESTMAKER
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+<em>Transform Learning with Effortless, Accurate Testing</em>
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+<!-- BADGES -->
+<img src="https://img.shields.io/github/last-commit/SiddSparrow/TestMaker?style=flat&logo=git&logoColor=white&color=0080ff" alt="last-commit">
+<img src="https://img.shields.io/github/languages/top/SiddSparrow/TestMaker?style=flat&color=0080ff" alt="repo-top-language">
+<img src="https://img.shields.io/github/languages/count/SiddSparrow/TestMaker?style=flat&color=0080ff" alt="repo-language-count">
 
-## Learning Laravel
+<em>Built with the tools and technologies:</em>
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+<img src="https://img.shields.io/badge/JSON-000000.svg?style=flat&logo=JSON&logoColor=white" alt="JSON">
+<img src="https://img.shields.io/badge/Markdown-000000.svg?style=flat&logo=Markdown&logoColor=white" alt="Markdown">
+<img src="https://img.shields.io/badge/npm-CB3837.svg?style=flat&logo=npm&logoColor=white" alt="npm">
+<img src="https://img.shields.io/badge/Autoprefixer-DD3735.svg?style=flat&logo=Autoprefixer&logoColor=white" alt="Autoprefixer">
+<img src="https://img.shields.io/badge/Redis-FF4438.svg?style=flat&logo=Redis&logoColor=white" alt="Redis">
+<img src="https://img.shields.io/badge/PostCSS-DD3A0A.svg?style=flat&logo=PostCSS&logoColor=white" alt="PostCSS">
+<img src="https://img.shields.io/badge/Composer-885630.svg?style=flat&logo=Composer&logoColor=white" alt="Composer">
+<img src="https://img.shields.io/badge/JavaScript-F7DF1E.svg?style=flat&logo=JavaScript&logoColor=black" alt="JavaScript">
+<br>
+<img src="https://img.shields.io/badge/Vue.js-4FC08D.svg?style=flat&logo=vuedotjs&logoColor=white" alt="Vue.js">
+<img src="https://img.shields.io/badge/PostgreSQL-316192?logo=postgresql&logoColor=white" alt="PostgreSql">
+<img src="https://img.shields.io/badge/Docker-2496ED.svg?style=flat&logo=Docker&logoColor=white" alt="Docker">
+<img src="https://img.shields.io/badge/XML-005FAD.svg?style=flat&logo=XML&logoColor=white" alt="XML">
+<img src="https://img.shields.io/badge/PHP-777BB4.svg?style=flat&logo=PHP&logoColor=white" alt="PHP">
+<img src="https://img.shields.io/badge/Vite-646CFF.svg?style=flat&logo=Vite&logoColor=white" alt="Vite">
+<img src="https://img.shields.io/badge/Axios-5A29E4.svg?style=flat&logo=Axios&logoColor=white" alt="Axios">
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+</div>
+<br>
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Table of Contents
 
-### Premium Partners
+- [Overview](#overview)
+- [Getting Started](#getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Installation](#installation)
+    - [Usage](#usage)
+    - [Testing](#testing)
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+---
 
-## Contributing
+## Overview
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+TestMaker is an all-in-one developer tool designed to simplify the development of assessment platforms. It provides a robust, containerized environment and a modular architecture that integrates Laravel, Vue 3, Inertia.js, and Tailwind CSS for building scalable, maintainable applications. The core features include:
 
-## Code of Conduct
+- **Docker Environment:** Preconfigured PHP, database, cache, and queue services for consistent local development.
+- **Modular Architecture:** Seamless integration of backend and frontend components supporting rapid feature development.
+- **Content Management:** Rich models and controllers for questions, exams, subjects, and topics, enabling dynamic content workflows.
+- **Testing & Seeding:** Built-in PHPUnit setup with factories for efficient testing and realistic data generation.
+- **UI Components:** Reusable Vue components for forms, navigation, and modals, ensuring a cohesive user experience.
+- **Developer Tools:** Commands for cache management and environment setup to streamline workflows.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## Key Features
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- **Question Bank**: Create, organize, and tag questions by subject/topic
+- **Exam Builder**: Drag-and-drop interface for assembling exams
+- **Multiple Question Types**: Multiple choice, true/false, essays
+- **User Management**: Role-based access control (teachers/admins)
+- **Real-time Preview**: Instant exam preview with automatic scoring
+- **Export Options**: Generate PDF exams and answer keys
 
-## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Getting Started
+
+### Prerequisites
+
+This project requires the following dependencies:
+
+- **Programming Language:** PHP
+- **Package Manager:** Composer, Npm
+- **Container Runtime:** Docker
+
+### Installation
+
+Build TestMaker from the source and install dependencies:
+
+1. **Clone the repository:**
+
+    ```sh
+    ❯ git clone https://github.com/SiddSparrow/TestMaker
+    ```
+
+2. **Navigate to the project directory:**
+
+    ```sh
+    ❯ cd TestMaker
+    ```
+
+3. **Install the dependencies:**
+
+**Using [docker](https://www.docker.com/):**
+
+```sh
+❯ docker-compose up -d --build
+  docker-compose exec php composer install
+  docker-compose exec php npm install
+```
+**Using [composer](https://www.php.net/):**
+
+```sh
+❯ composer install
+```
+**Using [npm](https://www.npmjs.com/):**
+
+```sh
+❯ npm install
+```
+
+### Configuration
+
+1. Copy environment file:
+```bash
+cp .env.example .env
+```
+2. Generate application key:
+```bash
+docker-compose exec php artisan key:generate
+```
+3. Run migrations:
+```bash
+docker-compose exec php php artisan migrate
+```
+4. Run seed: (optional for mock data)
+```bash
+docker-compose exec app php artisan db:seed
+```
+### Usage
+
+Run the project with:
+
+**Using [docker](https://www.docker.com/):**
+
+```sh
+docker run -it {image_name}
+```
+**Using [composer](https://www.php.net/):**
+
+```sh
+php {entrypoint}
+```
+**Using [npm](https://www.npmjs.com/):**
+
+```sh
+npm start
+```
+
+### Testing
+
+Testmaker uses the {__test_framework__} test framework. Run the test suite with:
+
+**Using [docker](https://www.docker.com/):**
+
+```sh
+echo 'INSERT-TEST-COMMAND-HERE'
+```
+**Using [composer](https://www.php.net/):**
+
+```sh
+vendor/bin/phpunit
+```
+**Using [npm](https://www.npmjs.com/):**
+
+```sh
+npm test
+```
+
+**For the frontend (vue.js):**
+
+```sh
+docker-compose exec php npm run dev
+```
+
+
+##  Support
+
+For support, email fabio.duqueestrada@gmail.com or open an issue in the GitHub repository.
+
+---

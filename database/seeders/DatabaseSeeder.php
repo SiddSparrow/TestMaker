@@ -5,6 +5,7 @@ use App\Models\Exam;
 use App\Models\Question;
 use App\Models\QuestionAlternative;
 use App\Models\Subject;
+use App\Models\QuestionType;
 use App\Models\Tag;
 use App\Models\Topic;
 use App\Models\User;
@@ -24,7 +25,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Professor Teste',
             'email' => 'professor@teste.com',
         ]);
-
+        $questionTypes = QuestionType::all();
         // Criar tópicos para cada matéria
         $subjects = Subject::all();
         foreach ($subjects as $subject) {
@@ -35,10 +36,18 @@ class DatabaseSeeder extends Seeder
         $tags = Tag::factory(20)->create();
 
         // Criar questões
-        $questions = Question::factory(50)->create(['user_id' => $user->id]);
-
-        // Adicionar alternativas às questões
-        foreach ($questions as $question) {
+        $questions = collect();
+        for ($i = 0; $i < 50; $i++) {
+            $subject = $subjects->random();
+            $topic = $subject->topics->random();
+            
+            $question = Question::factory()->create([
+                'user_id' => $user->id,
+                'subject_id' => $subject->id,
+                'topic_id' => $topic->id,
+                'question_type_id' => $questionTypes->random()->id,
+            ]);
+            
             // Criar 4 alternativas incorretas
             QuestionAlternative::factory(4)->create([
                 'question_id' => $question->id,
@@ -54,6 +63,8 @@ class DatabaseSeeder extends Seeder
             $question->tags()->attach(
                 $tags->random(rand(2, 5))->pluck('id')->toArray()
             );
+            
+            $questions->push($question);
         }
 
         // Criar algumas provas de exemplo

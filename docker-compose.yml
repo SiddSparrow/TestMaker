@@ -1,0 +1,63 @@
+#version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: test-maker-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "8000:8000"  # IMPORTANTE: Adicione esta linha
+    networks:
+      - laravel-network
+    depends_on:
+      - postgres
+      - redis
+    command: php artisan serve --host=0.0.0.0 --port=8000  # E esta linha
+
+  
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: test-maker-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: test-maker
+      POSTGRES_USER: laravel
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - laravel-network
+
+  redis:
+    image: redis:alpine
+    container_name: test-maker-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"  # Adicione esta linha
+    networks:
+      - laravel-network
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: test-maker-mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - laravel-network
+
+volumes:
+  postgres_data:
+
+networks:
+  laravel-network:
+    driver: bridge

@@ -19,7 +19,7 @@ const logout = () => {
                 <div class="flex justify-between items-center h-16">
                     <!-- Logo ou Nome do Sistema -->
                     <div class="flex items-center">
-                        <h1 class="text-xl font-bold text-gray-800">TestMaker</h1>
+                        <h1 class="text-xl font-bold text-gray-800"><a href="/dashboard">TestMaker</a></h1>
                     </div>
 
                     <!-- User Info e Logout -->

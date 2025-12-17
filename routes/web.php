@@ -53,6 +53,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('documents', DocumentController::class);
     Route::resource('subjects', SubjectController::class);
     Route::resource('topics', TopicController::class);
+    Route::post('/questions/{question}/copy', [QuestionController::class, 'copy'])
+    ->name('questions.copy');
     
     // Rotas customizadas
     Route::post('/documents/{document}/process', [DocumentController::class, 'process'])->name('documents.process');

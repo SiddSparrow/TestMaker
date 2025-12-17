@@ -101,11 +101,13 @@
                     <!-- Botões -->
                     <div class="flex items-end space-x-2">
                         <button @click="applyFilters"
-                                class="btn-elegant btn-elegant-primary flex-1">
+                                class="btn-elegant btn-elegant-primary flex-1"
+                                style="margin-top: 2rem;margin-bottom: auto;">
                             Aplicar Filtros
                         </button>
                         <button @click="resetFilters"
-                                class="btn-elegant btn-elegant-secondary">
+                                class="btn-elegant btn-elegant-secondary"
+                                style="margin-top: 2.3rem;margin-bottom: auto;">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
@@ -329,7 +331,7 @@
                                         </a>
                                         <button @click="confirmDelete(question)"
                                                 class="btn-elegant btn-elegant-outline p-1.5 text-xs text-red-600 border-red-300 hover:bg-red-50"
-                                                title="Excluir questão">
+                                                title="Inativar questão">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                             </svg>
@@ -403,9 +405,13 @@
             </div>
         </div>
 
+        
+
+    </AppLayout>
+    <Teleport to="body">
         <!-- Modal de Confirmação Elegante -->
         <div v-if="showDeleteModal" 
-            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 fade-in">
+            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4 fade-in">
             <div class="card-elegant max-w-md w-full mx-4">
                 <div class="flex items-center mb-4">
                     <div class="h-10 w-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center mr-3">
@@ -414,17 +420,17 @@
                         </svg>
                     </div>
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900">Confirmar exclusão</h3>
-                        <p class="text-sm text-gray-500">Atenção: esta ação não pode ser desfeita</p>
+                        <h3 class="text-lg font-semibold text-gray-900">Confirmar inativação</h3>
+                        <!-- <p class="text-sm text-gray-500">Atenção: esta ação não pode ser desfeita</p> -->
                     </div>
                 </div>
                 
                 <p class="text-gray-600 mb-6 p-4 bg-red-50 rounded-lg border border-red-100">
-                    Tem certeza que deseja excluir permanentemente a questão 
+                    Tem certeza que deseja inativar a questão 
                     <span class="font-semibold">"{{ questionToDelete?.statement?.substring(0, 50) }}..."</span>?
                 </p>
                 
-                <div class="card-footer-elegant">
+                <div class="card-footer-elegant" style="justify-content: center;">
                     <button @click="showDeleteModal = false"
                             class="btn-elegant btn-elegant-secondary">
                         Cancelar
@@ -434,13 +440,12 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                         </svg>
-                        Sim, excluir questão
+                        Sim, inativar questão
                     </button>
                 </div>
             </div>
         </div>
-
-    </AppLayout>
+    </Teleport>
     
 </template>
 
@@ -502,6 +507,7 @@ const resetFilters = () => {
 };
 
 const confirmDelete = (question) => {
+    console.log(question);
     questionToDelete.value = question;
     showDeleteModal.value = true;
 };

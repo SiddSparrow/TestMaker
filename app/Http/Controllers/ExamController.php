@@ -13,6 +13,23 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class ExamController extends Controller
 {
+    public function index(){
+        
+        $exams = Exam::with([
+            'questions' => function($query) {
+                $query->with('alternatives')
+                    ->orderBy('order', 'asc');
+            }
+        ])
+        ->withCount('questions') // Isso adiciona uma propriedade 'questions_count'
+        ->where('user_id', auth()->id())
+        ->get();
+
+        return Inertia::render('Exams/Index', [
+            'exams' => $exams,
+            'questionTypes' => QuestionType::all(),
+        ]);
+    }
     //
     public function create(){
         return Inertia::render('Exams/Create', [
@@ -52,7 +69,7 @@ class ExamController extends Controller
             'question_distribution' => $validated['topic_distribution'],
             'total_points' => 0, // Será calculado
         ]);
-        dd($exam);
+        //dd($exam);
         // Adiciona questões
         foreach ($validated['questions'] as $questionData) {
             $exam->questions()->attach($questionData['question_id'], [
@@ -68,7 +85,7 @@ class ExamController extends Controller
             })
         ]);
 
-        return redirect()->route('exams.show', $exam);
+        return redirect()->route('exams.index', $exam)->with('success', 'Exame criado com sucesso!');
     }
 
     public function show(Exam $exam){

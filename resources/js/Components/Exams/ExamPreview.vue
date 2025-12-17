@@ -1,0 +1,378 @@
+<template>
+    <!-- Modal Overlay -->
+    <Teleport to="body">
+        <Transition name="modal">
+            <div v-if="show" 
+                 class="fixed inset-0 z-50 overflow-y-auto"
+                 @click.self="closePreview">
+                <div class="flex min-h-screen items-center justify-center p-4">
+                    <!-- Background Overlay -->
+                    <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
+                    
+                    <!-- Modal Content -->
+                    <div class="relative bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col">
+                        <!-- Header -->
+                        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900">Preview da Prova</h3>
+                                    <p class="text-xs text-gray-600">Visualização antes de exportar</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center gap-2">
+                                <!-- Zoom Controls -->
+                                <div class="flex items-center gap-1 mr-2">
+                                    <button @click="zoomOut"
+                                            class="p-2 text-gray-600 hover:bg-gray-100 rounded transition-colors"
+                                            :disabled="zoom <= 50">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"/>
+                                        </svg>
+                                    </button>
+                                    <span class="text-sm text-gray-600 w-16 text-center">{{ zoom }}%</span>
+                                    <button @click="zoomIn"
+                                            class="p-2 text-gray-600 hover:bg-gray-100 rounded transition-colors"
+                                            :disabled="zoom >= 150">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                <!-- Toggle Gabarito -->
+                                <button @click="showAnswers = !showAnswers"
+                                        class="px-3 py-2 text-sm rounded-md transition-colors"
+                                        :class="showAnswers 
+                                            ? 'bg-green-100 text-green-700 hover:bg-green-200' 
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'">
+                                    {{ showAnswers ? '✓ Com Gabarito' : 'Sem Gabarito' }}
+                                </button>
+
+                                <!-- Close Button -->
+                                <button @click="closePreview"
+                                        class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Preview Content (Scrollable) -->
+                        <div class="flex-1 overflow-y-auto p-6 bg-gray-100">
+                            <div ref="previewContent"
+                                 class="mx-auto bg-white shadow-lg transition-transform duration-200"
+                                 :style="{ 
+                                     width: `${210 * (zoom / 100)}mm`,
+                                     transform: `scale(${zoom / 100})`,
+                                     transformOrigin: 'top center'
+                                 }">
+                                
+                                <!-- A4 Page Content -->
+                                <div class="p-16 min-h-[297mm]">
+                                    <!-- Header -->
+                                    <div class="text-center mb-8 pb-6 border-b-2 border-gray-300">
+                                        <h1 v-if="exam.header_config?.school_name" 
+                                            class="text-2xl font-bold text-gray-900 mb-2">
+                                            {{ exam.header_config.school_name }}
+                                        </h1>
+                                        
+                                        <h2 class="text-xl font-semibold text-gray-800 mb-1">
+                                            {{ exam.title }}
+                                        </h2>
+                                        
+                                        <p v-if="exam.description" 
+                                           class="text-sm text-gray-600 mt-2">
+                                            {{ exam.description }}
+                                        </p>
+                                        
+                                        <div v-if="exam.header_config?.show_date && exam.exam_date" 
+                                             class="text-sm text-gray-600 mt-2">
+                                            Data: {{ formatDate(exam.exam_date) }}
+                                        </div>
+
+                                        <!-- Student Info Fields -->
+                                        <div v-if="exam.header_config?.show_student_info" 
+                                             class="mt-4 text-left space-y-2 text-sm text-gray-700">
+                                            <div class="flex gap-4">
+                                                <div class="flex-1">
+                                                    <span class="font-medium">Nome:</span>
+                                                    <span class="ml-2 border-b border-gray-400 inline-block w-96">
+                                                        &nbsp;
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="flex gap-4">
+                                                <div>
+                                                    <span class="font-medium">Turma:</span>
+                                                    <span class="ml-2 border-b border-gray-400 inline-block w-32">
+                                                        &nbsp;
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <span class="font-medium">Data:</span>
+                                                    <span class="ml-2 border-b border-gray-400 inline-block w-32">
+                                                        &nbsp;
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <span class="font-medium">Nota:</span>
+                                                    <span class="ml-2 border-b border-gray-400 inline-block w-20">
+                                                        &nbsp;
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Total Points -->
+                                        <div class="mt-4 text-sm font-medium text-gray-700">
+                                            Valor Total: {{ totalPoints }} pontos
+                                        </div>
+                                    </div>
+
+                                    <!-- Questions -->
+                                    <div class="space-y-6">
+                                        <div v-for="(question, index) in questions" 
+                                             :key="question.id"
+                                             class="question-block">
+                                            
+                                            <!-- Question Header -->
+                                            <div class="flex items-start gap-3 mb-3">
+                                                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-sm">
+                                                    {{ index + 1 }}
+                                                </div>
+                                                
+                                                <div class="flex-1">
+                                                    <div class="flex items-center justify-between mb-2">
+                                                        <span class="text-xs text-gray-500 uppercase tracking-wide">
+                                                            {{ getQuestionTypeName(question.question_type_id) }}
+                                                        </span>
+                                                        <span class="text-xs font-semibold text-gray-700">
+                                                            ({{ getQuestionPoints(question) }} {{ getQuestionPoints(question) === 1 ? 'ponto' : 'pontos' }})
+                                                        </span>
+                                                    </div>
+                                                    
+                                                    <!-- Statement -->
+                                                    <div class="text-base text-gray-900 leading-relaxed whitespace-pre-wrap">
+                                                        {{ question.statement }}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Alternatives (if applicable) -->
+                                            <div v-if="question.alternatives && question.alternatives.length > 0" 
+                                                 class="ml-11 mt-3 space-y-2">
+                                                <div v-for="(alt, altIndex) in question.alternatives"
+                                                     :key="alt.id"
+                                                     class="flex items-start gap-3 py-1">
+                                                    <div class="flex-shrink-0 w-6 h-6 rounded border-2 border-gray-400 flex items-center justify-center text-xs font-semibold"
+                                                         :class="showAnswers && alt.is_correct ? 'bg-green-100 border-green-500 text-green-700' : ''">
+                                                        {{ String.fromCharCode(65 + altIndex) }}
+                                                    </div>
+                                                    <div class="flex-1 text-sm text-gray-800 leading-relaxed">
+                                                        {{ alt.content }}
+                                                        <span v-if="showAnswers && alt.is_correct" 
+                                                              class="ml-2 text-green-600 font-semibold">
+                                                            ✓ Correta
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Answer Space for Dissertative -->
+                                            <div v-else class="ml-11 mt-3 space-y-2">
+                                                <div class="border-b border-gray-300 py-2" 
+                                                     v-for="line in 4" 
+                                                     :key="line">
+                                                    &nbsp;
+                                                </div>
+                                            </div>
+
+                                            <!-- Explanation (if showing answers) -->
+                                            <div v-if="showAnswers && question.explanation" 
+                                                 class="ml-11 mt-3 p-3 bg-blue-50 border-l-4 border-blue-500 rounded">
+                                                <p class="text-xs font-semibold text-blue-900 mb-1">Explicação:</p>
+                                                <p class="text-sm text-blue-800">{{ question.explanation }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Footer -->
+                                    <div class="mt-12 pt-6 border-t-2 border-gray-300 text-center">
+                                        <p v-if="exam.footer_config?.custom_text" 
+                                           class="text-sm text-gray-600 mb-2">
+                                            {{ exam.footer_config.custom_text }}
+                                        </p>
+                                        
+                                        <p v-if="exam.footer_config?.show_page_number" 
+                                           class="text-xs text-gray-500">
+                                            Página 1
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer Actions -->
+                        <div class="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gray-50">
+                            <div class="text-sm text-gray-600">
+                                <span class="font-medium">{{ questions.length }}</span> questões • 
+                                <span class="font-medium">{{ totalPoints }}</span> pontos
+                            </div>
+                            
+                            <div class="flex items-center gap-3">
+                                <button @click="$emit('edit')"
+                                        class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                                    ✏️ Editar
+                                </button>
+                                
+                                <button @click="$emit('export-pdf', showAnswers)"
+                                        class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Exportar PDF
+                                </button>
+                                
+                                <button @click="$emit('export-docx', showAnswers)"
+                                        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Exportar DOCX
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Transition>
+    </Teleport>
+</template>
+
+<script setup>
+import { ref, computed } from 'vue';
+
+const props = defineProps({
+    show: {
+        type: Boolean,
+        default: false
+    },
+    exam: {
+        type: Object,
+        required: true
+    },
+    questions: {
+        type: Array,
+        required: true
+    },
+    questionTypes: {
+        type: Array,
+        default: () => []
+    }
+});
+
+const emit = defineEmits(['close', 'edit', 'export-pdf', 'export-docx']);
+
+// Estados
+const showAnswers = ref(false);
+const zoom = ref(100);
+
+// Computed
+const totalPoints = computed(() => {
+    return props.questions.reduce((sum, q) => {
+        return sum + getQuestionPoints(q);
+    }, 0);
+});
+
+// Methods
+const closePreview = () => {
+    emit('close');
+};
+
+const zoomIn = () => {
+    if (zoom.value < 150) {
+        zoom.value += 10;
+    }
+};
+
+const zoomOut = () => {
+    if (zoom.value > 50) {
+        zoom.value -= 10;
+    }
+};
+
+const getQuestionPoints = (question) => {
+    return question.points_override || question.points || 1;
+};
+
+const getQuestionTypeName = (typeId) => {
+    const type = props.questionTypes.find(t => t.id === typeId);
+    return type?.name || 'Questão';
+};
+
+const formatDate = (date) => {
+    if (!date) return '';
+    return new Date(date).toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+};
+</script>
+
+<style scoped>
+/* Modal Transitions */
+.modal-enter-active,
+.modal-leave-active {
+    transition: opacity 0.3s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+    opacity: 0;
+}
+
+.modal-enter-active .relative,
+.modal-leave-active .relative {
+    transition: transform 0.3s ease;
+}
+
+.modal-enter-from .relative {
+    transform: scale(0.95);
+}
+
+.modal-leave-to .relative {
+    transform: scale(0.95);
+}
+
+/* Print Styles */
+@media print {
+    .modal-overlay,
+    .modal-header,
+    .modal-footer {
+        display: none !important;
+    }
+    
+    .preview-content {
+        transform: none !important;
+        width: 100% !important;
+    }
+}
+
+/* Question spacing */
+.question-block {
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+/* Smooth zoom */
+.transition-transform {
+    transition: transform 0.2s ease;
+}
+</style>

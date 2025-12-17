@@ -44,14 +44,14 @@
                 <!-- Lista de Questões Disponíveis -->
                 <div class="p-4 max-h-[600px] overflow-y-auto">
                     <draggable
-                        :list="filteredQuestions"
+                        :model-value="filteredQuestions"
                         :group="{ name: 'questions', pull: 'clone', put: false }"
                         :clone="cloneQuestion"
                         :sort="false"
                         item-key="id"
                         class="space-y-3">
                         <template #item="{ element: question }">
-                            <div class="p-3 border border-gray-200 rounded-lg hover:border-blue-400 hover:shadow-md transition-all cursor-move bg-white"
+                            <div class="relative p-3 border border-gray-200 rounded-lg hover:border-blue-400 hover:shadow-md transition-all cursor-move bg-white"
                                  :class="{ 'opacity-50': isQuestionInExam(question.id) }">
                                 <div class="flex items-start gap-3">
                                     <!-- Ícone de Drag -->
@@ -94,7 +94,7 @@
                                 
                                 <!-- Overlay se já está na prova -->
                                 <div v-if="isQuestionInExam(question.id)" 
-                                     class="absolute inset-0 bg-gray-100 bg-opacity-50 rounded-lg flex items-center justify-center">
+                                     class="absolute inset-0 bg-gray-100 bg-opacity-70 rounded-lg flex items-center justify-center pointer-events-none">
                                     <span class="text-xs font-medium text-gray-600 bg-white px-2 py-1 rounded shadow-sm">
                                         ✓ Já adicionada
                                     </span>
@@ -258,7 +258,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, nextTick } from 'vue';
 import draggable from 'vuedraggable';
 
 const props = defineProps({
@@ -296,13 +296,24 @@ const searchQuery = ref('');
 const filterSubject = ref('');
 const filterDifficulty = ref('');
 
-// Sincroniza com v-model
+// Flag para prevenir loops infinitos
+const isInternalUpdate = ref(false);
+
+// Sincroniza com v-model apenas quando vem de fora
 watch(() => props.modelValue, (newVal) => {
-    localExamQuestions.value = [...newVal];
+    if (!isInternalUpdate.value) {
+        localExamQuestions.value = JSON.parse(JSON.stringify(newVal));
+    }
 }, { deep: true });
 
+// Emite mudanças para o pai
 watch(localExamQuestions, (newVal) => {
-    emit('update:modelValue', newVal);
+    isInternalUpdate.value = true;
+    emit('update:modelValue', [...newVal]);
+    // Reset flag após o próximo tick
+    nextTick(() => {
+        isInternalUpdate.value = false;
+    });
 }, { deep: true });
 
 // Computed: Questões filtradas
@@ -379,7 +390,7 @@ const handleReorder = () => {
     localExamQuestions.value.forEach((q, index) => {
         q.exam_order = index + 1;
     });
-    emit('reorder', localExamQuestions.value);
+    // Não precisa emitir aqui pois o watch já faz isso
 };
 
 // Atualiza ordem manualmente

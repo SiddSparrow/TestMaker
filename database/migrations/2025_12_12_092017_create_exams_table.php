@@ -21,6 +21,8 @@ return new class extends Migration
             $table->json('footer_config')->nullable();
             $table->date('exam_date')->nullable();
             $table->integer('total_points')->default(0);
+            $table->json('question_distribution')->nullable();
+            $table->integer('target_total_points')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

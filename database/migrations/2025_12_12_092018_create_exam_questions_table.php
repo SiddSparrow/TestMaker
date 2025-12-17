@@ -14,6 +14,7 @@ return new class extends Migration
             $table->foreignId('question_id')->constrained()->onDelete('cascade');
             $table->integer('order')->default(0);
             $table->integer('points_override')->nullable();
+            $table->json('custom_config')->nullable();
             $table->timestamps();
             
             $table->unique(['exam_id', 'question_id']);

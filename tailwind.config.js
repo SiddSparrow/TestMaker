@@ -9,6 +9,9 @@ export default {
         './resources/views/**/*.blade.php',
         './resources/js/**/*.vue',
     ],
+    safelist: [
+    'grid-cols-4', // Adicione esta linha para forçar a inclusão
+    ],
     theme: {
         extend: {
             fontFamily: {

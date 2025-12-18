@@ -6,16 +6,23 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Builder;
 
 class Topic extends Model
 {
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'subject_id',
         'name',
         'description',
     ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function subject(): BelongsTo
     {
@@ -25,5 +32,14 @@ class Topic extends Model
     public function questions(): HasMany
     {
         return $this->hasMany(Question::class);
+    }
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope('user', function (Builder $builder) {
+            if (auth()->check()) {
+                $builder->where('user_id', auth()->id());
+            }
+        });
     }
 }

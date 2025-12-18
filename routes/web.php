@@ -12,6 +12,7 @@ use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TopicController;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\TagController;
 /*Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -48,6 +49,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     // Resources
+    Route::resource('subjects', SubjectController::class)->only(['store', 'update', 'destroy']);
+    Route::resource('topics', TopicController::class)->only(['store', 'update', 'destroy']);
+    Route::resource('tags', TagController::class)->only(['store', 'update', 'destroy']);
     Route::resource('questions', QuestionController::class);
     Route::resource('exams', ExamController::class);
     Route::resource('documents', DocumentController::class);

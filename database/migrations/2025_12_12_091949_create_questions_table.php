@@ -21,7 +21,7 @@ return new class extends Migration
             $table->text('statement');
             $table->text('explanation')->nullable();
             $table->enum('difficulty_level', ['easy', 'medium', 'hard'])->default('medium');
-            $table->integer('points')->default(1);
+            $table->decimal('points', 3, 1)->default(1.0);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
             $table->softDeletes();

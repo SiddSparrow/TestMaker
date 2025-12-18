@@ -327,7 +327,8 @@ const downloadType = ref('');
 // Computed
 const totalPoints = computed(() => {
     return props.questions.reduce((sum, q) => {
-        return sum + getQuestionPoints(q);
+        const points = getQuestionPoints(q);
+        return sum + Number(points);
     }, 0);
 });
 
@@ -374,8 +375,14 @@ const handleExportDOCX = () => {
     }, 3000);
 };
 
-const getQuestionPoints = (question) => {
+/* const getQuestionPoints = (question) => {
     return question.points_override || question.points || 1;
+}; */
+
+const getQuestionPoints = (question) => {
+    // Usa parseFloat para garantir que é número
+    const points = question.points_override || question.points || 1;
+    return parseFloat(points) || 0; // Retorna 0 se não for número válido
 };
 
 const getQuestionTypeName = (typeId) => {

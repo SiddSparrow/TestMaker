@@ -15,6 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('name')->unique();
             $table->string('slug')->unique();
+            $table->foreignId('user_id') // Adiciona a coluna user_id
+                ->constrained() // Cria a foreign key para users.id
+                ->onDelete('cascade'); // Define comportamento ao deletar usuário
             $table->timestamps();
         });
     }

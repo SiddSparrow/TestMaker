@@ -37,7 +37,8 @@ import {
     BookOpenIcon,
     ArrowUpTrayIcon,
     ArrowTrendingUpIcon,
-    ArrowTrendingDownIcon
+    ArrowTrendingDownIcon,
+    TagIcon
 } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
@@ -57,7 +58,8 @@ const iconComponent = computed(() => {
         QuestionMarkCircleIcon,
         DocumentTextIcon,
         BookOpenIcon,
-        ArrowUpTrayIcon
+        ArrowUpTrayIcon,
+        TagIcon
     };
     return icons[props.icon] || QuestionMarkCircleIcon;
 });

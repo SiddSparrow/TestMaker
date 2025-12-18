@@ -20,9 +20,9 @@ return new class extends Migration
             $table->json('header_config')->nullable();
             $table->json('footer_config')->nullable();
             $table->date('exam_date')->nullable();
-            $table->integer('total_points')->default(0);
+            $table->decimal('total_points', 10, 2)->default(0.0);
             $table->json('question_distribution')->nullable();
-            $table->integer('target_total_points')->nullable();
+            $table->decimal('target_total_points', 10, 2)->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

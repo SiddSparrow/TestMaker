@@ -231,23 +231,62 @@
                                     ✏️ Editar
                                 </button>
                                 
-                                <button @click="$emit('export-pdf', showAnswers)"
-                                        class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <button @click="handleExportPDF"
+                                        :disabled="isDownloading"
+                                        class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <svg v-if="!isDownloading" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
                                     </svg>
-                                    Exportar PDF
+                                    <svg v-else class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    {{ isDownloading && downloadType === 'pdf' ? 'Gerando PDF...' : 'Exportar PDF' }}
                                 </button>
                                 
-                                <button @click="$emit('export-docx', showAnswers)"
-                                        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <button @click="handleExportDOCX"
+                                        :disabled="isDownloading"
+                                        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <svg v-if="!isDownloading" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
                                     </svg>
-                                    Exportar DOCX
+                                    <svg v-else class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    {{ isDownloading && downloadType === 'docx' ? 'Gerando DOCX...' : 'Exportar DOCX' }}
                                 </button>
                             </div>
                         </div>
+
+                        <!-- Loading Overlay dentro do Modal -->
+                        <Transition name="fade">
+                            <div v-if="isDownloading" 
+                                 class="absolute inset-0 bg-white bg-opacity-95 flex items-center justify-center z-10 rounded-lg">
+                                <div class="text-center">
+                                    <div class="mb-4 flex justify-center">
+                                        <svg class="animate-spin h-16 w-16 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="text-xl font-bold text-gray-900 mb-2">
+                                        {{ downloadType === 'pdf' ? 'Gerando PDF...' : 'Gerando DOCX...' }}
+                                    </h3>
+                                    <p class="text-sm text-gray-600 mb-4">
+                                        {{ showAnswers ? 'Com gabarito' : 'Sem gabarito' }}
+                                    </p>
+                                    <div class="flex justify-center space-x-1">
+                                        <div class="w-3 h-3 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                                        <div class="w-3 h-3 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                                        <div class="w-3 h-3 bg-blue-600 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-4">
+                                        O download começará em instantes...
+                                    </p>
+                                </div>
+                            </div>
+                        </Transition>
                     </div>
                 </div>
             </div>
@@ -282,6 +321,8 @@ const emit = defineEmits(['close', 'edit', 'export-pdf', 'export-docx']);
 // Estados
 const showAnswers = ref(false);
 const zoom = ref(100);
+const isDownloading = ref(false);
+const downloadType = ref('');
 
 // Computed
 const totalPoints = computed(() => {
@@ -305,6 +346,32 @@ const zoomOut = () => {
     if (zoom.value > 50) {
         zoom.value -= 10;
     }
+};
+
+const handleExportPDF = () => {
+    isDownloading.value = true;
+    downloadType.value = 'pdf';
+    
+    emit('export-pdf', showAnswers.value);
+    
+    // Remove loading após 3 segundos
+    setTimeout(() => {
+        isDownloading.value = false;
+        downloadType.value = '';
+    }, 3000);
+};
+
+const handleExportDOCX = () => {
+    isDownloading.value = true;
+    downloadType.value = 'docx';
+    
+    emit('export-docx', showAnswers.value);
+    
+    // Remove loading após 3 segundos
+    setTimeout(() => {
+        isDownloading.value = false;
+        downloadType.value = '';
+    }, 3000);
 };
 
 const getQuestionPoints = (question) => {
@@ -349,6 +416,17 @@ const formatDate = (date) => {
 
 .modal-leave-to .relative {
     transform: scale(0.95);
+}
+
+/* Fade transition for loading overlay */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
 }
 
 /* Print Styles */

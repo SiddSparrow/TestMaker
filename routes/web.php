@@ -60,6 +60,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/documents/{document}/process', [DocumentController::class, 'process'])->name('documents.process');
     Route::get('/exams/{exam}/preview', [ExamController::class, 'preview'])->name('exams.preview');
     Route::get('/exams/{exam}/export', [ExamController::class, 'export'])->name('exams.export');
+
+    // Rotas de Exportação
+    Route::get('exams/{exam}/export-pdf', [ExamController::class, 'exportPdf'])->name('exams.export.pdf');
+    Route::get('exams/{exam}/export-docx', [ExamController::class, 'exportDocx'])->name('exams.export.docx');
 });
 
 require __DIR__.'/auth.php';

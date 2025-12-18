@@ -178,15 +178,27 @@ const saveExam = () => {
     });
 };
 
-const exportPDF = (withAnswers) => {
-    console.log('Exportar PDF', withAnswers ? 'com gabarito' : 'sem gabarito');
-    // TODO: Implementar quando a prova estiver salva
-    alert('Salve a prova primeiro para exportar');
+const exportPDF = (withAnswers = false) => {
+    if (!selectedExam.value) return;
+    
+    const url = route('exams.export.pdf', {
+        exam: selectedExam.value.id,
+        with_answers: withAnswers ? 1 : 0
+    });
+    
+    // Usa window.location para forçar download
+    window.location.href = url;
 };
 
-const exportDOCX = (withAnswers) => {
-    console.log('Exportar DOCX', withAnswers ? 'com gabarito' : 'sem gabarito');
-    // TODO: Implementar quando a prova estiver salva
-    alert('Salve a prova primeiro para exportar');
+const exportDOCX = (withAnswers = false) => {
+    if (!selectedExam.value) return;
+    console.log('Exportando DOCX, com respostas:', withAnswers);
+    const url = route('exams.export.docx', {
+        exam: selectedExam.value.id,
+        with_answers: withAnswers ? 1 : 0
+    });
+    
+    // Usa window.location para forçar download
+    window.location.href = url;
 };
 </script>

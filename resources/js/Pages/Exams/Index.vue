@@ -47,8 +47,7 @@
                         </div>
                         
                         <div class="relative w-full sm:w-80">
-                            <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            style="margin-top: 0.5rem;margin-left: 0.5rem !important;">
+                            <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
                             <input 
@@ -386,18 +385,24 @@ const deleteExam = (exam) => {
 const exportPDF = (withAnswers = false) => {
     if (!selectedExam.value) return;
     
-    router.visit(route('exams.export.pdf', {
+    const url = route('exams.export.pdf', {
         exam: selectedExam.value.id,
-        withAnswers: withAnswers
-    }));
+        with_answers: withAnswers ? 1 : 0
+    });
+    
+    // Usa window.location para forçar download
+    window.location.href = url;
 };
 
 const exportDOCX = (withAnswers = false) => {
     if (!selectedExam.value) return;
-    
-    router.visit(route('exams.export.docx', {
+    console.log('Exportando DOCX, com respostas:', withAnswers);
+    const url = route('exams.export.docx', {
         exam: selectedExam.value.id,
-        withAnswers: withAnswers
-    }));
+        with_answers: withAnswers ? 1 : 0
+    });
+    
+    // Usa window.location para forçar download
+    window.location.href = url;
 };
 </script>

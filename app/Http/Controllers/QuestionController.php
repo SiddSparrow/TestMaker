@@ -7,12 +7,14 @@ use App\Models\Subject;
 use App\Models\Topic;
 use App\Models\QuestionType;
 use App\Models\Tag;
+use App\Models\User;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class QuestionController extends Controller
 {
@@ -39,6 +41,7 @@ class QuestionController extends Controller
      */
     public function index(Request $request)
     {
+        $userId = Auth::id();
         // Filtros da requisição
         $filters = $request->only([
             'search',
@@ -82,13 +85,13 @@ class QuestionController extends Controller
         $subjects = Cache::remember(
             $this->cacheKeys['subjects'], 
             $this->cacheDuration, 
-            fn() => Subject::select('id', 'name', 'color')->get()
+            fn() => Subject::select('id', 'name', 'color')->where('user_id','=',$userId)->get()
         );
 
         $topics = Cache::remember(
             $this->cacheKeys['topics'], 
             $this->cacheDuration, 
-            fn() => Topic::select('id', 'name', 'subject_id')->get()
+            fn() => Topic::select('id', 'name', 'subject_id')->where('user_id','=',$userId)->get()
         );
 
         $questionTypes = Cache::remember(
@@ -100,7 +103,7 @@ class QuestionController extends Controller
         $tags = Cache::remember(
             $this->cacheKeys['tags'], 
             $this->cacheDuration, 
-            fn() => Tag::select('id', 'name')->get()
+            fn() => Tag::select('id', 'name')->where('user_id','=',$userId)->get()
         );
 
         // Estatísticas (com cache)

@@ -250,7 +250,8 @@
                                 </td>
                                 
                                 <!-- Matéria -->
-                                <td class="py-4">
+
+                                <td v-if="question.subject != null" class="py-4">
                                     <div class="flex items-center">
                                         <div class="h-8 w-8 rounded-full mr-3 flex items-center justify-center text-white font-medium text-xs shadow-sm"
                                             :style="{ backgroundColor: question.subject.color }">
@@ -258,6 +259,20 @@
                                         </div>
                                         <div>
                                             <span class="text-sm font-medium text-gray-900">{{ question.subject.name }}</span>
+                                            <div v-if="question.topic" class="text-xs text-gray-500">
+                                                {{ question.topic.name }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td v-else class="py-4">
+                                    <div class="flex items-center">
+                                        <div class="h-8 w-8 rounded-full mr-3 flex items-center justify-center text-white font-medium text-xs shadow-sm"
+                                            :style="{ backgroundColor: 'red' }">
+                                        </div>
+                                        <div>
+                                            <span class="text-sm font-medium text-gray-900">Sem matéria</span>
                                             <div v-if="question.topic" class="text-xs text-gray-500">
                                                 {{ question.topic.name }}
                                             </div>

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
+
 class Question extends Model
 {
     use HasFactory, SoftDeletes;
@@ -52,9 +53,9 @@ class Question extends Model
     public function clearCache(): void
     {
         $tags = ['questions', "question_{$this->id}"];
-        
+
         Cache::tags($tags)->flush();
-        
+
         // Limpa estatísticas
         Cache::forget('questions_stats');
         Cache::forget('questions_count_total');

@@ -19,7 +19,7 @@ trait HasCache
     {
         $modelName = class_basename($this);
         $modelId = $this->id ?? 'all';
-        
+
         return Str::slug("{$modelName}_{$modelId}_{$suffix}");
     }
 
@@ -30,7 +30,7 @@ trait HasCache
     {
         $modelName = class_basename($this);
         $filtersHash = md5(serialize($filters));
-        
+
         return "query_{$modelName}_{$filtersHash}";
     }
 
@@ -41,27 +41,27 @@ trait HasCache
     {
         $modelName = class_basename($this);
         $prefix = Str::slug($modelName);
-        
+
         Cache::tags([$prefix])->flush();
     }
 
     /**
      * Get cached data or store if not exists
      */
-    protected function remember(string $key, callable $callback, int $duration = null)
+    protected function remember(string $key, callable $callback, ?int $duration = null)
     {
         $duration = $duration ?? $this->cacheDuration;
-        
+
         return Cache::remember($key, $duration, $callback);
     }
 
     /**
      * Get cached data with tags or store if not exists
      */
-    protected function rememberWithTags(array $tags, string $key, callable $callback, int $duration = null)
+    protected function rememberWithTags(array $tags, string $key, callable $callback, ?int $duration = null)
     {
         $duration = $duration ?? $this->cacheDuration;
-        
+
         return Cache::tags($tags)->remember($key, $duration, $callback);
     }
 }

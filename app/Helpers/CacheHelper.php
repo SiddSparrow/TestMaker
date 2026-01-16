@@ -14,7 +14,7 @@ class CacheHelper
     public static function arrayToPaginator(array $data, int $perPage, int $currentPage, int $total, array $options = []): LengthAwarePaginator
     {
         $items = Collection::make($data['data'] ?? $data);
-        
+
         return new LengthAwarePaginator(
             $items,
             $total,
@@ -31,7 +31,7 @@ class CacheHelper
     {
         $filtersJson = json_encode($filters);
         $filtersHash = md5($filtersJson);
-        
+
         return "paginated_{$model}_{$filtersHash}_page_{$page}";
     }
 
@@ -47,7 +47,7 @@ class CacheHelper
         if (!empty($tags)) {
             return Cache::tags($tags)->remember($cacheKey, $duration, $callback);
         }
-        
+
         return Cache::remember($cacheKey, $duration, $callback);
     }
 }

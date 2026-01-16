@@ -107,7 +107,7 @@ class Exam extends Model
      * RELACIONAMENTOS
      * ========================================
      */
-    
+
     /**
      * Relacionamento com User (quem criou a prova)
      */
@@ -142,7 +142,6 @@ class Exam extends Model
      * SCOPES
      * ========================================
      */
-    
     public function scopeByUser($query, $userId)
     {
         return $query->where('user_id', $userId);
@@ -158,7 +157,6 @@ class Exam extends Model
      * ACCESSORS
      * ========================================
      */
-    
     public function getQuestionCountAttribute()
     {
         return $this->questions()->count();
@@ -174,7 +172,7 @@ class Exam extends Model
      * MÉTODOS AUXILIARES
      * ========================================
      */
-    
+
     /**
      * Recalcula o total de pontos baseado nas questões
      */
@@ -202,7 +200,6 @@ class Exam extends Model
      * MUTATORS (para PostgreSQL)
      * ========================================
      */
-    
     public function setHeaderConfigAttribute($value)
     {
         $this->attributes['header_config'] = is_array($value) ? json_encode($value) : $value;

@@ -21,29 +21,29 @@ class SubjectSeeder extends Seeder
                 'name' => 'Língua Inglesa',
                 'description' => 'Estudo da língua inglesa, gramática, vocabulário e literatura inglesa',
                 'color' => '#3B82F6', // Azul
-                'user_id' => $englishTeacher->id 
+                'user_id' => $englishTeacher->id,
             ],
             [
                 'name' => 'Literatura Inglesa',
                 'description' => 'Estudo das obras literárias em língua inglesa',
                 'color' => '#1D4ED8', // Azul mais escuro
-                'user_id' => $englishTeacher->id
+                'user_id' => $englishTeacher->id,
             ],
-            
+
             // Matérias do professor de Biologia
             [
                 'name' => 'Biologia',
                 'description' => 'Ciência que estuda a vida e os seres vivos',
                 'color' => '#10B981', // Verde
-                'user_id' => $biologyTeacher->id
+                'user_id' => $biologyTeacher->id,
             ],
             [
                 'name' => 'Ciências da Natureza',
                 'description' => 'Estudo integrado de biologia, física e química',
                 'color' => '#059669', // Verde mais escuro
-                'user_id' => $biologyTeacher->id
+                'user_id' => $biologyTeacher->id,
             ],
-            
+
             // Matéria compartilhada (opcional)
             /* [
                 'name' => 'Redação',

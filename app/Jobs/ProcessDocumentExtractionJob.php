@@ -18,6 +18,7 @@ class ProcessDocumentExtractionJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $timeout = 300; // 5 minutos
+
     public $tries = 2; // Tentar 2 vezes em caso de falha
 
     /**
@@ -33,8 +34,7 @@ class ProcessDocumentExtractionJob implements ShouldQueue
     public function handle(
         DocumentParserService $parser,
         ClaudeExtractorService $extractor
-    ): void
-    {
+    ): void {
         Log::info('Iniciando processamento de documento', [
             'document_id' => $this->document->id,
             'filename' => $this->document->original_name,
@@ -99,7 +99,6 @@ class ProcessDocumentExtractionJob implements ShouldQueue
                 'document_id' => $this->document->id,
                 'questions_found' => count($extractedData['questions'] ?? []),
             ]);
-
         } catch (Exception $e) {
             Log::error('Erro ao processar documento', [
                 'document_id' => $this->document->id,

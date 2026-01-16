@@ -35,7 +35,7 @@ class DocumentParserService
     {
         try {
             // Usando smalot/pdfparser
-            $parser = new \Smalot\PdfParser\Parser();
+            $parser = new \Smalot\PdfParser\Parser;
             $pdf = $parser->parseFile($filePath);
             $text = $pdf->getText();
 
@@ -44,7 +44,6 @@ class DocumentParserService
             }
 
             return $this->cleanText($text);
-
         } catch (Exception $e) {
             Log::error('Erro ao extrair texto de PDF', [
                 'file' => $filePath,
@@ -79,7 +78,6 @@ class DocumentParserService
             }
 
             return $this->cleanText($text);
-
         } catch (Exception $e) {
             Log::error('Erro ao extrair texto de DOCX', [
                 'file' => $filePath,

@@ -155,7 +155,7 @@ class DocumentController extends Controller
                 }
 
                 if (!$questionType) {
-                    $errors[] = "Questão " . ($index + 1) . ": tipo de questão inválido";
+                    $errors[] = 'Questão ' . ($index + 1) . ': tipo de questão inválido';
                     continue;
                 }
 
@@ -200,7 +200,6 @@ class DocumentController extends Controller
 
             return redirect()->route('questions.index')
                 ->with('success', $message);
-
         } catch (\Exception $e) {
             DB::rollBack();
 

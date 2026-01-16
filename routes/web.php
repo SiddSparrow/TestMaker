@@ -1,18 +1,19 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use Illuminate\Foundation\Application;
-use Inertia\Inertia;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\QuestionController;
-use App\Http\Controllers\ExamController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\ExamController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\TagController;
 use App\Http\Controllers\TopicController;
 use Illuminate\Auth\Events\Logout;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\TagController;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+
 /*Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -40,11 +41,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/logout', function () {
         Auth::logout();
         event(new Logout('web', Auth::user()));
+
         return redirect('/login');
     })->name('logout');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    //rotas de perfil
+    // rotas de perfil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -58,8 +60,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('subjects', SubjectController::class);
     Route::resource('topics', TopicController::class);
     Route::post('/questions/{question}/copy', [QuestionController::class, 'copy'])
-    ->name('questions.copy');
-    
+        ->name('questions.copy');
+
     // Rotas customizadas
     Route::post('/documents/{document}/import-questions', [DocumentController::class, 'importQuestions'])->name('documents.import-questions');
     Route::post('/documents/{document}/reprocess', [DocumentController::class, 'reprocess'])->name('documents.reprocess');
@@ -71,6 +73,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('exams/{exam}/export-docx', [ExamController::class, 'exportDocx'])->name('exams.export.docx');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

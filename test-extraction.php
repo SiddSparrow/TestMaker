@@ -5,14 +5,12 @@
  * Execute: php test-extraction.php
  */
 
-require __DIR__.'/vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
-$app = require_once __DIR__.'/bootstrap/app.php';
+$app = require_once __DIR__ . '/bootstrap/app.php';
 $app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
 
 use App\Services\ClaudeExtractorService;
-use App\Services\DocumentParserService;
-use Illuminate\Support\Facades\Log;
 
 echo "===========================================\n";
 echo "  TESTE DE EXTRAÇÃO DE QUESTÕES\n";
@@ -47,9 +45,9 @@ echo "1. Testando ClaudeExtractorService...\n";
 echo "--------------------------------------\n\n";
 
 try {
-    $extractor = new ClaudeExtractorService();
+    $extractor = new ClaudeExtractorService;
     echo "✓ ClaudeExtractorService instanciado\n";
-    echo "✓ CLAUDE_KEY configurada: " . (config('services.claude.key') ? 'SIM' : 'NÃO') . "\n\n";
+    echo '✓ CLAUDE_KEY configurada: ' . (config('services.claude.key') ? 'SIM' : 'NÃO') . "\n\n";
 
     echo "2. Enviando para Claude API...\n";
     echo "--------------------------------------\n";
@@ -62,16 +60,16 @@ try {
 
     echo "3. Resultado da Extração:\n";
     echo "--------------------------------------\n";
-    echo "Total de questões: " . count($resultado['questions'] ?? []) . "\n\n";
+    echo 'Total de questões: ' . count($resultado['questions'] ?? []) . "\n\n";
 
     if (isset($resultado['questions'])) {
         foreach ($resultado['questions'] as $index => $questao) {
-            echo "Questão " . ($index + 1) . ":\n";
-            echo "  Enunciado: " . substr($questao['statement'], 0, 80) . "...\n";
-            echo "  Tipo: " . ($questao['type'] ?? 'N/A') . "\n";
-            echo "  Dificuldade: " . ($questao['difficulty_hint'] ?? 'N/A') . "\n";
-            echo "  Confiança: " . (isset($questao['confidence']) ? round($questao['confidence'] * 100) . '%' : 'N/A') . "\n";
-            echo "  Alternativas: " . count($questao['alternatives'] ?? []) . "\n";
+            echo 'Questão ' . ($index + 1) . ":\n";
+            echo '  Enunciado: ' . substr($questao['statement'], 0, 80) . "...\n";
+            echo '  Tipo: ' . ($questao['type'] ?? 'N/A') . "\n";
+            echo '  Dificuldade: ' . ($questao['difficulty_hint'] ?? 'N/A') . "\n";
+            echo '  Confiança: ' . (isset($questao['confidence']) ? round($questao['confidence'] * 100) . '%' : 'N/A') . "\n";
+            echo '  Alternativas: ' . count($questao['alternatives'] ?? []) . "\n";
 
             if (!empty($questao['alternatives'])) {
                 foreach ($questao['alternatives'] as $alt) {
@@ -103,16 +101,15 @@ try {
     echo "===========================================\n";
     echo "✓ TESTE CONCLUÍDO COM SUCESSO!\n";
     echo "===========================================\n";
-
 } catch (Exception $e) {
     echo "\n✗ ERRO: " . $e->getMessage() . "\n\n";
     echo "Stacktrace:\n";
     echo $e->getTraceAsString() . "\n\n";
 
     echo "Verificações:\n";
-    echo "1. CLAUDE_KEY está no .env? " . (env('CLAUDE_KEY') ? 'SIM' : 'NÃO') . "\n";
-    echo "2. Composer instalou smalot/pdfparser? " . (class_exists('Smalot\PdfParser\Parser') ? 'SIM' : 'NÃO') . "\n";
-    echo "3. Composer instalou phpoffice/phpword? " . (class_exists('PhpOffice\PhpWord\IOFactory') ? 'SIM' : 'NÃO') . "\n";
+    echo '1. CLAUDE_KEY está no .env? ' . (env('CLAUDE_KEY') ? 'SIM' : 'NÃO') . "\n";
+    echo '2. Composer instalou smalot/pdfparser? ' . (class_exists('Smalot\PdfParser\Parser') ? 'SIM' : 'NÃO') . "\n";
+    echo '3. Composer instalou phpoffice/phpword? ' . (class_exists('PhpOffice\PhpWord\IOFactory') ? 'SIM' : 'NÃO') . "\n";
 
     exit(1);
 }

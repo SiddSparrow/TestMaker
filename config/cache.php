@@ -112,7 +112,7 @@ return [
     |
     */
 
-    'prefix' => env('CACHE_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')).'_cache_'),
+    'prefix' => env('CACHE_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')) . '_cache_'),
 
     /*
     |--------------------------------------------------------------------------
@@ -124,7 +124,7 @@ return [
     |
     */
     'connections' => [
-        
+
         'cache' => [
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
@@ -133,9 +133,9 @@ return [
             'timeout' => 0.1,
             'read_timeout' => 60,
             'persistent' => false,
-            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_cache_'),
+            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_') . '_cache_'),
         ],
-        
+
         'default' => [
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
@@ -144,9 +144,9 @@ return [
             'timeout' => 0.1,
             'read_timeout' => 60,
             'persistent' => false,
-            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'),
+            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_') . '_database_'),
         ],
-        
+
     ],
 
 ];

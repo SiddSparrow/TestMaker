@@ -2,22 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Inertia\Inertia;
-use App\Models\Question;
-use App\Models\Subject;
-use App\Models\QuestionType;
 use App\Models\Exam;
+use App\Models\Question;
+use App\Models\QuestionType;
+use App\Models\Subject;
 use App\Models\Topic;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class ExamController extends Controller
 {
-
     use AuthorizesRequests;
 
     public function index()
@@ -27,7 +26,7 @@ class ExamController extends Controller
             'user',
             'questions' => function ($query) {
                 $query->orderBy('exam_questions.order');
-            }
+            },
         ])
             ->withCount('questions')
             ->byUser(auth()->id())
@@ -209,7 +208,6 @@ class ExamController extends Controller
         }
     } */
 
-
     /* public function edit(Exam $exam)
     {
         $this->authorize('update', $exam);
@@ -231,11 +229,10 @@ class ExamController extends Controller
         ]);
     } */
 
-
     /*    public function update(Request $request, Exam $exam)
 {
     $this->authorize('update', $exam);
-    
+
     // Debug 1: Verificar todos os dados recebidos
     \Log::info('Exam Update - Request Data:', [
         'exam_id' => $exam->id,
@@ -245,18 +242,18 @@ class ExamController extends Controller
 
      // Decodificar JSONs se forem strings
     $data = $request->all();
-    
+
     if (isset($data['header_config']) && is_string($data['header_config'])) {
         $data['header_config'] = json_decode($data['header_config'], true);
     }
-    
+
     if (isset($data['footer_config']) && is_string($data['footer_config'])) {
         $data['footer_config'] = json_decode($data['footer_config'], true);
     }
-    
+
     // Substituir a request com dados decodificados
     $request->replace($data);
-    
+
     $validated = $request->validate([
         'title' => 'required|string|max:255',
         'description' => 'nullable|string',
@@ -276,9 +273,9 @@ class ExamController extends Controller
         'validated' => $validated,
         'questions_count' => count($validated['questions'] ?? [])
     ]);
-    
+
     DB::beginTransaction();
-    
+
     try {
         // Debug 3: Antes de atualizar
         \Log::info('Exam Update - Before Update:', [
@@ -286,7 +283,7 @@ class ExamController extends Controller
             'old_title' => $exam->title,
             'old_total_points' => $exam->total_points
         ]);
-        
+
         // Atualiza dados da prova
         $updateData = [
             'title' => $validated['title'],
@@ -296,11 +293,11 @@ class ExamController extends Controller
             'header_config' => $validated['header_config'] ?? [],
             'footer_config' => $validated['footer_config'] ?? [],
         ];
-        
+
         \Log::info('Exam Update - Update Data:', $updateData);
-        
+
         $exam->update($updateData);
-        
+
         // Debug 4: Verificar questões atuais antes de sincronizar
         $currentQuestions = $exam->questions()->pluck('questions.id')->toArray();
         \Log::info('Exam Update - Current Questions:', [
@@ -308,17 +305,17 @@ class ExamController extends Controller
             'current_question_ids' => $currentQuestions,
             'current_count' => count($currentQuestions)
         ]);
-        
+
         // Sincroniza questões (remove antigas e adiciona novas)
         $exam->questions()->detach();
-        
+
         // Debug 5: Depois de detach
         $afterDetachQuestions = $exam->questions()->pluck('questions.id')->toArray();
         \Log::info('Exam Update - After Detach:', [
             'exam_id' => $exam->id,
             'question_ids_after_detach' => $afterDetachQuestions
         ]);
-        
+
         // Debug 6: Verificar cada questão a ser adicionada
         $questionsToAttach = [];
         foreach ($validated['questions'] as $index => $questionData) {
@@ -328,23 +325,23 @@ class ExamController extends Controller
                 'points_override' => $questionData['points_override'] ?? 'null',
                 'question_exists' => \App\Models\Question::where('id', $questionData['question_id'])->exists()
             ]);
-            
+
             $questionsToAttach[$questionData['question_id']] = [
                 'order' => $questionData['order'],
                 'points_override' => $questionData['points_override'] ?? null,
             ];
         }
-        
+
         // Debug 7: Antes de attach
         \Log::info('Exam Update - Before Attach:', [
             'exam_id' => $exam->id,
             'questions_to_attach' => $questionsToAttach,
             'count_to_attach' => count($questionsToAttach)
         ]);
-        
+
         // Usar sync em vez de attach individual
         $exam->questions()->sync($questionsToAttach);
-        
+
         // Debug 8: Depois de attach
         $afterAttachQuestions = $exam->questions()->withPivot('order', 'points_override')->get();
         \Log::info('Exam Update - After Attach:', [
@@ -358,7 +355,7 @@ class ExamController extends Controller
                 ];
             })->toArray()
         ]);
-        
+
         // Recalcula total de pontos
         $exam->load('questions');
         $totalPoints = $exam->questions->sum(function($q) {
@@ -371,14 +368,14 @@ class ExamController extends Controller
             ]);
             return $points;
         });
-        
+
         \Log::info('Exam Update - Total Points Calculation:', [
             'exam_id' => $exam->id,
             'total_points' => $totalPoints
         ]);
-        
+
         $exam->update(['total_points' => $totalPoints]);
-        
+
         // Debug 9: Verificar exame após atualização
         $exam->refresh();
         \Log::info('Exam Update - After Complete Update:', [
@@ -387,19 +384,19 @@ class ExamController extends Controller
             'new_total_points' => $exam->total_points,
             'questions_count' => $exam->questions()->count()
         ]);
-        
+
         DB::commit();
-        
+
         \Log::info('Exam Update - Success:', [
             'exam_id' => $exam->id,
             'status' => 'updated_successfully'
         ]);
-        
+
         return redirect()->back()->with('success', 'Prova atualizada com sucesso!');
-        
+
     } catch (\Exception $e) {
         DB::rollBack();
-        
+
         // Debug 10: Erro detalhado
         \Log::error('Exam Update - Error:', [
             'exam_id' => $exam->id,
@@ -409,7 +406,7 @@ class ExamController extends Controller
             'error_line' => $e->getLine(),
             'request_data' => $request->all()
         ]);
-        
+
         return back()
             ->withInput()
             ->withErrors(['error' => 'Erro ao atualizar prova: ' . $e->getMessage()])
@@ -550,7 +547,7 @@ class ExamController extends Controller
                     'alternatives' => function ($q) {
                         $q->orderBy('order');
                     },
-                    'tags:id,name,slug'
+                    'tags:id,name,slug',
                 ])->orderBy('exam_questions.order');
             },
         ]);
@@ -575,7 +572,7 @@ class ExamController extends Controller
             'questions' => function ($query) {
                 $query->with(['subject', 'questionType', 'alternatives', 'topic'])
                     ->orderBy('exam_questions.order');
-            }
+            },
         ]);
 
         return Inertia::render('Exams/Edit', [
@@ -937,75 +934,76 @@ class ExamController extends Controller
     } */
 
     public function exportPdf(Exam $exam, Request $request)
-{
-    $this->authorize('view', $exam);
+    {
+        $this->authorize('view', $exam);
 
-    // DEBUG: Adicione isso temporariamente
-    Log::info('Exportando PDF:', [
-        'exam_id' => $exam->id,
-        'format_config' => $exam->format_config,
-        'format_config_type' => gettype($exam->format_config),
-        'header_config' => $exam->header_config,
-    ]);
+        // DEBUG: Adicione isso temporariamente
+        Log::info('Exportando PDF:', [
+            'exam_id' => $exam->id,
+            'format_config' => $exam->format_config,
+            'format_config_type' => gettype($exam->format_config),
+            'header_config' => $exam->header_config,
+        ]);
 
-    // Carregar relações
-    $exam->load([
-        'subject',
-        'questions' => function ($query) use ($exam) {
-            $query->orderBy('exam_questions.order');
-            
-            // Embaralhar se configurado
-            if (($exam->format_config['shuffle_questions'] ?? false) == true) {
-                $query->inRandomOrder();
-            }
-        },
-        'questions.alternatives' => function ($query) {
-            $query->orderBy('order');
+        // Carregar relações
+        $exam->load([
+            'subject',
+            'questions' => function ($query) use ($exam) {
+                $query->orderBy('exam_questions.order');
+
+                // Embaralhar se configurado
+                if (($exam->format_config['shuffle_questions'] ?? false) == true) {
+                    $query->inRandomOrder();
+                }
+            },
+            'questions.alternatives' => function ($query) {
+                $query->orderBy('order');
+            },
+        ]);
+
+        $withAnswers = $request->boolean('with_answers', false);
+
+        // Preparar questões (embaralhar alternativas se necessário)
+        $questions = $exam->questions;
+
+        if (($exam->format_config['shuffle_alternatives'] ?? false) == true) {
+            $questions = $questions->map(function ($question) {
+                $question->alternatives = $question->alternatives->shuffle();
+
+                return $question;
+            });
         }
-    ]);
 
-    $withAnswers = $request->boolean('with_answers', false);
+        // DEBUG: Verifique o que está sendo passado
+        Log::info('Dados para PDF:', [
+            'exam_title' => $exam->title,
+            'format_config_fonte' => $exam->format_config['font_family'] ?? 'não definido',
+            'format_config_tamanho' => $exam->format_config['font_size'] ?? 'não definido',
+            'colunas' => $exam->format_config['columns'] ?? 'não definido',
+        ]);
 
-    // Preparar questões (embaralhar alternativas se necessário)
-    $questions = $exam->questions;
-    
-    if (($exam->format_config['shuffle_alternatives'] ?? false) == true) {
-        $questions = $questions->map(function ($question) {
-            $question->alternatives = $question->alternatives->shuffle();
-            return $question;
-        });
+        // Gerar PDF
+        $pdf = Pdf::loadView('exams.pdf', [
+            'exam' => $exam,              // ← Passa o exam completo (com format_config, header_config, etc)
+            'questions' => $questions,
+            'showAnswers' => $withAnswers,
+        ])
+            ->setPaper(
+                $exam->format_config['paper_size'] ?? 'A4',
+                $exam->format_config['orientation'] ?? 'portrait'
+            );
+
+        // Margens
+        $marginValue = $this->getMarginValue($exam->format_config['margins'] ?? 'normal');
+        $pdf->setOption('margin-top', $marginValue)
+            ->setOption('margin-bottom', $marginValue)
+            ->setOption('margin-left', $marginValue)
+            ->setOption('margin-right', $marginValue);
+
+        $filename = Str::slug($exam->title) . ($withAnswers ? '-gabarito' : '') . '.pdf';
+
+        return $pdf->download($filename);
     }
-
-    // DEBUG: Verifique o que está sendo passado
-    Log::info('Dados para PDF:', [
-        'exam_title' => $exam->title,
-        'format_config_fonte' => $exam->format_config['font_family'] ?? 'não definido',
-        'format_config_tamanho' => $exam->format_config['font_size'] ?? 'não definido',
-        'colunas' => $exam->format_config['columns'] ?? 'não definido',
-    ]);
-
-    // Gerar PDF
-    $pdf = Pdf::loadView('exams.pdf', [
-        'exam' => $exam,              // ← Passa o exam completo (com format_config, header_config, etc)
-        'questions' => $questions,
-        'showAnswers' => $withAnswers,
-    ])
-    ->setPaper(
-        $exam->format_config['paper_size'] ?? 'A4', 
-        $exam->format_config['orientation'] ?? 'portrait'
-    );
-
-    // Margens
-    $marginValue = $this->getMarginValue($exam->format_config['margins'] ?? 'normal');
-    $pdf->setOption('margin-top', $marginValue)
-        ->setOption('margin-bottom', $marginValue)
-        ->setOption('margin-left', $marginValue)
-        ->setOption('margin-right', $marginValue);
-
-    $filename = Str::slug($exam->title) . ($withAnswers ? '-gabarito' : '') . '.pdf';
-
-    return $pdf->download($filename);
-}
 
     /**
      * Export exam to DOCX
@@ -1026,12 +1024,12 @@ class ExamController extends Controller
             },
             'questions.alternatives' => function ($query) {
                 $query->orderBy('order');
-            }
+            },
         ]);
 
         $withAnswers = $request->boolean('with_answers', false);
 
-        $phpWord = new \PhpOffice\PhpWord\PhpWord();
+        $phpWord = new \PhpOffice\PhpWord\PhpWord;
         $phpWord->getSettings()->setThemeFontLang(new \PhpOffice\PhpWord\Style\Language('pt-BR'));
 
         // Pegar configurações
@@ -1137,7 +1135,7 @@ class ExamController extends Controller
             'weight' => 1,
             'width' => 450,
             'height' => 0,
-            'color' => '000000'
+            'color' => '000000',
         ]);
 
         $section->addTextBreak(1);
@@ -1152,6 +1150,7 @@ class ExamController extends Controller
         if ($config['shuffle_alternatives'] ?? false) {
             $questions = $questions->map(function ($question) {
                 $question->alternatives = $question->alternatives->shuffle();
+
                 return $question;
             });
         }
@@ -1211,13 +1210,13 @@ class ExamController extends Controller
                             'bold' => true,
                             'color' => '008000',
                             'size' => $fontSize - 1,
-                            'name' => $fontFamily
+                            'name' => $fontFamily,
                         ]);
                     }
                 }
             }
             // Espaço para resposta (dissertativa)
-            else if ($config['show_answer_space'] ?? true) {
+            elseif ($config['show_answer_space'] ?? true) {
                 for ($i = 0; $i < 4; $i++) {
                     $section->addText(
                         '_____________________________________________',
@@ -1266,7 +1265,7 @@ class ExamController extends Controller
             $section->addTextBreak(1);
 
             // Tabela de gabarito
-            $multipleChoiceQuestions = $questions->filter(fn($q) => $q->alternatives->count() > 0);
+            $multipleChoiceQuestions = $questions->filter(fn ($q) => $q->alternatives->count() > 0);
 
             if ($multipleChoiceQuestions->count() > 0) {
                 $tableStyle = [
@@ -1304,7 +1303,7 @@ class ExamController extends Controller
             'weight' => 1,
             'width' => 450,
             'height' => 0,
-            'color' => '000000'
+            'color' => '000000',
         ]);
 
         if (!empty($footerConfig['custom_text'])) {

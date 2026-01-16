@@ -3,18 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Question;
-use App\Models\Subject;
-use App\Models\Topic;
 use App\Models\QuestionType;
+use App\Models\Subject;
 use App\Models\Tag;
-use App\Models\User;
-use Inertia\Inertia;
+use App\Models\Topic;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class QuestionController extends Controller
 {
@@ -51,7 +49,7 @@ class QuestionController extends Controller
             'difficulty_level',
             'question_type_id',
             'is_active',
-            'per_page'
+            'per_page',
         ]);
 
         // Cache key para a query com filtros + userId (importante!)
@@ -66,7 +64,7 @@ class QuestionController extends Controller
                 'topic:id,name',
                 'questionType:id,name',
                 'tags:id,name',
-                'alternatives:id,question_id,content,is_correct'
+                'alternatives:id,question_id,content,is_correct',
             ])
                 ->where('user_id', $userId)  // Filtrar por usuário
                 ->orderBy('is_active', 'desc')
@@ -88,7 +86,7 @@ class QuestionController extends Controller
         $subjects = Cache::remember(
             $this->cacheKeys['subjects'] . $userId,  // Cache por usuário
             $this->cacheDuration,
-            fn() => Subject::select('id', 'name', 'color')
+            fn () => Subject::select('id', 'name', 'color')
                 ->where('user_id', $userId)
                 ->get()
         );
@@ -96,7 +94,7 @@ class QuestionController extends Controller
         $topics = Cache::remember(
             $this->cacheKeys['topics'] . $userId,  // Cache por usuário
             $this->cacheDuration,
-            fn() => Topic::select('id', 'name', 'subject_id')
+            fn () => Topic::select('id', 'name', 'subject_id')
                 ->where('user_id', $userId)
                 ->get()
         );
@@ -104,13 +102,13 @@ class QuestionController extends Controller
         $questionTypes = Cache::remember(
             $this->cacheKeys['question_types'],
             $this->cacheDuration,
-            fn() => QuestionType::select('id', 'name')->get()
+            fn () => QuestionType::select('id', 'name')->get()
         );
 
         $tags = Cache::remember(
             $this->cacheKeys['tags'] . $userId,  // Cache por usuário
             $this->cacheDuration,
-            fn() => Tag::select('id', 'name')
+            fn () => Tag::select('id', 'name')
                 ->where('user_id', $userId)
                 ->get()
         );
@@ -122,7 +120,7 @@ class QuestionController extends Controller
         $difficultyLevels = [
             ['value' => 'easy', 'label' => 'Fácil'],
             ['value' => 'medium', 'label' => 'Média'],
-            ['value' => 'hard', 'label' => 'Difícil']
+            ['value' => 'hard', 'label' => 'Difícil'],
         ];
 
         return Inertia::render('Questions/Index', [
@@ -133,7 +131,7 @@ class QuestionController extends Controller
             'question_types' => $questionTypes,
             'tags' => $tags,
             'difficulty_levels' => $difficultyLevels,
-            'stats' => $stats
+            'stats' => $stats,
         ]);
     }
 
@@ -166,7 +164,7 @@ class QuestionController extends Controller
         }
 
         if (isset($filters['is_active']) && $filters['is_active'] !== '') {
-            $query->where('is_active', (bool)$filters['is_active']);
+            $query->where('is_active', (bool) $filters['is_active']);
         }
     }
 
@@ -206,9 +204,11 @@ class QuestionController extends Controller
                 ->with('success', 'Cópia criada com sucesso! Edite a nova questão.');
         } catch (\Exception $e) {
             DB::rollBack();
+
             return back()->with('error', 'Erro ao criar cópia: ' . $e->getMessage());
         }
     }
+
     /**
      * Get cached statistics
      */
@@ -223,7 +223,7 @@ class QuestionController extends Controller
                     'easy' => Question::where('difficulty_level', 'easy')->count(),
                     'medium' => Question::where('difficulty_level', 'medium')->count(),
                     'hard' => Question::where('difficulty_level', 'hard')->count(),
-                ]
+                ],
             ];
         });
     }
@@ -255,7 +255,7 @@ class QuestionController extends Controller
     {
         // Busca o tipo de questão para validação condicional
         $questionType = QuestionType::find($request->question_type_id);
-        //dd($request->all());
+        // dd($request->all());
         // Define se o tipo requer alternativas
         $requiresAlternatives = $questionType &&
             in_array($questionType->slug, ['multipla-escolha', 'verdadeiro-falso', 'multipla-resposta']);
@@ -312,7 +312,7 @@ class QuestionController extends Controller
                     if (!$hasCorrect) {
                         $fail('Pelo menos uma alternativa deve estar marcada como correta.');
                     }
-                }
+                },
             ];
         } else {
             // Para dissertativa, alternativas são opcionais/ignoradas
@@ -364,7 +364,7 @@ class QuestionController extends Controller
 
             Log::error('Erro ao criar questão', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return back()
@@ -372,7 +372,6 @@ class QuestionController extends Controller
                 ->with('error', 'Erro ao criar questão: ' . $e->getMessage());
         }
     }
-
 
     /**
      * Display the specified resource.
@@ -388,7 +387,7 @@ class QuestionController extends Controller
             'alternatives' => function ($query) {
                 $query->orderBy('order');
             },
-            'tags:id,name'
+            'tags:id,name',
         ]);
 
         return Inertia::render('Questions/Show', [
@@ -418,7 +417,7 @@ class QuestionController extends Controller
             'alternatives' => function ($query) {
                 $query->orderBy('order');
             },
-            'tags:id,name'
+            'tags:id,name',
         ]);
 
         return Inertia::render('Questions/Edit', array_merge($data, [
@@ -463,7 +462,7 @@ class QuestionController extends Controller
                     if (!$hasCorrect) {
                         $fail('Pelo menos uma alternativa deve estar marcada como correta.');
                     }
-                }
+                },
             ];
             $rules['alternatives.*.content'] = 'required|string';
             $rules['alternatives.*.is_correct'] = 'boolean';
@@ -527,7 +526,7 @@ class QuestionController extends Controller
             Log::error('Erro ao atualizar questão', [
                 'question_id' => $question->id,
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return back()
@@ -547,7 +546,7 @@ class QuestionController extends Controller
         }
 
         $questionId = $question->id;
-        //$question->delete();
+        // $question->delete();
         $question->is_active = false;
         $question->save();
 
@@ -561,7 +560,7 @@ class QuestionController extends Controller
     /**
      * Clear all cache related to questions
      */
-    protected function clearQuestionCache(int $questionId = null): void
+    protected function clearQuestionCache(?int $questionId = null): void
     {
         // Padrão de chaves para limpar
         $patterns = [
@@ -607,7 +606,7 @@ class QuestionController extends Controller
             // Usa SCAN para encontrar e deletar chaves
             $cursor = 0;
             do {
-                list($cursor, $keys) = $redis->scan($cursor, 'MATCH', $pattern);
+                [$cursor, $keys] = $redis->scan($cursor, 'MATCH', $pattern);
                 if (!empty($keys)) {
                     $redis->del($keys);
                 }
@@ -618,7 +617,7 @@ class QuestionController extends Controller
     /**
      * Alternative: Manual cache key management
      */
-    protected function getCacheKeysToClear(int $questionId = null): array
+    protected function getCacheKeysToClear(?int $questionId = null): array
     {
         $keys = [
             $this->cacheKeys['stats'],
@@ -640,12 +639,12 @@ class QuestionController extends Controller
         DB::beginTransaction();
 
         try {
-            //dd($original, $data);
+            // dd($original, $data);
             $newQuestion = $original->replicate();
-            //dd($newQuestion);
-            //$newQuestion->fill($data);
+            // dd($newQuestion);
+            // $newQuestion->fill($data);
             $newQuestion->user_id = auth()->id();
-            //$newQuestion->copied_from_id = $original->id; comentando porque nao tem o campo no banco
+            // $newQuestion->copied_from_id = $original->id; comentando porque nao tem o campo no banco
             $newQuestion->save();
 
             // Copia alternativas se existirem no request
@@ -675,6 +674,7 @@ class QuestionController extends Controller
                 ->with('success', 'Cópia criada com sucesso! Agora basta editar a nova questão.');
         } catch (\Exception $e) {
             DB::rollBack();
+
             return back()->with('error', 'Erro ao criar cópia: ' . $e->getMessage());
         }
     }
@@ -682,6 +682,6 @@ class QuestionController extends Controller
     private function addCopyIdentifier(string $statement): string
     {
         // Adiciona um indicador que é cópia (opcional)
-        return "(Cópia) " . $statement;
+        return '(Cópia) ' . $statement;
     }
 }

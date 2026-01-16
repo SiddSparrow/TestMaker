@@ -8,12 +8,13 @@ use Illuminate\Support\Facades\Cache;
 class ClearQuestionsCache extends Command
 {
     protected $signature = 'cache:questions {--all : Clear all question related cache}';
+
     protected $description = 'Clear questions cache';
 
     public function handle()
     {
         $tags = ['questions', 'filters'];
-        
+
         if ($this->option('all')) {
             Cache::tags($tags)->flush();
             $this->info('All questions cache cleared!');
@@ -26,7 +27,7 @@ class ClearQuestionsCache extends Command
             Cache::forget('questions_by_difficulty');
             $this->info('Questions statistics cache cleared!');
         }
-        
+
         return 0;
     }
 }

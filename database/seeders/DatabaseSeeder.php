@@ -5,8 +5,8 @@ namespace Database\Seeders;
 use App\Models\Exam;
 use App\Models\Question;
 use App\Models\QuestionAlternative;
-use App\Models\Subject;
 use App\Models\QuestionType;
+use App\Models\Subject;
 use App\Models\Tag;
 use App\Models\Topic;
 use App\Models\User;
@@ -113,7 +113,7 @@ class DatabaseSeeder extends Seeder
             'toefl',
             'ielts',
             'british-english',
-            'american-english'
+            'american-english',
         ];
 
         // Tags para Biologia
@@ -136,7 +136,7 @@ class DatabaseSeeder extends Seeder
             'neuroscience',
             'genomics',
             'bioinformatics',
-            'conservation'
+            'conservation',
         ];
 
         foreach ($englishTags as $tagName) {
@@ -175,7 +175,7 @@ class DatabaseSeeder extends Seeder
                     ['content' => 'goes', 'is_correct' => true],
                     ['content' => 'gone', 'is_correct' => false],
                     ['content' => 'went', 'is_correct' => false],
-                ]
+                ],
             ],
             [
                 'statement' => 'Which sentence is in the Present Continuous tense?',
@@ -190,7 +190,7 @@ class DatabaseSeeder extends Seeder
                     ['content' => 'I worked yesterday.', 'is_correct' => false],
                     ['content' => 'I have worked here for 5 years.', 'is_correct' => false],
                     ['content' => 'I will work tomorrow.', 'is_correct' => false],
-                ]
+                ],
             ],
             [
                 'statement' => 'What is the past simple form of the verb "to eat"?',
@@ -205,7 +205,7 @@ class DatabaseSeeder extends Seeder
                     ['content' => 'ate', 'is_correct' => true],
                     ['content' => 'eating', 'is_correct' => false],
                     ['content' => 'eats', 'is_correct' => false],
-                ]
+                ],
             ],
             [
                 'statement' => 'Complete with the correct phrasal verb: "Could you _____ the music? It\'s too loud."',
@@ -220,7 +220,7 @@ class DatabaseSeeder extends Seeder
                     ['content' => 'turn on', 'is_correct' => false],
                     ['content' => 'turn off', 'is_correct' => false],
                     ['content' => 'turn over', 'is_correct' => false],
-                ]
+                ],
             ],
             [
                 'statement' => 'Which sentence uses the First Conditional correctly?',
@@ -235,7 +235,7 @@ class DatabaseSeeder extends Seeder
                     ['content' => 'If it rains, we will cancel the picnic.', 'is_correct' => true],
                     ['content' => 'If it had rained, we would have canceled the picnic.', 'is_correct' => false],
                     ['content' => 'If it will rain, we cancel the picnic.', 'is_correct' => false],
-                ]
+                ],
             ],
         ];
 
@@ -285,7 +285,7 @@ class DatabaseSeeder extends Seeder
                     ['content' => 'Retículo endoplasmático', 'is_correct' => false],
                     ['content' => 'Complexo de Golgi', 'is_correct' => false],
                     ['content' => 'Núcleo', 'is_correct' => false],
-                ]
+                ],
             ],
             [
                 'statement' => 'Segunda Lei de Mendel (Lei da Segregação Independente) estabelece que:',
@@ -300,7 +300,7 @@ class DatabaseSeeder extends Seeder
                     ['content' => 'Os caracteres são determinados por pares de fatores', 'is_correct' => false],
                     ['content' => 'Um caráter é determinado por dois fatores', 'is_correct' => false],
                     ['content' => 'Os fatores podem ser dominantes ou recessivos', 'is_correct' => false],
-                ]
+                ],
             ],
             [
                 'statement' => 'Qual dessas relações ecológicas é um exemplo de mutualismo?',
@@ -315,7 +315,7 @@ class DatabaseSeeder extends Seeder
                     ['content' => 'Tênia no intestino humano', 'is_correct' => false],
                     ['content' => 'Orquídea epífita em árvore', 'is_correct' => false],
                     ['content' => 'Leão caçando zebra', 'is_correct' => false],
-                ]
+                ],
             ],
             [
                 'statement' => 'Em qual parte do sistema digestório ocorre a maior absorção de nutrientes?',
@@ -330,7 +330,7 @@ class DatabaseSeeder extends Seeder
                     ['content' => 'Intestino grosso', 'is_correct' => false],
                     ['content' => 'Esôfago', 'is_correct' => false],
                     ['content' => 'Boca', 'is_correct' => false],
-                ]
+                ],
             ],
             [
                 'statement' => 'Qual gás é liberado durante o processo de fotossíntese?',
@@ -345,7 +345,7 @@ class DatabaseSeeder extends Seeder
                     ['content' => 'Nitrogênio', 'is_correct' => false],
                     ['content' => 'Metano', 'is_correct' => false],
                     ['content' => 'Hidrogênio', 'is_correct' => false],
-                ]
+                ],
             ],
         ];
 

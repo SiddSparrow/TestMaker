@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 class ClaudeExtractorService
 {
     private Client $client;
+
     private string $model = 'claude-sonnet-4-5-20250929'; // Claude 3.5 Sonnet
 
     public function __construct()
@@ -91,7 +92,7 @@ class ClaudeExtractorService
             $startQuestion = ($i * $chunkSize) + 1;
             $endQuestion = min(($i + 1) * $chunkSize, $totalQuestions);
 
-            Log::info("Processando chunk " . ($i + 1) . "/{$chunks}", [
+            Log::info('Processando chunk ' . ($i + 1) . "/{$chunks}", [
                 'questions_range' => "{$startQuestion}-{$endQuestion}",
             ]);
 
@@ -109,9 +110,8 @@ class ClaudeExtractorService
                 if (!empty($chunkData['metadata']['warnings'])) {
                     $allWarnings = array_merge($allWarnings, $chunkData['metadata']['warnings']);
                 }
-
             } catch (Exception $e) {
-                Log::warning("Erro ao processar chunk " . ($i + 1), [
+                Log::warning('Erro ao processar chunk ' . ($i + 1), [
                     'error' => $e->getMessage(),
                 ]);
                 $allWarnings[] = "Chunk {$startQuestion}-{$endQuestion}: " . $e->getMessage();
@@ -205,7 +205,6 @@ class ClaudeExtractorService
             ]);
 
             return $extractedData;
-
         } catch (Exception $e) {
             Log::error('Erro ao extrair questões com Claude', [
                 'error' => $e->getMessage(),
@@ -294,6 +293,7 @@ PROMPT;
 
         if (!isset($data['questions']) || !is_array($data['questions'])) {
             $errors[] = 'Estrutura inválida: campo "questions" não encontrado';
+
             return $errors;
         }
 

@@ -2,30 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use Inertia\Inertia;
-use Inertia\Response;
-use App\Models\Question;
-use App\Models\Exam;
-use App\Models\Subject;
 use App\Models\Document;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use App\Models\Exam;
+use App\Models\Question;
+use App\Models\Subject;
 use App\Models\Tag;
 use App\Models\Topic;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class DashboardController extends Controller
 {
     public function index(): Response
     {
         $userId = Auth::id();
-        
+
         $stats = [
             'total_questions' => Question::where('user_id', $userId)->count(),
             'total_exams' => Exam::where('user_id', $userId)->count(),
             'total_subjects' => Subject::where('user_id', $userId)->count(),
             'total_documents' => Document::where('user_id', $userId)
-                                         ->where('status', 'completed')
-                                         ->count(),
+                ->where('status', 'completed')
+                ->count(),
             'total_topics' => Topic::where('user_id', $userId)->count(),
             'total_tags' => Tag::where('user_id', $userId)->count(),
         ];
@@ -70,8 +70,12 @@ class DashboardController extends Controller
         // CORREÇÃO: Especificar qual tabela tem o user_id
         $mostUsedSubjects = Question::where('questions.user_id', $userId) // Especificar tabela
             ->join('subjects', 'questions.subject_id', '=', 'subjects.id')
-            ->select('subjects.id', 'subjects.name', 'subjects.color', 
-                     DB::raw('COUNT(questions.id) as question_count'))
+            ->select(
+                'subjects.id',
+                'subjects.name',
+                'subjects.color',
+                DB::raw('COUNT(questions.id) as question_count')
+            )
             ->groupBy('subjects.id', 'subjects.name', 'subjects.color')
             ->orderByDesc('question_count')
             ->limit(5)

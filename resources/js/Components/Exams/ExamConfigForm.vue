@@ -239,91 +239,332 @@
 
             <!-- STEP 4: Layout e Personalização -->
             <div v-show="currentStep === 3" class="space-y-6">
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Layout da Prova</h2>
-                    <p class="text-sm text-gray-600">Personalize o cabeçalho e rodapé da prova</p>
+    <div>
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">Layout da Prova</h2>
+        <p class="text-sm text-gray-600">Personalize a aparência e formatação da prova</p>
+    </div>
+
+    <!-- Cabeçalho -->
+    <div class="space-y-4 p-5 bg-white border border-gray-200 rounded-lg">
+        <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+            </svg>
+            Cabeçalho
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Nome da Escola/Instituição
+                </label>
+                <input type="text"
+                       v-model="localConfig.header_config.school_name"
+                       placeholder="Ex: Colégio ABC"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+            </div>
+
+            <div class="space-y-2">
+                <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                    <input type="checkbox" 
+                           v-model="localConfig.header_config.show_date"
+                           class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    <span class="text-sm font-medium text-gray-700">Mostrar data da prova</span>
+                </label>
+
+                <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                    <input type="checkbox" 
+                           v-model="localConfig.header_config.show_student_info"
+                           class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    <span class="text-sm font-medium text-gray-700">Campos para nome/turma do aluno</span>
+                </label>
+
+                <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                    <input type="checkbox" 
+                           v-model="localConfig.header_config.show_logo"
+                           class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    <span class="text-sm font-medium text-gray-700">Espaço para logo da escola</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formatação de Texto -->
+    <div class="space-y-4 p-5 bg-white border border-gray-200 rounded-lg">
+        <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+            </svg>
+            Formatação de Texto
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Tamanho da Fonte
+                </label>
+                <select v-model="localConfig.format_config.font_size"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                    <option value="10pt">10pt (Pequeno)</option>
+                    <option value="11pt">11pt (Normal)</option>
+                    <option value="12pt">12pt (Médio)</option>
+                    <option value="14pt">14pt (Grande)</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Família da Fonte
+                </label>
+                <select v-model="localConfig.format_config.font_family"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                    <option value="Arial">Arial</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Calibri">Calibri</option>
+                    <option value="Georgia">Georgia</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Espaçamento entre Linhas
+                </label>
+                <select v-model="localConfig.format_config.line_spacing"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                    <option value="1.0">Simples (1.0)</option>
+                    <option value="1.15">1.15</option>
+                    <option value="1.5">1.5</option>
+                    <option value="2.0">Duplo (2.0)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="pt-2 border-t border-gray-200">
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                <input type="checkbox" 
+                       v-model="localConfig.format_config.justify_text"
+                       class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                <span class="text-sm font-medium text-gray-700">Justificar texto das questões</span>
+            </label>
+        </div>
+    </div>
+
+    <!-- Layout da Página -->
+    <div class="space-y-4 p-5 bg-white border border-gray-200 rounded-lg">
+        <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z"/>
+            </svg>
+            Layout da Página
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Número de Colunas
+                </label>
+                <div class="grid grid-cols-2 gap-2">
+                    <button type="button"
+                            @click="localConfig.format_config.columns = 1"
+                            :class="localConfig.format_config.columns === 1 ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'"
+                            class="px-4 py-2 border border-gray-300 rounded-md hover:bg-blue-50 transition-colors">
+                        1 Coluna
+                    </button>
+                    <button type="button"
+                            @click="localConfig.format_config.columns = 2"
+                            :class="localConfig.format_config.columns === 2 ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'"
+                            class="px-4 py-2 border border-gray-300 rounded-md hover:bg-blue-50 transition-colors">
+                        2 Colunas
+                    </button>
                 </div>
+                <p class="mt-1 text-xs text-gray-500">
+                    Duas colunas economizam papel e são ideais para questões objetivas
+                </p>
+            </div>
 
-                <!-- Cabeçalho -->
-                <div class="space-y-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Cabeçalho</h3>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Nome da Escola/Instituição
-                            </label>
-                            <input type="text"
-                                   v-model="localConfig.header_config.school_name"
-                                   placeholder="Ex: Colégio ABC"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                        </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Tamanho das Margens
+                </label>
+                <select v-model="localConfig.format_config.margins"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                    <option value="narrow">Estreitas (1.27cm)</option>
+                    <option value="normal">Normais (2.5cm)</option>
+                    <option value="wide">Largas (3.17cm)</option>
+                </select>
+            </div>
 
-                        <div class="flex items-end gap-4">
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" 
-                                       v-model="localConfig.header_config.show_date"
-                                       class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                <span class="text-sm font-medium text-gray-700">Mostrar data</span>
-                            </label>
-
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" 
-                                       v-model="localConfig.header_config.show_student_info"
-                                       class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                <span class="text-sm font-medium text-gray-700">Campos para aluno</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Rodapé -->
-                <div class="space-y-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Rodapé</h3>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Texto Customizado
-                        </label>
-                        <input type="text"
-                               v-model="localConfig.footer_config.custom_text"
-                               placeholder="Ex: Boa prova!"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" 
-                               v-model="localConfig.footer_config.show_page_number"
-                               class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                        <span class="text-sm font-medium text-gray-700">Mostrar número de página</span>
-                    </label>
-                </div>
-
-                <!-- Preview -->
-                <div class="p-6 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
-                    <p class="text-sm font-medium text-gray-700 mb-3">Preview do Layout:</p>
-                    <div class="bg-white p-6 rounded shadow-sm border border-gray-200">
-                        <div class="text-center mb-4 pb-4 border-b border-gray-200">
-                            <h3 class="text-lg font-bold">{{ localConfig.header_config.school_name || 'Nome da Escola' }}</h3>
-                            <p class="text-sm text-gray-600">{{ localConfig.title || 'Título da Prova' }}</p>
-                            <p v-if="localConfig.header_config.show_date" class="text-xs text-gray-500 mt-1">
-                                Data: {{ formatDate(localConfig.exam_date) }}
-                            </p>
-                            <div v-if="localConfig.header_config.show_student_info" class="mt-3 text-left text-xs text-gray-600 space-y-1">
-                                <p>Nome: _______________________________________</p>
-                                <p>Turma: _____________ Data: ___/___/___</p>
-                            </div>
-                        </div>
-                        <div class="text-center text-gray-400 py-8 text-sm">
-                            [Questões da prova aparecerão aqui]
-                        </div>
-                        <div class="text-center pt-4 border-t border-gray-200 text-xs text-gray-500">
-                            <p>{{ localConfig.footer_config.custom_text || 'Boa prova!' }}</p>
-                            <p v-if="localConfig.footer_config.show_page_number">Página 1</p>
-                        </div>
-                    </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Orientação da Página
+                </label>
+                <div class="grid grid-cols-2 gap-2">
+                    <button type="button"
+                            @click="localConfig.format_config.orientation = 'portrait'"
+                            :class="localConfig.format_config.orientation === 'portrait' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'"
+                            class="px-4 py-2 border border-gray-300 rounded-md hover:bg-blue-50 transition-colors">
+                        Retrato
+                    </button>
+                    <button type="button"
+                            @click="localConfig.format_config.orientation = 'landscape'"
+                            :class="localConfig.format_config.orientation === 'landscape' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'"
+                            class="px-4 py-2 border border-gray-300 rounded-md hover:bg-blue-50 transition-colors">
+                        Paisagem
+                    </button>
                 </div>
             </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Tamanho do Papel
+                </label>
+                <select v-model="localConfig.format_config.paper_size"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                    <option value="A4">A4 (21 x 29.7 cm)</option>
+                    <option value="Letter">Carta (21.6 x 27.9 cm)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Opções de Questões -->
+    <div class="space-y-4 p-5 bg-white border border-gray-200 rounded-lg">
+        <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+            </svg>
+            Opções de Questões
+        </h3>
+        
+        <div class="space-y-2">
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                <input type="checkbox" 
+                       v-model="localConfig.format_config.show_question_points"
+                       class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                <span class="text-sm font-medium text-gray-700">Mostrar pontuação de cada questão</span>
+            </label>
+
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                <input type="checkbox" 
+                       v-model="localConfig.format_config.shuffle_questions"
+                       class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                <span class="text-sm font-medium text-gray-700">Embaralhar ordem das questões</span>
+            </label>
+
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                <input type="checkbox" 
+                       v-model="localConfig.format_config.shuffle_alternatives"
+                       class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                <span class="text-sm font-medium text-gray-700">Embaralhar alternativas (múltipla escolha)</span>
+            </label>
+
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                <input type="checkbox" 
+                       v-model="localConfig.format_config.show_answer_space"
+                       class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                <span class="text-sm font-medium text-gray-700">Adicionar espaço para resposta (questões dissertativas)</span>
+            </label>
+
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                <input type="checkbox" 
+                       v-model="localConfig.format_config.separate_answer_sheet"
+                       class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                <span class="text-sm font-medium text-gray-700">Gerar folha de respostas separada (gabarito)</span>
+            </label>
+        </div>
+    </div>
+
+    <!-- Rodapé -->
+    <div class="space-y-4 p-5 bg-white border border-gray-200 rounded-lg">
+        <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+            </svg>
+            Rodapé
+        </h3>
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+                Texto Personalizado
+            </label>
+            <input type="text"
+                   v-model="localConfig.footer_config.custom_text"
+                   placeholder="Ex: Boa prova!"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+        </div>
+
+        <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
+            <input type="checkbox" 
+                   v-model="localConfig.footer_config.show_page_number"
+                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+            <span class="text-sm font-medium text-gray-700">Mostrar numeração de páginas</span>
+        </label>
+    </div>
+
+    <!-- Preview -->
+    <div class="p-6 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
+        <p class="text-sm font-medium text-gray-700 mb-3">Preview do Layout:</p>
+        <div class="bg-white rounded shadow-sm border border-gray-200 overflow-hidden"
+             :style="{
+                 fontSize: localConfig.format_config.font_size,
+                 fontFamily: localConfig.format_config.font_family,
+                 lineHeight: localConfig.format_config.line_spacing
+             }">
+            <!-- Cabeçalho Preview -->
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-start gap-4">
+                    <div v-if="localConfig.header_config.show_logo" 
+                         class="w-16 h-16 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500 flex-shrink-0">
+                        LOGO
+                    </div>
+                    <div class="flex-1 text-center">
+                        <h3 class="text-lg font-bold">{{ localConfig.header_config.school_name || 'Nome da Escola' }}</h3>
+                        <p class="text-sm text-gray-600">{{ localConfig.title || 'Título da Prova' }}</p>
+                        <p v-if="localConfig.header_config.show_date" class="text-xs text-gray-500 mt-1">
+                            Data: {{ formatDate(localConfig.exam_date) }}
+                        </p>
+                    </div>
+                </div>
+                <div v-if="localConfig.header_config.show_student_info" class="mt-3 text-left text-xs text-gray-600 space-y-1">
+                    <p>Nome: _______________________________________</p>
+                    <p>Turma: _____________ Data: ___/___/___</p>
+                </div>
+            </div>
+
+            <!-- Conteúdo Preview -->
+            <div class="p-6"
+                 :class="{
+                     'columns-2 gap-6': localConfig.format_config.columns === 2,
+                     'text-justify': localConfig.format_config.justify_text
+                 }">
+                <div class="mb-4">
+                    <p class="font-semibold mb-2">
+                        1. Questão de exemplo aqui
+                        <span v-if="localConfig.format_config.show_question_points" class="text-blue-600">(2.5 pts)</span>
+                    </p>
+                    <p class="text-gray-600 text-sm">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt.
+                    </p>
+                </div>
+                <div>
+                    <p class="font-semibold mb-2">
+                        2. Outra questão de exemplo
+                        <span v-if="localConfig.format_config.show_question_points" class="text-blue-600">(1.5 pts)</span>
+                    </p>
+                    <p class="text-gray-600 text-sm">
+                        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Rodapé Preview -->
+            <div class="p-4 border-t border-gray-200 text-center text-xs text-gray-500">
+                <p>{{ localConfig.footer_config.custom_text || 'Boa prova!' }}</p>
+                <p v-if="localConfig.footer_config.show_page_number" class="mt-1">Página 1 de 3</p>
+            </div>
+        </div>
+    </div>
+</div>
         </div>
 
         <!-- Navigation Buttons -->
@@ -407,7 +648,28 @@ const localConfig = ref({
     header_config: {
         school_name: '',
         show_date: true,
-        show_student_info: true
+        show_student_info: true,
+        show_logo: false
+    },
+    format_config: {
+        // Texto
+        font_size: '12pt',
+        font_family: 'Arial',
+        line_spacing: '1.5',
+        justify_text: false,
+        
+        // Layout
+        columns: 1,
+        margins: 'normal',
+        orientation: 'portrait',
+        paper_size: 'A4',
+        
+        // Questões
+        show_question_points: true,
+        shuffle_questions: false,
+        shuffle_alternatives: false,
+        show_answer_space: true,
+        separate_answer_sheet: false
     },
     footer_config: {
         custom_text: 'Boa prova!',

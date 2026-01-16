@@ -61,7 +61,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     ->name('questions.copy');
     
     // Rotas customizadas
-    Route::post('/documents/{document}/process', [DocumentController::class, 'process'])->name('documents.process');
+    Route::post('/documents/{document}/import-questions', [DocumentController::class, 'importQuestions'])->name('documents.import-questions');
+    Route::post('/documents/{document}/reprocess', [DocumentController::class, 'reprocess'])->name('documents.reprocess');
     Route::get('/exams/{exam}/preview', [ExamController::class, 'preview'])->name('exams.preview');
     Route::get('/exams/{exam}/export', [ExamController::class, 'export'])->name('exams.export');
 

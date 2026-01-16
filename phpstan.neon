@@ -1,0 +1,26 @@
+includes:
+    - ./vendor/larastan/larastan/extension.neon
+
+parameters:
+    paths:
+        - app
+        - routes
+        - config
+
+    # Level 0 is the loosest and level 9 is the strictest
+    level: 5
+
+    ignoreErrors:
+        # Ignore errors on migrations (they're one-time files)
+        - '#PHPDoc tag @var#'
+
+    excludePaths:
+        - app/Console/Kernel.php
+        - bootstrap/*.php
+        - database/migrations/*
+        - storage/*
+        - vendor/*
+        - node_modules/*
+
+    checkMissingIterableValueType: false
+    checkGenericClassInNonGenericObjectType: false

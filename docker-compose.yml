@@ -11,15 +11,29 @@ services:
     volumes:
       - .:/var/www/html
     ports:
-      - "8000:8000"  
+      - "8000:8000"
     networks:
       - laravel-network
     depends_on:
       - postgres
       - redis
-    command: php artisan serve --host=0.0.0.0 --port=8000  
+    command: php artisan serve --host=0.0.0.0 --port=8000
 
-  
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: test-maker-queue
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    networks:
+      - laravel-network
+    depends_on:
+      - postgres
+      - redis
+    command: php artisan queue:work --tries=2 --timeout=300 --verbose
 
   postgres:
     image: postgres:15-alpine

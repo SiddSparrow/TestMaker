@@ -13,18 +13,44 @@ return new class extends Migration
     {
         Schema::create('exams', function (Blueprint $table) {
             $table->id();
+            
+            // Relacionamentos
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('main_subject_id')->nullable()->constrained('subjects')->onDelete('set null');
+            
+            // Informações básicas
             $table->string('title');
             $table->text('description')->nullable();
-            $table->string('layout_template')->default('default');
-            $table->json('header_config')->nullable();
-            $table->json('footer_config')->nullable();
             $table->date('exam_date')->nullable();
-            $table->decimal('total_points', 10, 2)->default(0.0);
-            $table->json('question_distribution')->nullable();
-            $table->decimal('target_total_points', 10, 2)->nullable();
+            
+            // Configurações de layout (JSON)
+            $table->json('header_config')->nullable()->comment('Configurações do cabeçalho da prova');
+            $table->json('format_config')->nullable()->comment('Configurações de formatação (fonte, margens, colunas, etc)');
+            $table->json('footer_config')->nullable()->comment('Configurações do rodapé da prova');
+            
+            // Distribuições de questões (JSON)
+            $table->json('difficulty_distribution')->nullable()->comment('Distribuição por dificuldade {easy, medium, hard}');
+            $table->json('topic_distribution')->nullable()->comment('Distribuição por tópicos [{topic_id, question_count}]');
+            
+            // Targets e totais
+            $table->decimal('target_total_points', 10, 2)->nullable()->comment('Pontuação total desejada');
+            $table->integer('target_question_count')->nullable()->comment('Quantidade de questões desejada');
+            $table->decimal('total_points', 10, 2)->default(0.00)->comment('Pontuação total calculada');
+            
+            // Controle
+            $table->boolean('is_published')->default(false);
+            $table->timestamp('published_at')->nullable();
+            
+            // Timestamps e soft deletes
             $table->timestamps();
             $table->softDeletes();
+            
+            // Índices para performance
+            $table->index('user_id');
+            $table->index('main_subject_id');
+            $table->index('exam_date');
+            $table->index('is_published');
+            $table->index('created_at');
         });
     }
 

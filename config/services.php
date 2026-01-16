@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'claude' => [
+        'key' => env('CLAUDE_KEY'),
+    ],
+
 ];

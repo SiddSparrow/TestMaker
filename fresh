@@ -1,0 +1,32 @@
+
+   INFO  Nothing to migrate.  
+
+   INFO  Seeding database.  
+
+  Database\Seeders\QuestionTypeSeeder ...................................................................................................... RUNNING  
+
+   Illuminate\Database\UniqueConstraintViolationException 
+
+  SQLSTATE[23505]: Unique violation: 7 ERROR:  duplicate key value violates unique constraint "question_types_slug_unique"
+DETAIL:  Key (slug)=(multipla-escolha) already exists. (Connection: pgsql, SQL: insert into "question_types" ("name", "slug", "description", "updated_at", "created_at") values (Múltipla Escolha, multipla-escolha, Questão com alternativas onde apenas uma é correta, 2025-12-30 02:26:27, 2025-12-30 02:26:27) returning "id")
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:821
+    817▕         // message to include the bindings with SQL, which will make this exception a
+    818▕         // lot more helpful to the developer instead of just the database's errors.
+    819▕         catch (Exception $e) {
+    820▕             if ($this->isUniqueConstraintError($e)) {
+  ➜ 821▕                 throw new UniqueConstraintViolationException(
+    822▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+    823▕                 );
+    824▕             }
+    825▕
+
+      [2m+18 vendor frames [22m
+
+  19  database/seeders/QuestionTypeSeeder.php:37
+      Illuminate\Database\Eloquent\Model::__callStatic("create")
+      [2m+8 vendor frames [22m
+
+  28  database/seeders/DatabaseSeeder.php:21
+      Illuminate\Database\Seeder::call("Database\Seeders\QuestionTypeSeeder")
+

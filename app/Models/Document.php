@@ -19,6 +19,11 @@ class Document extends Model
         'file_size',
         'status',
         'extraction_result',
+        'error_message',
+    ];
+
+    protected $casts = [
+        'extraction_result' => 'array',
     ];
 
     public function user(): BelongsTo

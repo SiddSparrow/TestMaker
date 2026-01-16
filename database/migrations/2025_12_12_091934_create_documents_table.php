@@ -19,7 +19,8 @@ return new class extends Migration
             $table->string('file_type');
             $table->integer('file_size');
             $table->enum('status', ['pending', 'processing', 'completed', 'failed'])->default('pending');
-            $table->text('extraction_result')->nullable();
+            $table->json('extraction_result')->nullable()->comment('JSON com questões extraídas pelo Claude');
+            $table->text('error_message')->nullable()->comment('Mensagem de erro se falhar');
             $table->timestamps();
         });
     }

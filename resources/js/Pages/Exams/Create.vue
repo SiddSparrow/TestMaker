@@ -63,8 +63,6 @@
                 :question-types="questionTypes"
                 @close="showPreview = false"
                 @edit="showPreview = false"
-                @export-pdf="exportPDF"
-                @export-docx="exportDOCX"
             />
         </div>
     </AppLayout>
@@ -98,33 +96,102 @@ const props = defineProps({
 });
 
 // Estados
-const configCompleted = ref(false);
+
 const showPreview = ref(false);
+// examConfig atualizado com todas as configurações
 const examConfig = ref({
     title: '',
     description: '',
     exam_date: '',
     main_subject_id: '',
     target_total_points: 100,
+    target_question_count: null,
+    difficulty_distribution: {
+        easy: 0,
+        medium: 0,
+        hard: 0
+    },
+    topic_distribution: [],
     header_config: {
         school_name: '',
         show_date: true,
-        show_student_info: true
+        show_student_info: true,
+        show_logo: false
+    },
+    format_config: {
+        // Texto
+        font_size: '12pt',
+        font_family: 'Arial',
+        line_spacing: '1.5',
+        justify_text: false,
+        
+        // Layout
+        columns: 1,
+        margins: 'normal',
+        orientation: 'portrait',
+        paper_size: 'A4',
+        
+        // Questões
+        show_question_points: true,
+        shuffle_questions: false,
+        shuffle_alternatives: false,
+        show_answer_space: true,
+        separate_answer_sheet: false
     },
     footer_config: {
         custom_text: 'Boa prova!',
         show_page_number: true
     }
 });
+
 const examQuestions = ref([]);
+const configCompleted = ref(false);
 
 // Computed: dados da prova para preview
 const examData = computed(() => ({
     title: examConfig.value.title || 'Nova Prova',
     description: examConfig.value.description || '',
     exam_date: examConfig.value.exam_date || null,
-    header_config: examConfig.value.header_config || {},
-    footer_config: examConfig.value.footer_config || {},
+    main_subject_id: examConfig.value.main_subject_id || null,
+    
+    // Configurações de cabeçalho
+    header_config: {
+        school_name: examConfig.value.header_config?.school_name || '',
+        show_date: examConfig.value.header_config?.show_date ?? true,
+        show_student_info: examConfig.value.header_config?.show_student_info ?? true,
+        show_logo: examConfig.value.header_config?.show_logo ?? false
+    },
+    
+    // Configurações de formatação
+    format_config: {
+        font_size: examConfig.value.format_config?.font_size || '12pt',
+        font_family: examConfig.value.format_config?.font_family || 'Arial',
+        line_spacing: examConfig.value.format_config?.line_spacing || '1.5',
+        justify_text: examConfig.value.format_config?.justify_text ?? false,
+        columns: examConfig.value.format_config?.columns || 1,
+        margins: examConfig.value.format_config?.margins || 'normal',
+        orientation: examConfig.value.format_config?.orientation || 'portrait',
+        paper_size: examConfig.value.format_config?.paper_size || 'A4',
+        show_question_points: examConfig.value.format_config?.show_question_points ?? true,
+        shuffle_questions: examConfig.value.format_config?.shuffle_questions ?? false,
+        shuffle_alternatives: examConfig.value.format_config?.shuffle_alternatives ?? false,
+        show_answer_space: examConfig.value.format_config?.show_answer_space ?? true,
+        separate_answer_sheet: examConfig.value.format_config?.separate_answer_sheet ?? false
+    },
+    
+    // Configurações de rodapé
+    footer_config: {
+        custom_text: examConfig.value.footer_config?.custom_text || 'Boa prova!',
+        show_page_number: examConfig.value.footer_config?.show_page_number ?? true
+    },
+    
+    // Distribuições configuradas
+    difficulty_distribution: examConfig.value.difficulty_distribution || {},
+    topic_distribution: examConfig.value.topic_distribution || [],
+    target_total_points: examConfig.value.target_total_points || 100,
+    target_question_count: examConfig.value.target_question_count || null,
+    
+    // Total de pontos calculado
     total_points: examQuestions.value.reduce((sum, q) => {
         return sum + (q.points_override || q.points || 0);
     }, 0)
@@ -132,8 +199,9 @@ const examData = computed(() => ({
 
 // Handlers
 const handleConfigComplete = (config) => {
-    examConfig.value = config;
+    examConfig.value = { ...examConfig.value, ...config };
     configCompleted.value = true;
+    console.log('Configuração completa recebida:', examConfig.value);
 };
 
 const editConfig = () => {

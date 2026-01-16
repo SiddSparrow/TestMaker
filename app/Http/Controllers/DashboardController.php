@@ -32,6 +32,7 @@ class DashboardController extends Controller
 
         $recentQuestions = Question::with(['subject', 'topic'])
             ->where('user_id', $userId)
+            ->whereHas('subject')
             ->latest()
             ->limit(5)
             ->get()

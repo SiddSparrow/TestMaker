@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
     {
         // Criar tipos de questão
         $this->call(QuestionTypeSeeder::class);
-        
+
         // Criar usuários
         $englishTeacher = User::factory()->create([
             'name' => 'Daiane Saraiva',
@@ -44,7 +44,7 @@ class DatabaseSeeder extends Seeder
         $questionTypes = QuestionType::all();
 
         // ==================== CRIAR TÓPICOS ====================
-        
+
         // Tópicos para Inglês
         $englishTopics = [
             ['name' => 'Simple Present', 'description' => 'Uso do presente simples'],
@@ -92,29 +92,57 @@ class DatabaseSeeder extends Seeder
         }
 
         // ==================== CRIAR TAGS ====================
-        
+
         // Tags para Inglês
         $englishTags = [
-            'grammar', 'vocabulary', 'reading', 'writing', 'listening',
-            'speaking', 'verbs', 'nouns', 'adjectives', 'pronunciation',
-            'business-english', 'academic-english', 'conversation', 'phrasal-verbs',
-            'idioms', 'toefl', 'ielts', 'british-english', 'american-english'
+            'grammar',
+            'vocabulary',
+            'reading',
+            'writing',
+            'listening',
+            'speaking',
+            'verbs',
+            'nouns',
+            'adjectives',
+            'pronunciation',
+            'business-english',
+            'academic-english',
+            'conversation',
+            'phrasal-verbs',
+            'idioms',
+            'toefl',
+            'ielts',
+            'british-english',
+            'american-english'
         ];
 
         // Tags para Biologia
         $biologyTags = [
-            'cell-biology', 'genetics', 'ecology', 'anatomy', 'physiology',
-            'botany', 'zoology', 'microbiology', 'biochemistry', 'evolution',
-            'molecular-biology', 'environmental-science', 'human-biology',
-            'marine-biology', 'immunology', 'neuroscience', 'genomics',
-            'bioinformatics', 'conservation'
+            'cell-biology',
+            'genetics',
+            'ecology',
+            'anatomy',
+            'physiology',
+            'botany',
+            'zoology',
+            'microbiology',
+            'biochemistry',
+            'evolution',
+            'molecular-biology',
+            'environmental-science',
+            'human-biology',
+            'marine-biology',
+            'immunology',
+            'neuroscience',
+            'genomics',
+            'bioinformatics',
+            'conservation'
         ];
 
         foreach ($englishTags as $tagName) {
             Tag::create([
                 'name' => $tagName,
                 'slug' => Str::slug($tagName),
-                //'color' => '#3B82F6',
                 'user_id' => $englishTeacher->id,
             ]);
         }
@@ -123,7 +151,6 @@ class DatabaseSeeder extends Seeder
             Tag::create([
                 'name' => $tagName,
                 'slug' => Str::slug($tagName),
-               // 'color' => '#10B981',
                 'user_id' => $biologyTeacher->id,
             ]);
         }
@@ -133,12 +160,13 @@ class DatabaseSeeder extends Seeder
         $biologyTags = Tag::where('user_id', $biologyTeacher->id)->get();
 
         // ==================== QUESTÕES DE INGLÊS ====================
-        
+
         $englishQuestionsData = [
             [
                 'statement' => 'Choose the correct alternative to complete the sentence: "She _____ to the gym every day."',
                 'explanation' => 'The sentence describes a routine/habit, so we use Simple Present. The correct form for "she" is "goes".',
                 'points' => 1.0,
+                'difficulty_level' => 'easy',
                 'subject_id' => $englishSubjects->first()->id,
                 'topic_id' => Topic::where('user_id', $englishTeacher->id)->where('name', 'Simple Present')->first()->id,
                 'alternatives' => [
@@ -153,6 +181,7 @@ class DatabaseSeeder extends Seeder
                 'statement' => 'Which sentence is in the Present Continuous tense?',
                 'explanation' => 'Present Continuous uses "am/is/are + verb-ing" to describe actions happening now.',
                 'points' => 1.0,
+                'difficulty_level' => 'easy',
                 'subject_id' => $englishSubjects->first()->id,
                 'topic_id' => Topic::where('user_id', $englishTeacher->id)->where('name', 'Present Continuous')->first()->id,
                 'alternatives' => [
@@ -167,6 +196,7 @@ class DatabaseSeeder extends Seeder
                 'statement' => 'What is the past simple form of the verb "to eat"?',
                 'explanation' => 'Irregular verbs have specific past forms. "Eat" becomes "ate" in the past simple.',
                 'points' => 1.0,
+                'difficulty_level' => 'medium',
                 'subject_id' => $englishSubjects->first()->id,
                 'topic_id' => Topic::where('user_id', $englishTeacher->id)->where('name', 'Past Simple')->first()->id,
                 'alternatives' => [
@@ -181,6 +211,7 @@ class DatabaseSeeder extends Seeder
                 'statement' => 'Complete with the correct phrasal verb: "Could you _____ the music? It\'s too loud."',
                 'explanation' => '"Turn down" means to decrease the volume. Other phrasal verbs have different meanings.',
                 'points' => 1.5,
+                'difficulty_level' => 'medium',
                 'subject_id' => $englishSubjects->first()->id,
                 'topic_id' => Topic::where('user_id', $englishTeacher->id)->where('name', 'Phrasal Verbs')->first()->id,
                 'alternatives' => [
@@ -195,6 +226,7 @@ class DatabaseSeeder extends Seeder
                 'statement' => 'Which sentence uses the First Conditional correctly?',
                 'explanation' => 'First Conditional: If + present simple, will + base verb. Used for real future possibilities.',
                 'points' => 2.0,
+                'difficulty_level' => 'hard',
                 'subject_id' => $englishSubjects->first()->id,
                 'topic_id' => Topic::where('user_id', $englishTeacher->id)->where('name', 'Conditionals')->first()->id,
                 'alternatives' => [
@@ -213,6 +245,7 @@ class DatabaseSeeder extends Seeder
                 'statement' => $qData['statement'],
                 'explanation' => $qData['explanation'],
                 'points' => $qData['points'],
+                'difficulty_level' => $qData['difficulty_level'],
                 'user_id' => $englishTeacher->id,
                 'subject_id' => $qData['subject_id'],
                 'topic_id' => $qData['topic_id'],
@@ -229,7 +262,6 @@ class DatabaseSeeder extends Seeder
                 ]);
             }
 
-            // Adicionar tags relacionadas
             $question->tags()->attach(
                 $englishTags->random(rand(2, 4))->pluck('id')->toArray()
             );
@@ -238,12 +270,13 @@ class DatabaseSeeder extends Seeder
         }
 
         // ==================== QUESTÕES DE BIOLOGIA ====================
-        
+
         $biologyQuestionsData = [
             [
                 'statement' => 'Qual organela é responsável pela produção de energia na célula?',
                 'explanation' => 'A mitocôndria é conhecida como a "usina de energia" da célula, onde ocorre a respiração celular e produção de ATP.',
                 'points' => 1.0,
+                'difficulty_level' => 'easy',
                 'subject_id' => $biologySubjects->first()->id,
                 'topic_id' => Topic::where('user_id', $biologyTeacher->id)->where('name', 'Célula Animal e Vegetal')->first()->id,
                 'alternatives' => [
@@ -258,6 +291,7 @@ class DatabaseSeeder extends Seeder
                 'statement' => 'Segunda Lei de Mendel (Lei da Segregação Independente) estabelece que:',
                 'explanation' => 'A segunda lei afirma que os alelos de diferentes genes segregam-se independentemente durante a formação dos gametas.',
                 'points' => 1.5,
+                'difficulty_level' => 'medium',
                 'subject_id' => $biologySubjects->first()->id,
                 'topic_id' => Topic::where('user_id', $biologyTeacher->id)->where('name', 'Genética Mendeliana')->first()->id,
                 'alternatives' => [
@@ -272,6 +306,7 @@ class DatabaseSeeder extends Seeder
                 'statement' => 'Qual dessas relações ecológicas é um exemplo de mutualismo?',
                 'explanation' => 'No mutualismo, ambas as espécies se beneficiam. As micorrizas são associações entre fungos e raízes de plantas onde ambos se beneficiam.',
                 'points' => 1.0,
+                'difficulty_level' => 'medium',
                 'subject_id' => $biologySubjects->first()->id,
                 'topic_id' => Topic::where('user_id', $biologyTeacher->id)->where('name', 'Ecologia')->first()->id,
                 'alternatives' => [
@@ -286,6 +321,7 @@ class DatabaseSeeder extends Seeder
                 'statement' => 'Em qual parte do sistema digestório ocorre a maior absorção de nutrientes?',
                 'explanation' => 'O intestino delgado possui vilosidades intestinais que aumentam a superfície de absorção, permitindo a absorção da maioria dos nutrientes.',
                 'points' => 1.0,
+                'difficulty_level' => 'easy',
                 'subject_id' => $biologySubjects->first()->id,
                 'topic_id' => Topic::where('user_id', $biologyTeacher->id)->where('name', 'Sistema Digestório')->first()->id,
                 'alternatives' => [
@@ -300,6 +336,7 @@ class DatabaseSeeder extends Seeder
                 'statement' => 'Qual gás é liberado durante o processo de fotossíntese?',
                 'explanation' => 'Na fotossíntese, as plantas utilizam dióxido de carbono e água para produzir glicose e liberam oxigênio como subproduto.',
                 'points' => 1.0,
+                'difficulty_level' => 'easy',
                 'subject_id' => $biologySubjects->first()->id,
                 'topic_id' => Topic::where('user_id', $biologyTeacher->id)->where('name', 'Fotossíntese')->first()->id,
                 'alternatives' => [
@@ -318,6 +355,7 @@ class DatabaseSeeder extends Seeder
                 'statement' => $qData['statement'],
                 'explanation' => $qData['explanation'],
                 'points' => $qData['points'],
+                'difficulty_level' => $qData['difficulty_level'],
                 'user_id' => $biologyTeacher->id,
                 'subject_id' => $qData['subject_id'],
                 'topic_id' => $qData['topic_id'],
@@ -334,7 +372,6 @@ class DatabaseSeeder extends Seeder
                 ]);
             }
 
-            // Adicionar tags relacionadas
             $question->tags()->attach(
                 $biologyTags->random(rand(2, 4))->pluck('id')->toArray()
             );
@@ -342,23 +379,64 @@ class DatabaseSeeder extends Seeder
             $biologyQuestions->push($question);
         }
 
-        // ==================== CRIAR PROVAS ====================
-        
-        // Prova de Inglês
+        // ==================== CRIAR PROVAS COM NOVAS CONFIGURAÇÕES ====================
+
+        // Prova 1: Inglês - Layout Simples e Tradicional
         $englishExam = Exam::create([
+            'user_id' => $englishTeacher->id,
+            'main_subject_id' => $englishSubjects->first()->id,
             'title' => 'Avaliação de Inglês - 1º Bimestre',
             'description' => 'Prova sobre tempos verbais e vocabulário básico',
             'exam_date' => now()->addDays(7),
-            'total_points' => 6.5,
-            'user_id' => $englishTeacher->id,
+
             'header_config' => json_encode([
                 'school_name' => 'Escola Estadual de Línguas',
                 'show_date' => true,
                 'show_student_info' => true,
+                'show_logo' => false,
             ]),
+
+            'format_config' => json_encode([
+                'font_size' => '12pt',
+                'font_family' => 'Arial',
+                'line_spacing' => '1.5',
+                'justify_text' => false,
+                'columns' => 1,
+                'margins' => 'normal',
+                'orientation' => 'portrait',
+                'paper_size' => 'A4',
+                'show_question_points' => true,
+                'shuffle_questions' => false,
+                'shuffle_alternatives' => false,
+                'show_answer_space' => true,
+                'separate_answer_sheet' => false,
+            ]),
+
             'footer_config' => json_encode([
                 'custom_text' => 'Boa prova!',
+                'show_page_number' => true,
             ]),
+
+            'difficulty_distribution' => json_encode([
+                'easy' => 2,
+                'medium' => 2,
+                'hard' => 1,
+            ]),
+
+            'topic_distribution' => json_encode([
+                [
+                    'topic_id' => Topic::where('user_id', $englishTeacher->id)->where('name', 'Simple Present')->first()->id,
+                    'question_count' => 1,
+                ],
+                [
+                    'topic_id' => Topic::where('user_id', $englishTeacher->id)->where('name', 'Present Continuous')->first()->id,
+                    'question_count' => 1,
+                ],
+            ]),
+
+            'target_total_points' => 6.50,
+            'target_question_count' => 5,
+            'total_points' => 0.00,
         ]);
 
         $order = 1;
@@ -368,22 +446,64 @@ class DatabaseSeeder extends Seeder
                 'points_override' => null,
             ]);
         }
+        $englishExam->recalculateTotalPoints();
 
-        // Prova de Biologia
+        // Prova 2: Biologia - Layout Compacto (2 colunas)
         $biologyExam = Exam::create([
+            'user_id' => $biologyTeacher->id,
+            'main_subject_id' => $biologySubjects->first()->id,
             'title' => 'Avaliação de Biologia - Citologia e Genética',
             'description' => 'Prova sobre organelas celulares e leis de Mendel',
             'exam_date' => now()->addDays(10),
-            'total_points' => 5.5,
-            'user_id' => $biologyTeacher->id,
+
             'header_config' => json_encode([
                 'school_name' => 'Colégio de Ciências Biológicas',
                 'show_date' => true,
                 'show_student_info' => true,
+                'show_logo' => true,
             ]),
+
+            'format_config' => json_encode([
+                'font_size' => '11pt',
+                'font_family' => 'Times New Roman',
+                'line_spacing' => '1.15',
+                'justify_text' => true,
+                'columns' => 2,
+                'margins' => 'narrow',
+                'orientation' => 'portrait',
+                'paper_size' => 'A4',
+                'show_question_points' => false,
+                'shuffle_questions' => false,
+                'shuffle_alternatives' => false,
+                'show_answer_space' => false,
+                'separate_answer_sheet' => true,
+            ]),
+
             'footer_config' => json_encode([
                 'custom_text' => 'Responda com atenção!',
+                'show_page_number' => true,
             ]),
+
+            'difficulty_distribution' => json_encode([
+                'easy' => 3,
+                'medium' => 2,
+                'hard' => 0,
+            ]),
+
+            'topic_distribution' => json_encode([
+                [
+                    'topic_id' => Topic::where('user_id', $biologyTeacher->id)->where('name', 'Célula Animal e Vegetal')->first()->id,
+                    'question_count' => 1,
+                ],
+                [
+                    'topic_id' => Topic::where('user_id', $biologyTeacher->id)->where('name', 'Genética Mendeliana')->first()->id,
+                    'question_count' => 1,
+                ],
+            ]),
+
+            'target_total_points' => 5.50,
+            'target_question_count' => 5,
+            'total_points' => 0.00,
         ]);
 
         $order = 1;
@@ -393,38 +513,82 @@ class DatabaseSeeder extends Seeder
                 'points_override' => null,
             ]);
         }
+        $biologyExam->recalculateTotalPoints();
 
-        // Prova mista (para demonstrar compartilhamento)
-        $mixedExam = Exam::create([
-            'title' => 'Avaliação Interdisciplinar',
-            'description' => 'Questões de inglês técnico e biologia',
+        // Prova 3: Simulado - Layout Estilo ENEM
+        $simuladoExam = Exam::create([
+            'user_id' => $englishTeacher->id,
+            'main_subject_id' => $englishSubjects->first()->id,
+            'title' => 'Simulado ENEM - Linguagens',
+            'description' => 'Simulado estilo ENEM com questões objetivas',
             'exam_date' => now()->addDays(14),
-            'total_points' => 4.0,
-            'user_id' => $englishTeacher->id, // Criada pelo professor de inglês
+
             'header_config' => json_encode([
-                'school_name' => 'Escola Integrada',
+                'school_name' => 'Cursinho Preparatório',
                 'show_date' => true,
                 'show_student_info' => true,
+                'show_logo' => false,
             ]),
+
+            'format_config' => json_encode([
+                'font_size' => '10pt',
+                'font_family' => 'Arial',
+                'line_spacing' => '1.0',
+                'justify_text' => true,
+                'columns' => 2,
+                'margins' => 'narrow',
+                'orientation' => 'portrait',
+                'paper_size' => 'A4',
+                'show_question_points' => false,
+                'shuffle_questions' => true,
+                'shuffle_alternatives' => true,
+                'show_answer_space' => false,
+                'separate_answer_sheet' => true,
+            ]),
+
             'footer_config' => json_encode([
-                'custom_text' => 'Atenção às questões interdisciplinares!',
+                'custom_text' => 'Confira suas respostas no gabarito!',
+                'show_page_number' => true,
             ]),
+
+            'difficulty_distribution' => json_encode([
+                'easy' => 1,
+                'medium' => 2,
+                'hard' => 1,
+            ]),
+
+            'topic_distribution' => json_encode([]),
+
+            'target_total_points' => 4.00,
+            'target_question_count' => 4,
+            'total_points' => 0.00,
+            'is_published' => true,
+            'published_at' => now(),
         ]);
 
-        // Adicionar 2 questões de cada
         $mixedQuestions = $englishQuestions->take(2)->merge($biologyQuestions->take(2));
         $order = 1;
         foreach ($mixedQuestions as $question) {
-            $mixedExam->questions()->attach($question->id, [
+            $simuladoExam->questions()->attach($question->id, [
                 'order' => $order++,
-                'points_override' => null,
+                'points_override' => 1.0,
             ]);
         }
+        $simuladoExam->recalculateTotalPoints();
 
-        $this->command->info('Seeders executados com sucesso!');
-        $this->command->info('Usuários criados:');
-        $this->command->info('- Professor de Inglês: professor.ingles@escola.com / senha123');
-        $this->command->info('- Professor de Biologia: professor.biologia@escola.com / senha123');
-        $this->command->info('Cada professor tem 5 questões específicas de sua disciplina.');
+        $this->command->info('✅ Seeders executados com sucesso!');
+        $this->command->info('');
+        $this->command->info('👥 Usuários criados:');
+        $this->command->info('   📧 Professor de Inglês: professor.ingles@escola.com / senha123');
+        $this->command->info('   📧 Professor de Biologia: professor.biologia@escola.com / senha123');
+        $this->command->info('');
+        $this->command->info('📝 Questões criadas:');
+        $this->command->info('   📚 Inglês: 5 questões');
+        $this->command->info('   📚 Biologia: 5 questões');
+        $this->command->info('');
+        $this->command->info('📄 Provas criadas:');
+        $this->command->info('   1️⃣  Avaliação de Inglês (Layout tradicional - 1 coluna)');
+        $this->command->info('   2️⃣  Avaliação de Biologia (Layout compacto - 2 colunas + gabarito)');
+        $this->command->info('   3️⃣  Simulado ENEM (Layout estilo ENEM - embaralhado + gabarito)');
     }
 }

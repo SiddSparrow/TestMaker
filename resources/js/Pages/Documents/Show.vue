@@ -182,8 +182,13 @@
                                         />
                                     </div>
                                     <div class="form-group-elegant">
-                                        <label class="form-label-elegant">Disciplina</label>
-                                        <select v-model="question.subject_id" class="form-control-elegant">
+                                        <label class="form-label-elegant">Disciplina *</label>
+                                        <select
+                                            v-model="question.subject_id"
+                                            required
+                                            class="form-control-elegant"
+                                            :class="{ 'border-red-400': selectedQuestions.includes(index) && !question.subject_id && attemptedImport }"
+                                        >
                                             <option :value="null">Selecione...</option>
                                             <option v-for="subject in subjects" :key="subject.id" :value="subject.id">
                                                 {{ subject.name }}
@@ -282,6 +287,7 @@ const props = defineProps({
 const extractedQuestions = ref(props.document.extraction_result?.questions || []);
 const metadata = ref(props.document.extraction_result?.metadata || {});
 const selectedQuestions = ref(extractedQuestions.value.map((_, i) => i));
+const attemptedImport = ref(false);
 
 const form = useForm({
     questions: [],
@@ -321,6 +327,19 @@ const setCorrectAlternative = (questionIndex, altIndex) => {
 };
 
 const importQuestions = () => {
+    attemptedImport.value = true;
+
+    const missingSubject = selectedQuestions.value.some(
+        index => !extractedQuestions.value[index].subject_id
+    );
+
+    if (missingSubject) {
+        form.setError('questions', 'Selecione uma disciplina para cada questão selecionada antes de importar.');
+        return;
+    }
+
+    form.clearErrors();
+
     const questionsToImport = selectedQuestions.value.map(index => {
         const question = extractedQuestions.value[index];
         return {

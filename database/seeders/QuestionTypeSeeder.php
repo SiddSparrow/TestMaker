@@ -33,7 +33,7 @@ class QuestionTypeSeeder extends Seeder
         ];
 
         foreach ($types as $type) {
-            QuestionType::create($type);
+            QuestionType::updateOrCreate(['slug' => $type['slug']], $type);
         }
     }
 }

@@ -8,71 +8,43 @@ use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\TopicController;
-use Illuminate\Auth\Events\Logout;
-use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-/*Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
-
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});*/
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/logout', function () {
-        Auth::logout();
-        event(new Logout('web', Auth::user()));
-
-        return redirect('/login');
-    })->name('logout');
-
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    // rotas de perfil
+
+    // Perfil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    // Resources
+
+    // Matérias, tópicos e tags — geridos inteiramente via modais no dashboard,
+    // sem páginas Inertia próprias, então só store/update/destroy existem.
     Route::resource('subjects', SubjectController::class)->only(['store', 'update', 'destroy']);
     Route::resource('topics', TopicController::class)->only(['store', 'update', 'destroy']);
     Route::resource('tags', TagController::class)->only(['store', 'update', 'destroy']);
+
+    // Questões
     Route::resource('questions', QuestionController::class);
-    Route::resource('exams', ExamController::class);
-    Route::resource('documents', DocumentController::class);
-    Route::resource('subjects', SubjectController::class);
-    Route::resource('topics', TopicController::class);
     Route::post('/questions/{question}/copy', [QuestionController::class, 'copy'])
         ->name('questions.copy');
 
-    // Rotas customizadas
+    // Provas
+    Route::resource('exams', ExamController::class);
+    Route::get('/exams/{exam}/questions', [ExamController::class, 'questions'])->name('exams.questions');
+    Route::post('/exams/{exam}/toggle-publish', [ExamController::class, 'togglePublish'])->name('exams.toggle-publish');
+    Route::post('/exams/{exam}/duplicate', [ExamController::class, 'duplicate'])->name('exams.duplicate');
+    Route::get('/exams/{exam}/export-pdf', [ExamController::class, 'exportPdf'])->name('exams.export.pdf');
+    Route::get('/exams/{exam}/export-docx', [ExamController::class, 'exportDocx'])->name('exams.export.docx');
+
+    // Documentos
+    Route::resource('documents', DocumentController::class)->except(['edit', 'update']);
     Route::post('/documents/{document}/import-questions', [DocumentController::class, 'importQuestions'])->name('documents.import-questions');
     Route::post('/documents/{document}/reprocess', [DocumentController::class, 'reprocess'])->name('documents.reprocess');
-    Route::get('/exams/{exam}/preview', [ExamController::class, 'preview'])->name('exams.preview');
-    Route::get('/exams/{exam}/export', [ExamController::class, 'export'])->name('exams.export');
-
-    // Rotas de Exportação
-    Route::get('exams/{exam}/export-pdf', [ExamController::class, 'exportPdf'])->name('exams.export.pdf');
-    Route::get('exams/{exam}/export-docx', [ExamController::class, 'exportDocx'])->name('exams.export.docx');
 });
-
-require __DIR__ . '/auth.php';
 
 require __DIR__ . '/auth.php';

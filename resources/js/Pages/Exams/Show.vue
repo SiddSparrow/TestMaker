@@ -317,7 +317,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ExamPreview from '@/Components/Exams/ExamPreview.vue';
@@ -376,12 +376,16 @@ const deleteExam = () => {
     }
 };
 
-// Fechar menu de exportação ao clicar fora
-document.addEventListener('click', (e) => {
+// Fechar menu de exportação ao clicar fora — precisa ser removido no unmount,
+// senão o listener se acumula a cada visita SPA a esta página.
+const closeExportMenuOnOutsideClick = (e) => {
     if (!e.target.closest('.relative.group')) {
         showExportMenu.value = false;
     }
-});
+};
+
+onMounted(() => document.addEventListener('click', closeExportMenuOnOutsideClick));
+onBeforeUnmount(() => document.removeEventListener('click', closeExportMenuOnOutsideClick));
 </script>
 
 <style scoped>

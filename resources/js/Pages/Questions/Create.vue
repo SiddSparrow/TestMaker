@@ -266,13 +266,9 @@ const submit = () => {
     form.post(route('questions.store'), {
         preserveScroll: true,
         onSuccess: () => {
-            // Sucesso
-            form.reset()
+            form.reset();
         },
-        onError: (errors) => {
-            // Erros serão automaticamente injetados em form.errors
-            console.log('Erros:', errors)
-        },
+        // Erros são automaticamente injetados em form.errors.
     });
 };
 </script>

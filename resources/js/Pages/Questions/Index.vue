@@ -522,7 +522,6 @@ const resetFilters = () => {
 };
 
 const confirmDelete = (question) => {
-    console.log(question);
     questionToDelete.value = question;
     showDeleteModal.value = true;
 };

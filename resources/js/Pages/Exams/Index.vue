@@ -365,8 +365,7 @@ const fetchExamQuestions = async (examId) => {
     try {
         const response = await router.get(route('exams.questions', examId));
         examQuestions.value = response.props.questions || [];
-    } catch (error) {
-        console.error('Erro ao buscar questões:', error);
+    } catch {
         examQuestions.value = [];
     }
 };
@@ -374,9 +373,6 @@ const fetchExamQuestions = async (examId) => {
 const deleteExam = (exam) => {
     if (confirm(`Tem certeza que deseja excluir a prova "${exam.title}"?\n\nEsta ação não pode ser desfeita.`)) {
         router.delete(route('exams.destroy', exam.id), {
-            onSuccess: () => {
-                console.log('Prova excluída com sucesso');
-            },
             onError: () => {
                 alert('Erro ao excluir a prova. Tente novamente.');
             }
@@ -398,7 +394,6 @@ const exportPDF = (withAnswers = false) => {
 
 const exportDOCX = (withAnswers = false) => {
     if (!selectedExam.value) return;
-    console.log('Exportando DOCX, com respostas:', withAnswers);
     const url = route('exams.export.docx', {
         exam: selectedExam.value.id,
         with_answers: withAnswers ? 1 : 0

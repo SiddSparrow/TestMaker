@@ -361,22 +361,13 @@ const getTagName = (tagId) => {
 const submit = () => {
     form.put(route('questions.update', props.question.id), {
         preserveScroll: true,
-        onSuccess: () => {
-            // Sucesso - redireciona para show
-        },
-        onError: (errors) => {
-            console.log('Erros:', errors);
-        },
+        // Erros são automaticamente injetados em form.errors.
     });
 };
 
-
-
 const createCopy = () => {
-    //console.log('Criando cópia da questão ID:', props.question.id);
-    // Preenche o form com os dados atuais
-    if (isCopying.value) return
-    
+    if (isCopying.value) return;
+
     isCopying.value = true;
 
     copyForm.statement = form.statement;
@@ -395,26 +386,15 @@ const createCopy = () => {
     copyForm.tags = [...form.tags];
     copyForm.copy_from_id = props.question.id;
 
-    console.log('Enviando cópia:', copyForm);
-
-    // Envia via POST
-    setTimeout(() => {
-        copyForm.post(route('questions.store'), {
-            preserveScroll: true,
-            onSuccess: (response) => {
-                console.log('Cópia criada com sucesso:', response);
-                isCopy.value = true;
-            },
-            onError: (errors) => {
-                console.log('Erros ao criar cópia:', errors);
-            },
-            onFinish: () => {
-                console.log('Requisição finalizada');
-                isCopying.value = false;
-            },
-        });
-    }, 600);
-    
+    copyForm.post(route('questions.store'), {
+        preserveScroll: true,
+        onSuccess: () => {
+            isCopy.value = true;
+        },
+        onFinish: () => {
+            isCopying.value = false;
+        },
+    });
 };
 </script>
 

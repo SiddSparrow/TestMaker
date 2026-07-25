@@ -177,7 +177,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, nextTick } from 'vue';
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ExamBuilder from '@/Components/Exams/ExamBuilder.vue';
@@ -253,16 +253,9 @@ const changesSummary = computed(() => {
     return 'Questões reordenadas ou pontos alterados';
 });
 
-// Watch para detectar mudanças e forçar recalculo
-watch(examQuestions, (newVal) => {
+// Watch para detectar mudanças
+watch(examQuestions, () => {
     hasUnsavedChanges.value = true;
-    
-    // Força recalculo imediato
-    nextTick(() => {
-        // Trigger do computed
-        const total = currentTotalPoints.value;
-        console.log('Total recalculado:', total);
-    });
 }, { deep: true });
 
 // Métodos
@@ -311,10 +304,7 @@ const saveAndExit = () => {
         onSuccess: () => {
             router.visit(route('exams.show', props.exam.id));
         },
-        onError: () => {
-            // Permanecer na página de edição em caso de erro
-            console.log('Erro ao salvar. Permanecendo na página de edição.');
-        }
+        // Em caso de erro, permanece na página de edição (form.errors já reflete a falha).
     });
 };
 
@@ -336,13 +326,18 @@ const exportDOCX = (withAnswers) => {
     window.open(url, '_blank');
 };
 
-// Aviso ao sair com mudanças não salvas
-window.addEventListener('beforeunload', (e) => {
+// Aviso ao sair com mudanças não salvas — precisa ser registrado/removido no
+// ciclo de vida do componente, senão o listener sobrevive à navegação SPA e
+// passa a disparar em telas onde não há nenhuma mudança pendente.
+const warnOnUnload = (e) => {
     if (hasUnsavedChanges.value) {
         e.preventDefault();
         e.returnValue = '';
     }
-});
+};
+
+onMounted(() => window.addEventListener('beforeunload', warnOnUnload));
+onBeforeUnmount(() => window.removeEventListener('beforeunload', warnOnUnload));
 </script>
 
 <style scoped>

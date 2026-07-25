@@ -33,8 +33,6 @@
                     :question-types="questionTypes"
                     :exam-title="examConfig.title"
                     :target-points="examConfig.target_total_points"
-                    @reorder="handleReorder"
-                    @points-change="handlePointsChange"
                 />
 
                 <div class="mt-6 flex justify-end gap-3">
@@ -203,7 +201,6 @@ const examData = computed(() => ({
 const handleConfigComplete = (config) => {
     examConfig.value = { ...examConfig.value, ...config };
     configCompleted.value = true;
-    console.log('Configuração completa recebida:', examConfig.value);
 };
 
 const editConfig = () => {
@@ -212,14 +209,6 @@ const editConfig = () => {
 
 const handleCancel = () => {
     router.visit(route('exams.index'));
-};
-
-const handleReorder = (questions) => {
-    console.log('Questões reordenadas:', questions);
-};
-
-const handlePointsChange = (totalPoints) => {
-    console.log('Total de pontos:', totalPoints);
 };
 
 const saveExam = () => {
@@ -237,38 +226,7 @@ const saveExam = () => {
         })),
         total_points: examData.value.total_points
     };
-    
-    router.post(route('exams.store'), examPayload, {
-        onSuccess: () => {
-            console.log('Prova salva com sucesso!');
-        },
-        onError: (errors) => {
-            console.error('Erros ao salvar:', errors);
-        }
-    });
-};
 
-const exportPDF = (withAnswers = false) => {
-    if (!selectedExam.value) return;
-    
-    const url = route('exams.export.pdf', {
-        exam: selectedExam.value.id,
-        with_answers: withAnswers ? 1 : 0
-    });
-    
-    // Usa window.location para forçar download
-    window.location.href = url;
-};
-
-const exportDOCX = (withAnswers = false) => {
-    if (!selectedExam.value) return;
-    console.log('Exportando DOCX, com respostas:', withAnswers);
-    const url = route('exams.export.docx', {
-        exam: selectedExam.value.id,
-        with_answers: withAnswers ? 1 : 0
-    });
-    
-    // Usa window.location para forçar download
-    window.location.href = url;
+    router.post(route('exams.store'), examPayload);
 };
 </script>

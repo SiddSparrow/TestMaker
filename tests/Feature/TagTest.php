@@ -1,0 +1,114 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Tag;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Route;
+use Tests\TestCase;
+
+/**
+ * TagController does not exist at all (`App\Http\Controllers\TagController`
+ * is imported in routes/web.php but the class was never created), and its
+ * Route::resource(...) registration is commented out. Yet
+ * resources/js/Components/Modals/TagsModal.vue already calls
+ * route('tags.store'|'tags.update'|'tags.destroy'), which throws a Ziggy
+ * "route not defined" error in the browser the moment the modal loads.
+ * These tests encode the CRUD the frontend expects
+ * (see docs/avaliacao-completude.md).
+ */
+class TagTest extends TestCase
+{
+    use RefreshDatabase;
+
+    private User $user;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->user = User::factory()->create();
+    }
+
+    public function test_tag_routes_are_registered(): void
+    {
+        $this->assertTrue(Route::has('tags.store'), 'tags.store is not registered (commented out in routes/web.php).');
+        $this->assertTrue(Route::has('tags.update'), 'tags.update is not registered (commented out in routes/web.php).');
+        $this->assertTrue(Route::has('tags.destroy'), 'tags.destroy is not registered (commented out in routes/web.php).');
+    }
+
+    public function test_store_creates_a_tag_for_the_authenticated_user(): void
+    {
+        // Exact payload shape sent by TagsModal.vue's useForm()/transform().
+        $payload = ['name' => 'Gramática', 'slug' => 'gramatica'];
+
+        $response = $this->actingAs($this->user)->post(route('tags.store'), $payload);
+
+        $response->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('tags', [
+            'user_id' => $this->user->id,
+            'name' => 'Gramática',
+        ]);
+    }
+
+    public function test_store_requires_a_name(): void
+    {
+        $response = $this->actingAs($this->user)->post(route('tags.store'), ['slug' => '']);
+
+        $response->assertSessionHasErrors('name');
+    }
+
+    public function test_update_modifies_an_existing_tag(): void
+    {
+        $tag = Tag::factory()->create(['user_id' => $this->user->id]);
+
+        $response = $this->actingAs($this->user)->put(route('tags.update', $tag), [
+            'name' => 'Nome Atualizado',
+            'slug' => 'nome-atualizado',
+        ]);
+
+        $response->assertSessionHasNoErrors();
+        $this->assertSame('Nome Atualizado', $tag->fresh()->name);
+    }
+
+    public function test_a_user_cannot_update_another_users_tag(): void
+    {
+        $other = User::factory()->create();
+        $tag = Tag::factory()->create(['user_id' => $other->id]);
+
+        $response = $this->actingAs($this->user)->put(route('tags.update', $tag), [
+            'name' => 'Sequestrada',
+            'slug' => 'sequestrada',
+        ]);
+
+        $response->assertNotFound();
+    }
+
+    public function test_destroy_removes_the_tag_without_deleting_its_questions(): void
+    {
+        $tag = Tag::factory()->create(['user_id' => $this->user->id]);
+
+        $response = $this->actingAs($this->user)->delete(route('tags.destroy', $tag));
+
+        $response->assertSessionHasNoErrors();
+        $this->assertDatabaseMissing('tags', ['id' => $tag->id]);
+    }
+
+    /**
+     * tags.name/slug used to be globally unique even though every Tag
+     * belongs to a user_id and the model scopes queries per user — so two
+     * different professors could never both have a tag named "Gramática".
+     * database/migrations/2025_12_13_000003_scope_tags_uniqueness_to_user.php
+     * rescopes the uniqueness to (user_id, name)/(user_id, slug).
+     */
+    public function test_two_different_users_can_have_a_tag_with_the_same_name(): void
+    {
+        $other = User::factory()->create();
+        Tag::factory()->create(['user_id' => $other->id, 'name' => 'Gramática', 'slug' => 'gramatica']);
+
+        $mine = Tag::factory()->create(['user_id' => $this->user->id, 'name' => 'Gramática', 'slug' => 'gramatica']);
+
+        $this->assertDatabaseHas('tags', ['id' => $mine->id, 'name' => 'Gramática']);
+    }
+}

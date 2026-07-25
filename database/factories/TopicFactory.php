@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Subject;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class TopicFactory extends Factory
@@ -11,6 +12,7 @@ class TopicFactory extends Factory
     {
         return [
             'subject_id' => Subject::factory(),
+            'user_id' => User::factory(),
             'name' => fake()->words(3, true),
             'description' => fake()->sentence(),
         ];

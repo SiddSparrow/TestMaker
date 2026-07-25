@@ -11,9 +11,9 @@ class ExamFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
+            'main_subject_id' => null,
             'title' => fake()->sentence(4),
             'description' => fake()->paragraph(),
-            'layout_template' => 'default',
             'header_config' => [
                 'show_logo' => true,
                 'school_name' => fake()->company(),

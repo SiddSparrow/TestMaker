@@ -1,16 +1,6 @@
 <template>
     <AppLayout>
         <div class="space-y-6 fade-in">
-            <!-- Mensagem de Sucesso -->
-            <div v-if="$page.props.flash?.success" class="slide-up bg-green-50 border-l-4 border-green-500 p-4 rounded-lg" style="animation-delay: 50ms">
-                <div class="flex items-center">
-                    <svg class="h-5 w-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                    </svg>
-                    <p class="text-green-800">{{ $page.props.flash.success }}</p>
-                </div>
-            </div>
-
             <!-- Cabeçalho -->
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 ml-mr-1">
                 <div class="slide-up" style="animation-delay: 100ms">

@@ -2,6 +2,7 @@
 import { usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import { router } from '@inertiajs/vue3';
+import ToastHost from '@/Components/UI/ToastHost.vue';
 
 const { props } = usePage();
 const user = computed(() => props.auth.user);
@@ -69,6 +70,8 @@ const logout = () => {
             </div>
         </footer>
     </div>
+
+    <ToastHost />
 </template>
 
 <style scoped>

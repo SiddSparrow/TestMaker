@@ -20,10 +20,12 @@ class Document extends Model
         'status',
         'extraction_result',
         'error_message',
+        'imported_at',
     ];
 
     protected $casts = [
         'extraction_result' => 'array',
+        'imported_at' => 'datetime',
     ];
 
     public function user(): BelongsTo

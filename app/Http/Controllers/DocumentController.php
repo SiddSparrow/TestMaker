@@ -12,6 +12,7 @@ use App\Models\Topic;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class DocumentController extends Controller
@@ -125,8 +126,8 @@ class DocumentController extends Controller
             'questions' => 'required|array|min:1',
             'questions.*.statement' => 'required|string|min:10',
             'questions.*.type' => 'required|string',
-            'questions.*.subject_id' => 'nullable|exists:subjects,id',
-            'questions.*.topic_id' => 'nullable|exists:topics,id',
+            'questions.*.subject_id' => ['required', Rule::exists('subjects', 'id')->where('user_id', auth()->id())],
+            'questions.*.topic_id' => ['nullable', Rule::exists('topics', 'id')->where('user_id', auth()->id())],
             'questions.*.difficulty_level' => 'required|in:easy,medium,hard',
             'questions.*.points' => 'nullable|numeric|min:0',
             'questions.*.explanation' => 'nullable|string',
@@ -164,7 +165,7 @@ class DocumentController extends Controller
                     'user_id' => auth()->id(),
                     'document_id' => $document->id,
                     'question_type_id' => $questionType->id,
-                    'subject_id' => $questionData['subject_id'] ?? null,
+                    'subject_id' => $questionData['subject_id'],
                     'topic_id' => $questionData['topic_id'] ?? null,
                     'statement' => $questionData['statement'],
                     'explanation' => $questionData['explanation'] ?? null,
@@ -190,8 +191,9 @@ class DocumentController extends Controller
 
             DB::commit();
 
-            // Atualizar status do documento para importado
-            $document->update(['status' => 'imported']);
+            // O status permanece 'completed' (fora do enum não existe
+            // 'imported'); a importação é registrada em imported_at.
+            $document->update(['imported_at' => now()]);
 
             $message = "{$importedCount} questões importadas com sucesso!";
             if (!empty($errors)) {

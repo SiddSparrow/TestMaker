@@ -210,8 +210,10 @@ const form = useForm({
     title: props.exam.title,
     description: props.exam.description,
     exam_date: props.exam.exam_date,
+    main_subject_id: props.exam.main_subject_id,
     target_total_points: props.exam.target_total_points,
     header_config: props.exam.header_config || {},
+    format_config: props.exam.format_config || {},
     footer_config: props.exam.footer_config || {},
     questions: []
 });

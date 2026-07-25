@@ -1,5 +1,7 @@
 <template>
     <AppLayout>
+            <Head title="Provas" />
+
             <div class="space-y-6">
                 <!-- Header com botão -->
                 <div class="flex justify-between items-center ml-mr-1 slide-up" style="animation-delay: 100ms">
@@ -218,7 +220,7 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import StatCard from '@/Components/StatCard.vue';
 import ExamPreview from '@/Components/Exams/ExamPreview.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';

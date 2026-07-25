@@ -1,5 +1,7 @@
 <template>
     <AppLayout>
+        <Head title="Editar Prova" />
+
         <div class="max-w-7xl mx-auto py-6 px-4">
             <!-- Header de Edição -->
             <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl shadow-lg p-6 mb-6">
@@ -176,7 +178,7 @@
 
 <script setup>
 import { ref, computed, watch, nextTick } from 'vue';
-import { Link, router, useForm } from '@inertiajs/vue3';
+import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ExamBuilder from '@/Components/Exams/ExamBuilder.vue';
 import ExamConfigEditModal from '@/Components/Exams/ExamConfigEditModal.vue';

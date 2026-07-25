@@ -1,5 +1,7 @@
 <template>
     <AppLayout>
+        <Head title="Nova Prova" />
+
         <div class="max-w-7xl mx-auto py-6 px-4">
             <!-- Config Form -->
             <ExamConfigForm 
@@ -70,7 +72,7 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import ExamConfigForm from '@/Components/Exams/ExamConfigForm.vue';
 import ExamBuilder from '@/Components/Exams/ExamBuilder.vue';
 import ExamPreview from '@/Components/Exams/ExamPreview.vue';

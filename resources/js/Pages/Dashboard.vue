@@ -1,6 +1,8 @@
 <!-- resources/js/Pages/Dashboard.vue -->
 <template>
     <AppLayout>
+        <Head title="Dashboard" />
+
         <div class="space-y-6">
             <!-- Cards de estatísticas -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 slide-up" style="animation-delay: 150ms">
@@ -114,7 +116,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import { Link } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import StatCard from '@/Components/StatCard.vue';
 import QuestionList from '@/Components/QuestionList.vue';
 import ExamList from '@/Components/ExamList.vue';

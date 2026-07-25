@@ -1,8 +1,10 @@
 <template>
     <AppLayout>
+        <Head title="Editar Questão" />
+
         <div class="max-w-5xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
 
-            <div v-if="Object.keys(form.errors).length > 0" 
+            <div v-if="Object.keys(form.errors).length > 0"
                  class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
                 <h3 class="text-red-800 font-bold mb-2">⚠️ Erros de Validação:</h3>
                 <ul class="list-disc list-inside text-red-700 text-sm space-y-1">
@@ -183,7 +185,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { useForm } from '@inertiajs/vue3';
+import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import CopySuccessBanner from '@/Components/CopySuccessBanner.vue';
 import AlternativesManager from '@/Components/AlternativesManager.vue';

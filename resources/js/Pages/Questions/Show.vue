@@ -1,5 +1,7 @@
 <template>
     <AppLayout>
+        <Head title="Detalhes da Questão" />
+
         <div class="max-w-5xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
             <!-- Header -->
             <div class="mb-6 flex items-center justify-between">
@@ -175,6 +177,7 @@
 
 <script setup>
 import { computed } from 'vue';
+import { Head } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 const props = defineProps({

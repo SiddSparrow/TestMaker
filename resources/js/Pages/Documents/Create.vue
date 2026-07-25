@@ -1,5 +1,7 @@
 <template>
     <AppLayout>
+        <Head title="Upload de Documento" />
+
         <div class="space-y-6 fade-in max-w-3xl mx-auto">
             <!-- Cabeçalho -->
             <div class="slide-up" style="animation-delay: 100ms">
@@ -128,7 +130,7 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref } from 'vue';
-import { useForm } from '@inertiajs/vue3';
+import { Head, useForm } from '@inertiajs/vue3';
 
 const dragover = ref(false);
 const selectedFile = ref(null);

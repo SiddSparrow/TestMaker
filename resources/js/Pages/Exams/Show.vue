@@ -1,5 +1,7 @@
 <template>
     <AppLayout>
+        <Head title="Detalhes da Prova" />
+
         <!-- Header -->
          <div class="container px-4">
             <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white" style="border-radius: 10px;">
@@ -316,7 +318,7 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { Link, router } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ExamPreview from '@/Components/Exams/ExamPreview.vue';
 

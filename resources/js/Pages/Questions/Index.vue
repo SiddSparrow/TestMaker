@@ -1,6 +1,6 @@
 <template>
     <AppLayout>
-        <!-- <Head title="Questões" /> -->
+        <Head title="Questões" />
 
         <div class="space-y-6 fade-in">
             <!-- Cabeçalho Elegante -->

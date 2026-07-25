@@ -1,5 +1,7 @@
 <template>
     <AppLayout>
+        <Head :title="document.original_name" />
+
         <div class="space-y-6 fade-in">
             <!-- Cabeçalho -->
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -275,7 +277,7 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref, computed } from 'vue';
-import { useForm, router } from '@inertiajs/vue3';
+import { Head, useForm, router } from '@inertiajs/vue3';
 
 const props = defineProps({
     document: Object,

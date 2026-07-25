@@ -134,6 +134,14 @@ class DocumentController extends Controller
             'questions.*.alternatives' => 'array',
             'questions.*.alternatives.*.content' => 'required|string',
             'questions.*.alternatives.*.is_correct' => 'required|boolean',
+        ], [
+            'questions.*.subject_id.required' => 'Selecione uma disciplina para cada questão antes de importar.',
+            'questions.*.subject_id.exists' => 'A disciplina selecionada em uma das questões não é válida.',
+            'questions.*.topic_id.exists' => 'O tópico selecionado em uma das questões não é válido.',
+            'questions.*.statement.required' => 'O enunciado de uma das questões está vazio.',
+            'questions.*.statement.min' => 'O enunciado de uma das questões é curto demais.',
+            'questions.*.difficulty_level.required' => 'Selecione a dificuldade de cada questão antes de importar.',
+            'questions.*.alternatives.*.content.required' => 'Preencha o conteúdo de todas as alternativas antes de importar.',
         ]);
 
         $importedCount = 0;

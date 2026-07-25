@@ -67,6 +67,23 @@
                     </div>
                 </div>
 
+                <!-- Erro de Importação -->
+                <div v-if="Object.keys(form.errors).length > 0"
+                     class="card-elegant slide-up bg-red-50 border border-red-200">
+                    <div class="flex">
+                        <svg class="h-5 w-5 text-red-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <div class="flex-1">
+                            <h3 class="text-sm font-semibold text-red-800 mb-1">Não foi possível importar</h3>
+                            <ul class="text-sm text-red-700 space-y-1">
+                                <li v-for="(message, field) in form.errors" :key="field">• {{ message }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Barra de Ações -->
                 <div class="card-elegant slide-up flex items-center justify-between">
                     <div class="text-sm text-gray-600">

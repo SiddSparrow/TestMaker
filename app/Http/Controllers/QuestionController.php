@@ -7,6 +7,7 @@ use App\Models\QuestionType;
 use App\Models\Subject;
 use App\Models\Tag;
 use App\Models\Topic;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -16,6 +17,8 @@ use Inertia\Inertia;
 
 class QuestionController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Cache duration in seconds
      */
@@ -173,6 +176,8 @@ class QuestionController extends Controller
     */
     public function copy(Request $request, Question $question)
     {
+        $this->authorize('view', $question);
+
         DB::beginTransaction();
 
         try {
@@ -199,6 +204,8 @@ class QuestionController extends Controller
 
             DB::commit();
 
+            $this->clearQuestionCache();
+
             // Retorna para a edição da nova questão
             return redirect()->route('questions.edit', $newQuestion->id)
                 ->with('success', 'Cópia criada com sucesso! Edite a nova questão.');
@@ -210,19 +217,22 @@ class QuestionController extends Controller
     }
 
     /**
-     * Get cached statistics
+     * Get cached statistics — escopadas por usuário para não vazar
+     * contagens entre professores diferentes.
      */
     protected function getCachedStats(): array
     {
-        return Cache::remember($this->cacheKeys['stats'], $this->cacheDuration, function () {
+        $userId = Auth::id();
+
+        return Cache::remember($this->cacheKeys['stats'] . '_' . $userId, $this->cacheDuration, function () use ($userId) {
             return [
-                'total' => Question::count(),
-                'active' => Question::where('is_active', true)->count(),
-                'inactive' => Question::where('is_active', false)->count(),
+                'total' => Question::where('user_id', $userId)->count(),
+                'active' => Question::where('user_id', $userId)->where('is_active', true)->count(),
+                'inactive' => Question::where('user_id', $userId)->where('is_active', false)->count(),
                 'by_difficulty' => [
-                    'easy' => Question::where('difficulty_level', 'easy')->count(),
-                    'medium' => Question::where('difficulty_level', 'medium')->count(),
-                    'hard' => Question::where('difficulty_level', 'hard')->count(),
+                    'easy' => Question::where('user_id', $userId)->where('difficulty_level', 'easy')->count(),
+                    'medium' => Question::where('user_id', $userId)->where('difficulty_level', 'medium')->count(),
+                    'hard' => Question::where('user_id', $userId)->where('difficulty_level', 'hard')->count(),
                 ],
             ];
         });
@@ -233,8 +243,11 @@ class QuestionController extends Controller
      */
     public function create()
     {
-        // Cache SEM tags
-        $cacheKey = 'questions_create_data';
+        // Chave por usuário: Subject/Topic/Tag já são filtrados pelo global
+        // scope de auth()->id(), mas sem o user_id na chave o cache
+        // devolveria os dados do primeiro professor a abrir esta tela para
+        // todos os outros.
+        $cacheKey = 'questions_create_data_' . Auth::id();
 
         $data = Cache::remember($cacheKey, $this->cacheDuration, function () {
             return [
@@ -255,13 +268,13 @@ class QuestionController extends Controller
     {
         // Busca o tipo de questão para validação condicional
         $questionType = QuestionType::find($request->question_type_id);
-        // dd($request->all());
         // Define se o tipo requer alternativas
         $requiresAlternatives = $questionType &&
             in_array($questionType->slug, ['multipla-escolha', 'verdadeiro-falso', 'multipla-resposta']);
         // Se for uma cópia via formulário (do botão na edição)
         if ($request->has('copy_from_id')) {
             $originalQuestion = Question::findOrFail($request->copy_from_id);
+            $this->authorize('view', $originalQuestion);
 
             $validated = $request->validate([
                 // suas regras de validação normais
@@ -378,6 +391,8 @@ class QuestionController extends Controller
      */
     public function show(Question $question)
     {
+        $this->authorize('view', $question);
+
         // Carrega relacionamentos necessários
         $question->load([
             'subject:id,name,color',
@@ -400,8 +415,10 @@ class QuestionController extends Controller
      */
     public function edit(Question $question)
     {
-        // Cache dos dados auxiliares
-        $cacheKey = 'questions_edit_data';
+        $this->authorize('update', $question);
+
+        // Cache dos dados auxiliares, por usuário (ver nota em create())
+        $cacheKey = 'questions_edit_data_' . Auth::id();
 
         $data = Cache::remember($cacheKey, $this->cacheDuration, function () {
             return [
@@ -430,6 +447,8 @@ class QuestionController extends Controller
      */
     public function update(Request $request, Question $question)
     {
+        $this->authorize('update', $question);
+
         // Busca o tipo de questão para validação condicional
         $questionType = QuestionType::find($request->question_type_id);
 
@@ -540,10 +559,7 @@ class QuestionController extends Controller
      */
     public function destroy(Question $question)
     {
-        // Verifica permissão
-        if ($question->user_id !== auth()->id() && !auth()->user()->is_admin) {
-            abort(403, 'Você não tem permissão para inativar esta questão.');
-        }
+        $this->authorize('delete', $question);
 
         $questionId = $question->id;
         // $question->delete();
@@ -577,9 +593,10 @@ class QuestionController extends Controller
             $patterns[] = "*question_{$questionId}*";
         }
 
-        // Limpa chaves específicas
-        Cache::forget($this->cacheKeys['stats']);
-        Cache::forget('questions_create_data');
+        // Limpa chaves específicas (escopadas por usuário — ver create()/edit()/getCachedStats())
+        Cache::forget($this->cacheKeys['stats'] . '_' . Auth::id());
+        Cache::forget('questions_create_data_' . Auth::id());
+        Cache::forget('questions_edit_data_' . Auth::id());
 
         foreach ($patterns as $pattern) {
             if (str_contains($pattern, '*')) {
@@ -614,52 +631,31 @@ class QuestionController extends Controller
         }
     }
 
-    /**
-     * Alternative: Manual cache key management
-     */
-    protected function getCacheKeysToClear(?int $questionId = null): array
-    {
-        $keys = [
-            $this->cacheKeys['stats'],
-            'questions_create_data',
-            // Adicione outras chaves fixas aqui
-        ];
-
-        // Se temos questionId, adicionamos chaves específicas
-        if ($questionId) {
-            $keys[] = "question_show_{$questionId}";
-            $keys[] = "question_edit_{$questionId}";
-        }
-
-        return $keys;
-    }
-
     private function createCopyFromRequest(Question $original, array $data)
     {
         DB::beginTransaction();
 
         try {
-            // dd($original, $data);
             $newQuestion = $original->replicate();
-            // dd($newQuestion);
-            // $newQuestion->fill($data);
+            $newQuestion->fill($data);
             $newQuestion->user_id = auth()->id();
-            // $newQuestion->copied_from_id = $original->id; comentando porque nao tem o campo no banco
+            $newQuestion->copied_from_id = $original->id;
+            $newQuestion->is_active = $data['is_active'] ?? true;
             $newQuestion->save();
 
-            // Copia alternativas se existirem no request
+            // Copia alternativas se existirem no request; senão, copia as da original
+            // (caso de uma questão dissertativa que não envia alternativas).
             if (isset($data['alternatives']) && is_array($data['alternatives'])) {
                 foreach ($data['alternatives'] as $altData) {
                     $newQuestion->alternatives()->create($altData);
                 }
-            } /*else {//se caiu aqui, então é dissertativa (provavelmente)
-                // Ou copia da original
+            } else {
                 foreach ($original->alternatives as $alternative) {
                     $newAlternative = $alternative->replicate();
                     $newAlternative->question_id = $newQuestion->id;
                     $newAlternative->save();
                 }
-            }*/
+            }
 
             // Copia tags
             if (isset($data['tags']) && is_array($data['tags'])) {
@@ -669,6 +665,8 @@ class QuestionController extends Controller
             }
 
             DB::commit();
+
+            $this->clearQuestionCache();
 
             return redirect()->route('questions.edit', $newQuestion->id)
                 ->with('success', 'Cópia criada com sucesso! Agora basta editar a nova questão.');

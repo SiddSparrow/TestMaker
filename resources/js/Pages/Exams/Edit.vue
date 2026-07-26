@@ -184,6 +184,9 @@ import ExamBuilder from '@/Components/Exams/ExamBuilder.vue';
 import ExamConfigEditModal from '@/Components/Exams/ExamConfigEditModal.vue';
 import ExamPreview from '@/Components/Exams/ExamPreview.vue';
 import ConfirmDialog from '@/Components/ConfirmDialog.vue';
+import { useFileDownload } from '@/composables/useFileDownload';
+
+const { download } = useFileDownload();
 
 const props = defineProps({
     exam: Object,
@@ -317,13 +320,11 @@ const deleteExam = () => {
 };
 
 const exportPDF = (withAnswers) => {
-    const url = `/exams/${props.exam.id}/export-pdf?with_answers=${withAnswers ? 1 : 0}`;
-    window.open(url, '_blank');
+    download(route('exams.export.pdf', { exam: props.exam.id, with_answers: withAnswers ? 1 : 0 }));
 };
 
 const exportDOCX = (withAnswers) => {
-    const url = `/exams/${props.exam.id}/export-docx?with_answers=${withAnswers ? 1 : 0}`;
-    window.open(url, '_blank');
+    download(route('exams.export.docx', { exam: props.exam.id, with_answers: withAnswers ? 1 : 0 }));
 };
 
 // Aviso ao sair com mudanças não salvas — precisa ser registrado/removido no

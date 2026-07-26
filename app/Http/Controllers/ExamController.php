@@ -19,22 +19,58 @@ class ExamController extends Controller
 {
     use AuthorizesRequests;
 
-    public function index()
+    /**
+     * Colunas pelas quais a listagem pode ser ordenada — mesma lógica de
+     * whitelist usada em QuestionController@index.
+     */
+    protected $sortableColumns = ['title', 'exam_date', 'total_points', 'created_at'];
+
+    public function index(Request $request)
     {
-        $exams = Exam::with([
-            'subject',
-            'user',
-            'questions' => function ($query) {
-                $query->orderBy('exam_questions.order');
-            },
-        ])
+        $filters = $request->only(['search', 'sort', 'direction', 'per_page']);
+
+        // Sem eager-load de `questions` aqui: a listagem não precisa das
+        // questões de cada prova, só da contagem — carregá-las (com suas
+        // alternativas etc.) para todas as provas de uma vez é o que fazia
+        // a tela travar a partir de ~50 provas.
+        $query = Exam::with(['subject:id,name,color', 'user:id,name'])
             ->withCount('questions')
-            ->byUser(auth()->id())
-            ->latest()
-            ->get();
+            ->byUser(auth()->id());
+
+        if (!empty($filters['search'])) {
+            $query->where(function ($q) use ($filters) {
+                $q->where('title', 'like', '%' . $filters['search'] . '%')
+                    ->orWhere('description', 'like', '%' . $filters['search'] . '%');
+            });
+        }
+
+        $sort = $filters['sort'] ?? null;
+        $direction = ($filters['direction'] ?? 'desc') === 'asc' ? 'asc' : 'desc';
+
+        if ($sort && in_array($sort, $this->sortableColumns, true)) {
+            $query->orderBy($sort, $direction);
+        } else {
+            $query->latest();
+        }
+
+        $perPage = $filters['per_page'] ?? 15;
+
+        // Estatísticas leves (contagem e próxima data) sem carregar a lista
+        // inteira — os cards da tela precisavam disso antes de a listagem
+        // vir do array completo de provas.
+        $stats = [
+            'total' => Exam::byUser(auth()->id())->count(),
+            'next_exam_date' => Exam::byUser(auth()->id())
+                ->whereNotNull('exam_date')
+                ->whereDate('exam_date', '>=', now()->toDateString())
+                ->orderBy('exam_date')
+                ->value('exam_date'),
+        ];
 
         return Inertia::render('Exams/Index', [
-            'exams' => $exams,
+            'exams' => $query->paginate($perPage)->withQueryString(),
+            'filters' => $filters,
+            'stats' => $stats,
             'questionTypes' => QuestionType::all(),
         ]);
     }
@@ -113,8 +149,9 @@ class ExamController extends Controller
     }
 
     /**
-     * JSON/Inertia fallback used by Exams/Index.vue when the exam's
-     * questions weren't already eager-loaded on the listing page.
+     * Endpoint JSON puro (não Inertia) usado por Exams/Index.vue para
+     * carregar as questões de uma prova sob demanda, ao abrir o preview —
+     * a listagem não as traz mais de cada prova (ver index()).
      */
     public function questions(Exam $exam)
     {
@@ -127,9 +164,7 @@ class ExamController extends Controller
             },
         ]);
 
-        return Inertia::render('Exams/Index', [
-            'exams' => Exam::with(['subject', 'user'])->withCount('questions')->byUser(auth()->id())->latest()->get(),
-            'questionTypes' => QuestionType::all(),
+        return response()->json([
             'questions' => $exam->questions,
         ]);
     }

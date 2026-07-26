@@ -42,8 +42,38 @@ class ExamTest extends TestCase
         $response->assertInertia(
             fn ($page) => $page
                 ->component('Exams/Index')
-                ->has('exams', 1)
-                ->where('exams.0.id', $mine->id)
+                ->has('exams.data', 1)
+                ->where('exams.data.0.id', $mine->id)
+        );
+    }
+
+    public function test_index_filters_by_search_term(): void
+    {
+        $match = Exam::factory()->create(['user_id' => $this->user->id, 'title' => 'Prova de Geografia']);
+        Exam::factory()->create(['user_id' => $this->user->id, 'title' => 'Prova de História']);
+
+        $response = $this->actingAs($this->user)->get(route('exams.index', ['search' => 'Geografia']));
+
+        $response->assertInertia(
+            fn ($page) => $page
+                ->has('exams.data', 1)
+                ->where('exams.data.0.id', $match->id)
+        );
+    }
+
+    public function test_index_sorts_by_a_whitelisted_column(): void
+    {
+        $older = Exam::factory()->create(['user_id' => $this->user->id, 'title' => 'A - Prova']);
+        $newer = Exam::factory()->create(['user_id' => $this->user->id, 'title' => 'Z - Prova']);
+
+        $response = $this->actingAs($this->user)->get(
+            route('exams.index', ['sort' => 'title', 'direction' => 'asc'])
+        );
+
+        $response->assertInertia(
+            fn ($page) => $page
+                ->where('exams.data.0.id', $older->id)
+                ->where('exams.data.1.id', $newer->id)
         );
     }
 
@@ -248,12 +278,8 @@ class ExamTest extends TestCase
         $response = $this->actingAs($this->user)->get(route('exams.questions', $exam));
 
         $response->assertOk();
-        $response->assertInertia(
-            fn ($page) => $page
-                ->component('Exams/Index')
-                ->has('questions', 1)
-                ->where('questions.0.id', $question->id)
-        );
+        $response->assertJsonCount(1, 'questions');
+        $response->assertJsonPath('questions.0.id', $question->id);
     }
 
     public function test_questions_endpoint_is_forbidden_for_non_owner(): void

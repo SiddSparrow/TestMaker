@@ -321,6 +321,9 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ExamPreview from '@/Components/Exams/ExamPreview.vue';
+import { useFileDownload } from '@/composables/useFileDownload';
+
+const { download } = useFileDownload();
 
 const props = defineProps({
     exam: Object,
@@ -359,14 +362,12 @@ const toggleExportMenu = () => {
 };
 
 const exportPDF = (withAnswers = false) => {
-    const url = `/exams/${props.exam.id}/export-pdf?with_answers=${withAnswers}`;
-    window.open(url, '_blank');
+    download(route('exams.export.pdf', { exam: props.exam.id, with_answers: withAnswers ? 1 : 0 }));
     showExportMenu.value = false;
 };
 
 const exportDOCX = (withAnswers = false) => {
-    const url = `/exams/${props.exam.id}/export-docx?with_answers=${withAnswers}`;
-    window.open(url, '_blank');
+    download(route('exams.export.docx', { exam: props.exam.id, with_answers: withAnswers ? 1 : 0 }));
     showExportMenu.value = false;
 };
 

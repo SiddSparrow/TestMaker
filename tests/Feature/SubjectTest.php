@@ -9,14 +9,6 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-/**
- * SubjectController is an empty stub (`app/Http/Controllers/SubjectController.php`
- * only contains `// `), even though routes/web.php registers a full REST
- * resource for it and resources/js/Components/Modals/SubjectsModal.vue
- * already sends real store/update/destroy requests. Every test below
- * encodes the CRUD the frontend expects and is failing until the
- * controller is implemented (see docs/avaliacao-completude.md).
- */
 class SubjectTest extends TestCase
 {
     use RefreshDatabase;
@@ -28,6 +20,31 @@ class SubjectTest extends TestCase
         parent::setUp();
 
         $this->user = User::factory()->create();
+    }
+
+    public function test_index_lists_only_the_authenticated_users_subjects(): void
+    {
+        $mine = Subject::factory()->create(['user_id' => $this->user->id]);
+        $other = User::factory()->create();
+        Subject::factory()->create(['user_id' => $other->id]);
+
+        $response = $this->actingAs($this->user)->get(route('subjects.index'));
+
+        $response->assertInertia(
+            fn ($page) => $page
+                ->component('Subjects/Index')
+                ->has('subjects', 1)
+                ->where('subjects.0.id', $mine->id)
+        );
+    }
+
+    public function test_store_returns_json_when_requested_for_inline_creation(): void
+    {
+        $response = $this->actingAs($this->user)
+            ->postJson(route('subjects.store'), ['name' => 'Física']);
+
+        $response->assertOk();
+        $response->assertJsonPath('subject.name', 'Física');
     }
 
     public function test_store_creates_a_subject_for_the_authenticated_user(): void

@@ -4,13 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Models\Subject;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class SubjectController extends Controller
 {
-    /**
-     * Matérias são geridas inteiramente pelo modal do dashboard
-     * (SubjectsModal.vue) — não há páginas Inertia de index/create/show/edit.
-     */
+    public function index()
+    {
+        $subjects = Subject::withCount(['topics', 'questions'])
+            ->where('user_id', auth()->id())
+            ->orderBy('name')
+            ->get();
+
+        return Inertia::render('Subjects/Index', [
+            'subjects' => $subjects,
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -19,7 +28,14 @@ class SubjectController extends Controller
             'color' => 'nullable|string|max:7',
         ]);
 
-        Subject::create(array_merge($validated, ['user_id' => auth()->id()]));
+        $subject = Subject::create(array_merge($validated, ['user_id' => auth()->id()]));
+
+        // Criação inline no formulário de questão (QuestionFormFields.vue)
+        // chama esta rota via axios esperando o registro de volta, sem sair
+        // da tela — não é um visit Inertia, então back() não serviria.
+        if ($request->wantsJson()) {
+            return response()->json(['subject' => $subject]);
+        }
 
         return back()->with('success', 'Matéria criada com sucesso!');
     }

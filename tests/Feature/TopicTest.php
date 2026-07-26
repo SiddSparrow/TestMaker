@@ -8,13 +8,6 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-/**
- * TopicController is an empty stub (`app/Http/Controllers/TopicController.php`
- * only contains `// `), even though routes/web.php registers a full REST
- * resource for it and resources/js/Components/Modals/TopicsModal.vue
- * already sends real store/update/destroy requests. These tests encode
- * the CRUD the frontend expects (see docs/avaliacao-completude.md).
- */
 class TopicTest extends TestCase
 {
     use RefreshDatabase;
@@ -29,6 +22,34 @@ class TopicTest extends TestCase
 
         $this->user = User::factory()->create();
         $this->subject = Subject::factory()->create(['user_id' => $this->user->id]);
+    }
+
+    public function test_index_lists_only_the_authenticated_users_topics(): void
+    {
+        $mine = Topic::factory()->create(['user_id' => $this->user->id, 'subject_id' => $this->subject->id]);
+        $other = User::factory()->create();
+        $otherSubject = Subject::factory()->create(['user_id' => $other->id]);
+        Topic::factory()->create(['user_id' => $other->id, 'subject_id' => $otherSubject->id]);
+
+        $response = $this->actingAs($this->user)->get(route('topics.index'));
+
+        $response->assertInertia(
+            fn ($page) => $page
+                ->component('Topics/Index')
+                ->has('topics', 1)
+                ->where('topics.0.id', $mine->id)
+        );
+    }
+
+    public function test_store_returns_json_when_requested_for_inline_creation(): void
+    {
+        $response = $this->actingAs($this->user)->postJson(route('topics.store'), [
+            'subject_id' => $this->subject->id,
+            'name' => 'Frações',
+        ]);
+
+        $response->assertOk();
+        $response->assertJsonPath('topic.name', 'Frações');
     }
 
     public function test_store_creates_a_topic_for_the_authenticated_user(): void

@@ -22,11 +22,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Matérias, tópicos e tags — geridos inteiramente via modais no dashboard,
-    // sem páginas Inertia próprias, então só store/update/destroy existem.
-    Route::resource('subjects', SubjectController::class)->only(['store', 'update', 'destroy']);
-    Route::resource('topics', TopicController::class)->only(['store', 'update', 'destroy']);
-    Route::resource('tags', TagController::class)->only(['store', 'update', 'destroy']);
+    // Matérias, tópicos e tags — cada um com sua própria tela de gestão
+    // (Subjects/Index, Topics/Index, Tags/Index); create/show/edit não
+    // existem como páginas separadas porque o form de criar/editar já vive
+    // na própria index, então só esses 4 verbos são registrados.
+    Route::resource('subjects', SubjectController::class)->only(['index', 'store', 'update', 'destroy']);
+    Route::resource('topics', TopicController::class)->only(['index', 'store', 'update', 'destroy']);
+    Route::resource('tags', TagController::class)->only(['index', 'store', 'update', 'destroy']);
 
     // Questões — bulk-status precisa vir ANTES do resource: como é uma
     // rota literal (/questions/bulk-status) do mesmo verbo PATCH usado por

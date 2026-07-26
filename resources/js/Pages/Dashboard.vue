@@ -20,27 +20,27 @@
                     color="green"
                     :link="route('exams.index')"
                 />
-                <StatCard 
+                <StatCard
                     title="Matérias"
                     :value="stats.total_subjects"
                     icon="BookOpenIcon"
                     color="purple"
-                    @click="showSubjectsModal = true"
+                    :link="route('subjects.index')"
                 />
-                <StatCard 
+                <StatCard
                     title="Tópicos"
                     :value="stats.total_topics"
                     icon="FolderIcon"
                     color="orange"
-                    @click="showTopicsModal = true"
+                    :link="route('topics.index')"
                 />
 
-                <StatCard 
+                <StatCard
                     title="Etiquetas"
                     :value="stats.total_tags"
                     icon="TagIcon"
                     color="orange"
-                    @click="showTagsModal = true"
+                    :link="route('tags.index')"
                 />
             </div>
             <!-- Ações rápidas -->
@@ -106,35 +106,19 @@
             </div>
 
         </div>
-
-        <!-- Modais -->
-        <SubjectsModal v-model:show="showSubjectsModal" :subjects="subjects" />
-        <TopicsModal v-model:show="showTopicsModal" :topics="topics" :subjects="subjects" />
-        <TagsModal v-model:show="showTagsModal" :tags="tags" />
     </AppLayout>
 </template>
 
 <script setup>
-import { ref } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import StatCard from '@/Components/StatCard.vue';
 import QuestionList from '@/Components/QuestionList.vue';
 import ExamList from '@/Components/ExamList.vue';
-import SubjectsModal from '@/Components/Modals/SubjectsModal.vue';
-import TopicsModal from '@/Components/Modals/TopicsModal.vue';
-import TagsModal from '@/Components/Modals/TagsModal.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 defineProps({
     stats: Object,
     recent_questions: Array,
     recent_exams: Array,
-    subjects: Array,
-    topics: Array,
-    tags: Array,
 });
-
-const showSubjectsModal = ref(false);
-const showTopicsModal = ref(false);
-const showTagsModal = ref(false);
 </script>

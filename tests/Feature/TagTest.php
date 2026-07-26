@@ -8,16 +8,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
-/**
- * TagController does not exist at all (`App\Http\Controllers\TagController`
- * is imported in routes/web.php but the class was never created), and its
- * Route::resource(...) registration is commented out. Yet
- * resources/js/Components/Modals/TagsModal.vue already calls
- * route('tags.store'|'tags.update'|'tags.destroy'), which throws a Ziggy
- * "route not defined" error in the browser the moment the modal loads.
- * These tests encode the CRUD the frontend expects
- * (see docs/avaliacao-completude.md).
- */
 class TagTest extends TestCase
 {
     use RefreshDatabase;
@@ -33,9 +23,26 @@ class TagTest extends TestCase
 
     public function test_tag_routes_are_registered(): void
     {
+        $this->assertTrue(Route::has('tags.index'), 'tags.index is not registered.');
         $this->assertTrue(Route::has('tags.store'), 'tags.store is not registered (commented out in routes/web.php).');
         $this->assertTrue(Route::has('tags.update'), 'tags.update is not registered (commented out in routes/web.php).');
         $this->assertTrue(Route::has('tags.destroy'), 'tags.destroy is not registered (commented out in routes/web.php).');
+    }
+
+    public function test_index_lists_only_the_authenticated_users_tags(): void
+    {
+        $mine = Tag::factory()->create(['user_id' => $this->user->id]);
+        $other = User::factory()->create();
+        Tag::factory()->create(['user_id' => $other->id]);
+
+        $response = $this->actingAs($this->user)->get(route('tags.index'));
+
+        $response->assertInertia(
+            fn ($page) => $page
+                ->component('Tags/Index')
+                ->has('tags', 1)
+                ->where('tags.0.id', $mine->id)
+        );
     }
 
     public function test_store_creates_a_tag_for_the_authenticated_user(): void

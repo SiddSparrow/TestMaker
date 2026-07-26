@@ -132,6 +132,21 @@ class RouteSmokeTest extends TestCase
         $this->actingAs($this->user)->get(route('documents.show', $document))->assertOk();
     }
 
+    public function test_subjects_index_renders(): void
+    {
+        $this->actingAs($this->user)->get(route('subjects.index'))->assertOk();
+    }
+
+    public function test_topics_index_renders(): void
+    {
+        $this->actingAs($this->user)->get(route('topics.index'))->assertOk();
+    }
+
+    public function test_tags_index_renders(): void
+    {
+        $this->actingAs($this->user)->get(route('tags.index'))->assertOk();
+    }
+
     private function createQuestionForUser(User $user): Question
     {
         $subject = Subject::factory()->create(['user_id' => $user->id]);

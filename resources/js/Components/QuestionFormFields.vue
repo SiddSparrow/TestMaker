@@ -5,16 +5,38 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Matéria -->
             <div>
-                <label :for="ids.subject" class="block text-sm font-medium text-gray-700 mb-2">
-                    Matéria <span class="text-red-500">*</span>
-                </label>
+                <div class="flex items-center justify-between mb-2">
+                    <label :for="ids.subject" class="block text-sm font-medium text-gray-700">
+                        Matéria <span class="text-red-500">*</span>
+                    </label>
+                    <button type="button" class="text-xs font-medium text-blue-600 hover:text-blue-800"
+                            @click="showNewSubjectForm = !showNewSubjectForm">
+                        {{ showNewSubjectForm ? 'Cancelar' : '+ Nova matéria' }}
+                    </button>
+                </div>
+
+                <div v-if="showNewSubjectForm" class="flex gap-2 mb-2">
+                    <label :for="ids.newSubject" class="sr-only">Nome da nova matéria</label>
+                    <input :id="ids.newSubject" v-model="newSubjectName" type="text"
+                           placeholder="Nome da nova matéria"
+                           @keydown.enter.prevent="createSubject"
+                           class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                    <button type="button"
+                            :disabled="!newSubjectName || creatingSubject"
+                            @click="createSubject"
+                            class="px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Criar
+                    </button>
+                </div>
+                <p v-if="newSubjectError" class="text-xs text-red-600 mb-2">{{ newSubjectError }}</p>
+
                 <select :id="ids.subject" v-model="localSubjectId"
                         @change="handleSubjectChange"
                         autofocus
                         class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"
                         :class="{ 'border-red-500': errors.subject_id }">
                     <option value="">Selecione uma matéria</option>
-                    <option v-for="subject in subjects"
+                    <option v-for="subject in localSubjects"
                             :key="subject.id"
                             :value="subject.id"
                             :style="{ color: subject.color }">
@@ -28,9 +50,31 @@
 
             <!-- Tópico -->
             <div>
-                <label :for="ids.topic" class="block text-sm font-medium text-gray-700 mb-2">
-                    Tópico
-                </label>
+                <div class="flex items-center justify-between mb-2">
+                    <label :for="ids.topic" class="block text-sm font-medium text-gray-700">
+                        Tópico
+                    </label>
+                    <button v-if="localSubjectId" type="button" class="text-xs font-medium text-blue-600 hover:text-blue-800"
+                            @click="showNewTopicForm = !showNewTopicForm">
+                        {{ showNewTopicForm ? 'Cancelar' : '+ Novo tópico' }}
+                    </button>
+                </div>
+
+                <div v-if="showNewTopicForm && localSubjectId" class="flex gap-2 mb-2">
+                    <label :for="ids.newTopic" class="sr-only">Nome do novo tópico</label>
+                    <input :id="ids.newTopic" v-model="newTopicName" type="text"
+                           placeholder="Nome do novo tópico"
+                           @keydown.enter.prevent="createTopic"
+                           class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                    <button type="button"
+                            :disabled="!newTopicName || creatingTopic"
+                            @click="createTopic"
+                            class="px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Criar
+                    </button>
+                </div>
+                <p v-if="newTopicError" class="text-xs text-red-600 mb-2">{{ newTopicError }}</p>
+
                 <select :id="ids.topic" v-model="localTopicId"
                         @change="handleTopicChange"
                         :disabled="!localSubjectId || filteredTopics.length === 0"
@@ -195,6 +239,8 @@ const ids = {
     points: `points-${uid}`,
     isActive: `is-active-${uid}`,
     difficulty: `difficulty-${uid}`,
+    newSubject: `new-subject-${uid}`,
+    newTopic: `new-topic-${uid}`,
 };
 
 const props = defineProps({
@@ -259,6 +305,25 @@ const localDifficulty = ref(props.difficultyLevel);
 const localPoints = ref(props.points);
 const localIsActive = ref(props.isActive);
 
+// Cópias locais de subjects/topics — props não podem ser mutadas, e uma
+// matéria/tópico criado inline (ver createSubject/createTopic) precisa
+// aparecer no <select> imediatamente, sem esperar um reload da página.
+const localSubjects = ref([...props.subjects]);
+const localTopics = ref([...props.topics]);
+
+// Criação inline de matéria/tópico — sem isto, uma questão sem nenhuma
+// matéria cadastrada não tinha como ser criada a não ser abandonando o
+// formulário para ir cadastrar a matéria em outro lugar.
+const showNewSubjectForm = ref(false);
+const newSubjectName = ref('');
+const newSubjectError = ref('');
+const creatingSubject = ref(false);
+
+const showNewTopicForm = ref(false);
+const newTopicName = ref('');
+const newTopicError = ref('');
+const creatingTopic = ref(false);
+
 // Watch para sincronizar props com estado local
 watch(() => props.subjectId, (val) => localSubjectId.value = val);
 watch(() => props.topicId, (val) => localTopicId.value = val);
@@ -270,7 +335,7 @@ watch(() => props.isActive, (val) => localIsActive.value = val);
 // Computed: tópicos filtrados pela matéria
 const filteredTopics = computed(() => {
     if (!localSubjectId.value) return [];
-    return props.topics.filter(topic => topic.subject_id == localSubjectId.value);
+    return localTopics.value.filter(topic => topic.subject_id == localSubjectId.value);
 });
 
 // Computed: tipo de questão selecionado
@@ -293,6 +358,57 @@ const handleSubjectChange = () => {
 
 const handleTopicChange = () => {
     emit('update:topicId', localTopicId.value);
+};
+
+const createSubject = async () => {
+    if (!newSubjectName.value || creatingSubject.value) return;
+
+    creatingSubject.value = true;
+    newSubjectError.value = '';
+
+    try {
+        const response = await window.axios.post(route('subjects.store'), {
+            name: newSubjectName.value,
+        });
+
+        const subject = response.data.subject;
+        localSubjects.value.push(subject);
+        localSubjectId.value = subject.id;
+        handleSubjectChange();
+
+        newSubjectName.value = '';
+        showNewSubjectForm.value = false;
+    } catch (error) {
+        newSubjectError.value = error.response?.data?.errors?.name?.[0] || 'Não foi possível criar a matéria.';
+    } finally {
+        creatingSubject.value = false;
+    }
+};
+
+const createTopic = async () => {
+    if (!newTopicName.value || creatingTopic.value || !localSubjectId.value) return;
+
+    creatingTopic.value = true;
+    newTopicError.value = '';
+
+    try {
+        const response = await window.axios.post(route('topics.store'), {
+            subject_id: localSubjectId.value,
+            name: newTopicName.value,
+        });
+
+        const topic = response.data.topic;
+        localTopics.value.push(topic);
+        localTopicId.value = topic.id;
+        handleTopicChange();
+
+        newTopicName.value = '';
+        showNewTopicForm.value = false;
+    } catch (error) {
+        newTopicError.value = error.response?.data?.errors?.name?.[0] || 'Não foi possível criar o tópico.';
+    } finally {
+        creatingTopic.value = false;
+    }
 };
 
 const handleQuestionTypeChange = () => {

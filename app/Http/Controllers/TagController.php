@@ -6,13 +6,22 @@ use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Inertia\Inertia;
 
 class TagController extends Controller
 {
-    /**
-     * Tags são geridas inteiramente pelo modal do dashboard
-     * (TagsModal.vue) — não há páginas Inertia de index/create/show/edit.
-     */
+    public function index()
+    {
+        $tags = Tag::withCount('questions')
+            ->where('user_id', auth()->id())
+            ->orderBy('name')
+            ->get();
+
+        return Inertia::render('Tags/Index', [
+            'tags' => $tags,
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([

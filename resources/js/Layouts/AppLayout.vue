@@ -13,6 +13,9 @@ const { props } = usePage();
 const user = computed(() => props.auth.user);
 
 const showingNavigationDropdown = ref(false);
+const isCatalogActive = computed(() =>
+    route().current('subjects.*') || route().current('topics.*') || route().current('tags.*')
+);
 
 const logout = () => {
     router.post(route('logout'));
@@ -48,6 +51,27 @@ const logout = () => {
                             <NavLink :href="route('documents.index')" :active="route().current('documents.*')">
                                 Documentos
                             </NavLink>
+                            <Dropdown align="left" width="48">
+                                <template #trigger>
+                                    <button
+                                        type="button"
+                                        class="group flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-lg transition-colors"
+                                        :class="isCatalogActive
+                                            ? 'bg-primary-50 text-primary-700 border-l-4 border-primary-600 pl-2.5'
+                                            : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'"
+                                    >
+                                        Cadastros
+                                        <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                </template>
+                                <template #content>
+                                    <DropdownLink :href="route('subjects.index')">Matérias</DropdownLink>
+                                    <DropdownLink :href="route('topics.index')">Tópicos</DropdownLink>
+                                    <DropdownLink :href="route('tags.index')">Etiquetas</DropdownLink>
+                                </template>
+                            </Dropdown>
                         </div>
                     </div>
 
@@ -113,6 +137,15 @@ const logout = () => {
                     </ResponsiveNavLink>
                     <ResponsiveNavLink :href="route('documents.index')" :active="route().current('documents.*')">
                         Documentos
+                    </ResponsiveNavLink>
+                    <ResponsiveNavLink :href="route('subjects.index')" :active="route().current('subjects.*')">
+                        Matérias
+                    </ResponsiveNavLink>
+                    <ResponsiveNavLink :href="route('topics.index')" :active="route().current('topics.*')">
+                        Tópicos
+                    </ResponsiveNavLink>
+                    <ResponsiveNavLink :href="route('tags.index')" :active="route().current('tags.*')">
+                        Etiquetas
                     </ResponsiveNavLink>
                 </div>
 

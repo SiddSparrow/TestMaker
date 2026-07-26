@@ -1,5 +1,7 @@
 <template>
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+    <component :is="link ? Link : 'div'" :href="link"
+        class="block bg-white rounded-xl shadow-sm border border-gray-200 p-6 transition-shadow"
+        :class="link ? 'hover:shadow-md hover:border-gray-300 cursor-pointer' : ''">
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm font-medium text-gray-500">{{ title }}</p>
@@ -26,11 +28,12 @@
             </span>
             <span class="ml-2 text-sm text-gray-500">desde o último mês</span>
         </div> -->
-    </div>
+    </component>
 </template>
 
 <script setup>
 import { computed } from 'vue';
+import { Link } from '@inertiajs/vue3';
 import {
     QuestionMarkCircleIcon,
     DocumentTextIcon,
@@ -45,6 +48,10 @@ const props = defineProps({
     title: String,
     value: [String, Number],
     icon: String,
+    link: {
+        type: String,
+        default: null
+    },
     color: {
         type: String,
         default: 'blue',

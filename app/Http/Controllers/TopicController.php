@@ -2,16 +2,33 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Subject;
 use App\Models\Topic;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Inertia\Inertia;
 
 class TopicController extends Controller
 {
-    /**
-     * Tópicos são geridos inteiramente pelo modal do dashboard
-     * (TopicsModal.vue) — não há páginas Inertia de index/create/show/edit.
-     */
+    public function index()
+    {
+        $topics = Topic::withCount('questions')
+            ->with('subject:id,name,color')
+            ->where('user_id', auth()->id())
+            ->orderBy('name')
+            ->get();
+
+        $subjects = Subject::select('id', 'name', 'color')
+            ->where('user_id', auth()->id())
+            ->orderBy('name')
+            ->get();
+
+        return Inertia::render('Topics/Index', [
+            'topics' => $topics,
+            'subjects' => $subjects,
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -20,7 +37,12 @@ class TopicController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        Topic::create(array_merge($validated, ['user_id' => auth()->id()]));
+        $topic = Topic::create(array_merge($validated, ['user_id' => auth()->id()]));
+
+        // Ver comentário equivalente em SubjectController@store.
+        if ($request->wantsJson()) {
+            return response()->json(['topic' => $topic]);
+        }
 
         return back()->with('success', 'Tópico criado com sucesso!');
     }

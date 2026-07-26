@@ -88,18 +88,11 @@ class DashboardController extends Controller
                     'question_count' => $subject->question_count,
                 ];
             });
-        $subjects = Subject::withCount('topics')->where('user_id', $userId)->get();
-        $tags = Tag::withCount('questions')->where('user_id', $userId)->get();
-        $topics = Topic::withCount('questions')->where('user_id', $userId)->get();
-
         return Inertia::render('Dashboard', [
             'stats' => $stats,
             'recent_questions' => $recentQuestions,
             'recent_exams' => $recentExams,
             'most_used_subjects' => $mostUsedSubjects,
-            'subjects' => $subjects,
-            'tags' => $tags,
-            'topics' => $topics,
         ]);
     }
 }

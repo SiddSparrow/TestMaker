@@ -130,11 +130,12 @@
 
                         <button @click="handleFinish"
                                 :disabled="form.processing"
-                                class="inline-flex items-center px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                                title="Salva as alterações e volta para a página de detalhes da prova"
+                                class="inline-flex items-center px-6 py-2.5 text-green-700 bg-white border border-green-300 rounded-lg hover:bg-green-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                             </svg>
-                            Concluir
+                            Salvar e Sair
                         </button>
                     </div>
                 </div>
@@ -212,6 +213,11 @@ const examQuestions = ref(props.exam.questions.map(q => ({
     exam_order: Number(q.pivot?.order) || 0
 })));
 
+// Snapshot para comparar mudanças reais — o watch(examQuestions, {deep:true})
+// abaixo disparava com qualquer normalização inicial do array (não uma
+// mudança do usuário), marcando a prova como alterada assim que a tela abria.
+let examQuestionsSnapshot = JSON.stringify(examQuestions.value);
+
 // Form
 const form = useForm({
     title: props.exam.title,
@@ -258,9 +264,12 @@ const changesSummary = computed(() => {
     return 'Questões reordenadas ou pontos alterados';
 });
 
-// Watch para detectar mudanças
+// Watch para detectar mudanças reais (comparado ao snapshot, não a
+// qualquer disparo do watcher).
 watch(examQuestions, () => {
-    hasUnsavedChanges.value = true;
+    if (JSON.stringify(examQuestions.value) !== examQuestionsSnapshot) {
+        hasUnsavedChanges.value = true;
+    }
 }, { deep: true });
 
 // Métodos
@@ -286,6 +295,7 @@ const saveChanges = () => {
         preserveScroll: true,
         onSuccess: () => {
             hasUnsavedChanges.value = false;
+            examQuestionsSnapshot = JSON.stringify(examQuestions.value);
         }
     });
 };

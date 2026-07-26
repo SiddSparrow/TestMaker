@@ -269,6 +269,30 @@ class ExamTest extends TestCase
         );
     }
 
+    /**
+     * BUG found via PHPStan/Larastan: the two-column layout used to call
+     * Section::addColumnBreak(), a method that doesn't exist in the
+     * installed PhpWord version, so exporting with format_config.columns=2
+     * always threw a fatal error.
+     */
+    public function test_export_docx_with_two_columns_downloads_for_the_owner(): void
+    {
+        $exam = Exam::factory()->create([
+            'user_id' => $this->user->id,
+            'format_config' => ['columns' => 2],
+        ]);
+        $question = $this->createQuestion();
+        $exam->questions()->attach($question->id, ['order' => 1]);
+
+        $response = $this->actingAs($this->user)->get(route('exams.export.docx', $exam));
+
+        $response->assertOk();
+        $response->assertHeader(
+            'content-type',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        );
+    }
+
     public function test_questions_endpoint_returns_the_exams_questions(): void
     {
         $exam = Exam::factory()->create(['user_id' => $this->user->id]);

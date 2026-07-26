@@ -377,11 +377,16 @@ class ExamController extends Controller
             $sectionStyle['orientation'] = 'landscape';
         }
 
-        $section = $phpWord->addSection($sectionStyle);
-
+        // Section::addColumnBreak() não existe no PhpWord instalado — layout
+        // em colunas é uma propriedade de estilo da seção, não uma chamada
+        // após criá-la. Sem essa correção, exportar em DOCX com
+        // format_config.columns=2 lançava um erro fatal.
         if (($config['columns'] ?? 1) === 2) {
-            $section->addColumnBreak();
+            $sectionStyle['colsNum'] = 2;
+            $sectionStyle['colsSpace'] = 720;
         }
+
+        $section = $phpWord->addSection($sectionStyle);
 
         $fontSize = (int) str_replace('pt', '', $config['font_size'] ?? '12pt');
         $fontFamily = $config['font_family'] ?? 'Arial';

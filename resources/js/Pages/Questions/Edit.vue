@@ -82,7 +82,6 @@
                         :topics="topics"
                         :question-types="question_types"
                         :errors="form.errors"
-                        @subject-change="onSubjectChange"
                         @question-type-change="onQuestionTypeChange"
                     />
 

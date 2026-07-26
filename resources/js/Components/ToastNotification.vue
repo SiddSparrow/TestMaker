@@ -1,9 +1,9 @@
 <!-- resources/js/Components/ToastNotification.vue -->
 <template>
     <transition name="toast">
-        <div v-if="show" 
+        <div v-if="show"
              :class="[
-                 'fixed top-4 right-4 z-[9999] p-4 rounded-lg shadow-lg max-w-sm',
+                 'p-4 rounded-lg shadow-lg max-w-sm',
                  type === 'success' ? 'bg-green-50 border-l-4 border-green-500' :
                  type === 'error' ? 'bg-red-50 border-l-4 border-red-500' :
                  type === 'warning' ? 'bg-yellow-50 border-l-4 border-yellow-500' :

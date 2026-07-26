@@ -39,6 +39,19 @@ watch(
     },
 );
 
+// Consumidores que montam o componente já com show=true (ex.: ExamPreview
+// atrás de v-if) nunca disparam o watch acima: ele só reage a MUDANÇAS de
+// show, e na montagem inicial não houve mudança nenhuma. Sem isto, o
+// <dialog> nativo nunca recebe showModal() e fica invisível.
+onMounted(() => {
+    if (props.show) {
+        document.body.style.overflow = 'hidden';
+        showSlot.value = true;
+
+        dialog.value?.showModal();
+    }
+});
+
 const close = () => {
     if (props.closeable) {
         emit('close');

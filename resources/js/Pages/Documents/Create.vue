@@ -16,15 +16,20 @@
                     <div class="space-y-4">
                         <!-- Drag & Drop Area -->
                         <div
+                            role="button"
+                            tabindex="0"
+                            aria-label="Selecionar arquivo para upload"
                             @dragover.prevent="dragover = true"
                             @dragleave.prevent="dragover = false"
                             @drop.prevent="onDrop"
                             :class="[
-                                'border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer',
+                                'border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
                                 dragover ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400',
                                 form.errors.document ? 'border-red-300 bg-red-50' : ''
                             ]"
-                            @click="$refs.fileInput.click()"
+                            @click="fileInput.click()"
+                            @keydown.enter.prevent="fileInput.click()"
+                            @keydown.space.prevent="fileInput.click()"
                         >
                             <input
                                 ref="fileInput"

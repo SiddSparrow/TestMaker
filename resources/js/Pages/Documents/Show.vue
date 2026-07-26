@@ -256,7 +256,38 @@
                     </div>
                 </div>
 
-                <Pagination v-if="paginationLinks.length > 3" :links="paginationLinks" :summary="paginationSummary" />
+                <nav v-if="totalPages > 1" aria-label="Paginação da revisão" class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <p class="text-sm text-gray-600">{{ paginationSummary }}</p>
+                    <ul class="flex flex-wrap items-center gap-1">
+                        <li>
+                            <button type="button" :disabled="currentPage === 1" @click="goToBatch(currentPage - 1)"
+                                    aria-label="Lote anterior"
+                                    class="inline-flex min-w-[2.25rem] items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                                &laquo; Anterior
+                            </button>
+                        </li>
+                        <li v-for="page in totalPages" :key="page">
+                            <button type="button" @click="goToBatch(page)"
+                                    :aria-current="page === currentPage ? 'page' : undefined"
+                                    :aria-label="`Lote ${page}`"
+                                    :class="[
+                                        'inline-flex min-w-[2.25rem] items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+                                        page === currentPage
+                                            ? 'bg-blue-600 text-white'
+                                            : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50',
+                                    ]">
+                                {{ page }}
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" :disabled="currentPage === totalPages" @click="goToBatch(currentPage + 1)"
+                                    aria-label="Próximo lote"
+                                    class="inline-flex min-w-[2.25rem] items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                                Próxima &raquo;
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
             </div>
 
             <!-- Nenhuma questão extraída -->
@@ -279,7 +310,6 @@ import { ref, reactive, computed, watch, onMounted, onUnmounted } from 'vue';
 import { Head, useForm, router } from '@inertiajs/vue3';
 import BaseButton from '@/Components/UI/BaseButton.vue';
 import FormField from '@/Components/UI/FormField.vue';
-import Pagination from '@/Components/UI/Pagination.vue';
 
 const props = defineProps({
     document: Object,
@@ -327,14 +357,12 @@ const paginatedQuestions = computed(() => {
 
 const totalPages = computed(() => Math.max(1, Math.ceil(extractedQuestions.length / perBatch)));
 
-const paginationLinks = computed(() => {
-    const links = [{ url: currentPage.value > 1 ? '#prev' : null, label: '&laquo; Anterior', active: false }];
-    for (let page = 1; page <= totalPages.value; page++) {
-        links.push({ url: `#${page}`, label: String(page), active: page === currentPage.value });
-    }
-    links.push({ url: currentPage.value < totalPages.value ? '#next' : null, label: 'Próxima &raquo;', active: false });
-    return links;
-});
+// Paginação 100% local (não é Inertia/servidor): os lotes só reorganizam
+// quais questões já extraídas aparecem na tela, sem navegar — trocar de
+// lote não pode descartar as edições feitas nos outros lotes.
+const goToBatch = (page) => {
+    currentPage.value = Math.min(Math.max(page, 1), totalPages.value);
+};
 
 const paginationSummary = computed(() => `Lote ${currentPage.value} de ${totalPages.value} (${extractedQuestions.length} questões no total)`);
 

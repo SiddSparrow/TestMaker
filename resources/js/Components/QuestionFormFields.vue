@@ -4,121 +4,105 @@
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Matéria -->
-            <div>
-                <div class="flex items-center justify-between mb-2">
-                    <label :for="ids.subject" class="block text-sm font-medium text-gray-700">
-                        Matéria <span class="text-red-500">*</span>
-                    </label>
+            <FormField label="Matéria" required :error="errors.subject_id" :id="ids.subject">
+                <template #label-actions>
                     <button type="button" class="text-xs font-medium text-blue-600 hover:text-blue-800"
                             @click="showNewSubjectForm = !showNewSubjectForm">
                         {{ showNewSubjectForm ? 'Cancelar' : '+ Nova matéria' }}
                     </button>
-                </div>
+                </template>
+                <template #default="{ id }">
+                    <div v-if="showNewSubjectForm" class="flex gap-2 mb-2">
+                        <label :for="ids.newSubject" class="sr-only">Nome da nova matéria</label>
+                        <input :id="ids.newSubject" v-model="newSubjectName" type="text"
+                               placeholder="Nome da nova matéria"
+                               @keydown.enter.prevent="createSubject"
+                               class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                        <button type="button"
+                                :disabled="!newSubjectName || creatingSubject"
+                                @click="createSubject"
+                                class="px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                            Criar
+                        </button>
+                    </div>
+                    <p v-if="newSubjectError" class="text-xs text-red-600 mb-2">{{ newSubjectError }}</p>
 
-                <div v-if="showNewSubjectForm" class="flex gap-2 mb-2">
-                    <label :for="ids.newSubject" class="sr-only">Nome da nova matéria</label>
-                    <input :id="ids.newSubject" v-model="newSubjectName" type="text"
-                           placeholder="Nome da nova matéria"
-                           @keydown.enter.prevent="createSubject"
-                           class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
-                    <button type="button"
-                            :disabled="!newSubjectName || creatingSubject"
-                            @click="createSubject"
-                            class="px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
-                        Criar
-                    </button>
-                </div>
-                <p v-if="newSubjectError" class="text-xs text-red-600 mb-2">{{ newSubjectError }}</p>
-
-                <select :id="ids.subject" v-model="localSubjectId"
-                        @change="handleSubjectChange"
-                        autofocus
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                        :class="{ 'border-red-500': errors.subject_id }">
-                    <option value="">Selecione uma matéria</option>
-                    <option v-for="subject in localSubjects"
-                            :key="subject.id"
-                            :value="subject.id"
-                            :style="{ color: getReadableTextColor(subject.color, { light: subject.color, dark: '#1f2937' }) }">
-                        {{ subject.name }}
-                    </option>
-                </select>
-                <p v-if="errors.subject_id" class="mt-1 text-sm text-red-600">
-                    {{ errors.subject_id }}
-                </p>
-            </div>
+                    <select :id="id" v-model="localSubjectId"
+                            @change="handleSubjectChange"
+                            autofocus
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                            :class="{ 'border-red-500': errors.subject_id }">
+                        <option value="">Selecione uma matéria</option>
+                        <option v-for="subject in localSubjects"
+                                :key="subject.id"
+                                :value="subject.id"
+                                :style="{ color: getReadableTextColor(subject.color, { light: subject.color, dark: '#1f2937' }) }">
+                            {{ subject.name }}
+                        </option>
+                    </select>
+                </template>
+            </FormField>
 
             <!-- Tópico -->
-            <div>
-                <div class="flex items-center justify-between mb-2">
-                    <label :for="ids.topic" class="block text-sm font-medium text-gray-700">
-                        Tópico
-                    </label>
+            <FormField label="Tópico" :error="errors.topic_id" :id="ids.topic">
+                <template #label-actions>
                     <button v-if="localSubjectId" type="button" class="text-xs font-medium text-blue-600 hover:text-blue-800"
                             @click="showNewTopicForm = !showNewTopicForm">
                         {{ showNewTopicForm ? 'Cancelar' : '+ Novo tópico' }}
                     </button>
-                </div>
+                </template>
+                <template #default="{ id }">
+                    <div v-if="showNewTopicForm && localSubjectId" class="flex gap-2 mb-2">
+                        <label :for="ids.newTopic" class="sr-only">Nome do novo tópico</label>
+                        <input :id="ids.newTopic" v-model="newTopicName" type="text"
+                               placeholder="Nome do novo tópico"
+                               @keydown.enter.prevent="createTopic"
+                               class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                        <button type="button"
+                                :disabled="!newTopicName || creatingTopic"
+                                @click="createTopic"
+                                class="px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                            Criar
+                        </button>
+                    </div>
+                    <p v-if="newTopicError" class="text-xs text-red-600 mb-2">{{ newTopicError }}</p>
 
-                <div v-if="showNewTopicForm && localSubjectId" class="flex gap-2 mb-2">
-                    <label :for="ids.newTopic" class="sr-only">Nome do novo tópico</label>
-                    <input :id="ids.newTopic" v-model="newTopicName" type="text"
-                           placeholder="Nome do novo tópico"
-                           @keydown.enter.prevent="createTopic"
-                           class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
-                    <button type="button"
-                            :disabled="!newTopicName || creatingTopic"
-                            @click="createTopic"
-                            class="px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
-                        Criar
-                    </button>
-                </div>
-                <p v-if="newTopicError" class="text-xs text-red-600 mb-2">{{ newTopicError }}</p>
-
-                <select :id="ids.topic" v-model="localTopicId"
-                        @change="handleTopicChange"
-                        :disabled="!localSubjectId || filteredTopics.length === 0"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors"
-                        :class="{ 'border-red-500': errors.topic_id }">
-                    <option value="">Selecione um tópico (opcional)</option>
-                    <option v-for="topic in filteredTopics"
-                            :key="topic.id"
-                            :value="topic.id">
-                        {{ topic.name }}
-                    </option>
-                </select>
-                <p v-if="errors.topic_id" class="mt-1 text-sm text-red-600">
-                    {{ errors.topic_id }}
-                </p>
-                <p v-if="localSubjectId && filteredTopics.length === 0"
-                   class="mt-1 text-xs text-gray-500">
-                    Nenhum tópico disponível para esta matéria
-                </p>
-            </div>
+                    <select :id="id" v-model="localTopicId"
+                            @change="handleTopicChange"
+                            :disabled="!localSubjectId || filteredTopics.length === 0"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors"
+                            :class="{ 'border-red-500': errors.topic_id }">
+                        <option value="">Selecione um tópico (opcional)</option>
+                        <option v-for="topic in filteredTopics"
+                                :key="topic.id"
+                                :value="topic.id">
+                            {{ topic.name }}
+                        </option>
+                    </select>
+                    <p v-if="localSubjectId && filteredTopics.length === 0"
+                       class="mt-1 text-xs text-gray-500">
+                        Nenhum tópico disponível para esta matéria
+                    </p>
+                </template>
+            </FormField>
 
             <!-- Tipo de Questão -->
-            <div>
-                <label :for="ids.questionType" class="block text-sm font-medium text-gray-700 mb-2">
-                    Tipo de Questão <span class="text-red-500">*</span>
-                </label>
-                <select :id="ids.questionType" v-model="localQuestionTypeId"
-                        @change="handleQuestionTypeChange"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                        :class="{ 'border-red-500': errors.question_type_id }">
-                    <option value="">Selecione o tipo</option>
-                    <option v-for="type in questionTypes"
-                            :key="type.id"
-                            :value="type.id">
-                        {{ type.name }}
-                    </option>
-                </select>
-                <p v-if="errors.question_type_id" class="mt-1 text-sm text-red-600">
-                    {{ errors.question_type_id }}
-                </p>
-                <p v-if="selectedQuestionType" class="mt-1 text-xs text-gray-500">
-                    {{ getQuestionTypeDescription(selectedQuestionType.slug) }}
-                </p>
-            </div>
+            <FormField label="Tipo de Questão" required :error="errors.question_type_id" :id="ids.questionType"
+                       :hint="selectedQuestionType ? getQuestionTypeDescription(selectedQuestionType.slug) : null">
+                <template #default="{ id }">
+                    <select :id="id" v-model="localQuestionTypeId"
+                            @change="handleQuestionTypeChange"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                            :class="{ 'border-red-500': errors.question_type_id }">
+                        <option value="">Selecione o tipo</option>
+                        <option v-for="type in questionTypes"
+                                :key="type.id"
+                                :value="type.id">
+                            {{ type.name }}
+                        </option>
+                    </select>
+                </template>
+            </FormField>
 
             <!-- Dificuldade -->
             <div>
@@ -186,31 +170,24 @@
 
         <!-- Pontuação e Status -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-            <div>
-                <label :for="ids.points" class="block text-sm font-medium text-gray-700 mb-2">
-                    Pontos <span class="text-red-500">*</span>
-                </label>
-                <div class="flex items-center gap-3">
-                    <input type="number"
-                           :id="ids.points"
-                           v-model.number="localPoints"
-                           @input="handlePointsChange"
-                           min="0.5"
-                           max="10"
-                           step="0.5"
-                           class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                           :class="{ 'border-red-500': errors.points }">
-                    <span class="text-sm text-gray-500 whitespace-nowrap">
-                        {{ localPoints === 1 ? 'ponto' : 'pontos' }}
-                    </span>
-                </div>
-                <p v-if="errors.points" class="mt-1 text-sm text-red-600">
-                    {{ errors.points }}
-                </p>
-                <p class="mt-1 text-xs text-gray-500">
-                    Valor mínimo: 0,5 | Valor máximo: 10
-                </p>
-            </div>
+            <FormField label="Pontos" required :error="errors.points" :id="ids.points" hint="Valor mínimo: 0,5 | Valor máximo: 10">
+                <template #default="{ id }">
+                    <div class="flex items-center gap-3">
+                        <input type="number"
+                               :id="id"
+                               v-model.number="localPoints"
+                               @input="handlePointsChange"
+                               min="0.5"
+                               max="10"
+                               step="0.5"
+                               class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                               :class="{ 'border-red-500': errors.points }">
+                        <span class="text-sm text-gray-500 whitespace-nowrap">
+                            {{ localPoints === 1 ? 'ponto' : 'pontos' }}
+                        </span>
+                    </div>
+                </template>
+            </FormField>
 
             <div class="flex items-center">
                 <label :for="ids.isActive" class="flex items-center space-x-2 cursor-pointer group">
@@ -238,6 +215,7 @@
 <script setup>
 import { ref, computed, watch, useId } from 'vue';
 import { getReadableTextColor } from '@/utils/color';
+import FormField from '@/Components/UI/FormField.vue';
 
 const uid = useId();
 const ids = {

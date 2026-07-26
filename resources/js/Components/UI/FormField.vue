@@ -11,10 +11,13 @@
 -->
 <template>
     <div>
-        <InputLabel v-if="label" :for="fieldId">
-            {{ label }}
-            <span v-if="required" class="text-red-500">*</span>
-        </InputLabel>
+        <div v-if="label" class="flex items-center justify-between">
+            <InputLabel :for="fieldId">
+                {{ label }}
+                <span v-if="required" class="text-red-500">*</span>
+            </InputLabel>
+            <slot name="label-actions" />
+        </div>
         <div :class="label ? 'mt-1' : ''">
             <slot :id="fieldId" :described-by="describedBy" />
         </div>

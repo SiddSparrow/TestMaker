@@ -78,6 +78,15 @@
                             {{ form.errors.document }}
                         </div>
 
+                        <!-- Progresso do upload -->
+                        <div v-if="form.progress" class="space-y-1">
+                            <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div class="h-full bg-blue-600 transition-all duration-150"
+                                     :style="{ width: `${form.progress.percentage}%` }"></div>
+                            </div>
+                            <p class="text-xs text-gray-500">Enviando... {{ form.progress.percentage }}%</p>
+                        </div>
+
                         <!-- Informações -->
                         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
                             <div class="flex">
@@ -144,11 +153,41 @@ const form = useForm({
     document: null,
 });
 
+// Validação client-side de tipo/tamanho — antes só o input file restringia
+// a extensão (e só no clique, não no drag&drop), e um arquivo de 10MB só
+// descobria que era inválido depois da viagem inteira até o servidor.
+const ALLOWED_EXTENSIONS = ['pdf', 'docx', 'txt'];
+const MAX_SIZE_BYTES = 10 * 1024 * 1024;
+
+const validateFile = (file) => {
+    const extension = file.name.split('.').pop()?.toLowerCase();
+    if (!ALLOWED_EXTENSIONS.includes(extension)) {
+        return 'Apenas arquivos PDF, DOCX ou TXT são permitidos.';
+    }
+    if (file.size > MAX_SIZE_BYTES) {
+        return 'O arquivo não pode ser maior que 10MB.';
+    }
+    return null;
+};
+
+const setFile = (file) => {
+    const error = validateFile(file);
+    if (error) {
+        selectedFile.value = null;
+        form.document = null;
+        form.setError('document', error);
+        return;
+    }
+
+    form.clearErrors('document');
+    selectedFile.value = file;
+    form.document = file;
+};
+
 const onFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-        selectedFile.value = file;
-        form.document = file;
+        setFile(file);
     }
 };
 
@@ -156,8 +195,7 @@ const onDrop = (event) => {
     dragover.value = false;
     const file = event.dataTransfer.files[0];
     if (file) {
-        selectedFile.value = file;
-        form.document = file;
+        setFile(file);
     }
 };
 

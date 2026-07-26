@@ -402,7 +402,13 @@ const setCorrectAlternative = (questionIndex, altIndex) => {
 const applyBulkSubjectTopic = () => {
     selectedQuestions.value.forEach((index) => {
         extractedQuestions[index].subject_id = bulkSubjectId.value;
-        extractedQuestions[index].topic_id = bulkTopicId.value;
+
+        // Só sobrescreve o tópico quando um foi de fato escolhido no lote —
+        // "Aplicar a todas as selecionadas" sem tópico selecionado apagava
+        // tópicos já definidos individualmente em cada questão.
+        if (bulkTopicId.value) {
+            extractedQuestions[index].topic_id = bulkTopicId.value;
+        }
     });
 };
 

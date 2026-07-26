@@ -28,7 +28,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('topics', TopicController::class)->only(['store', 'update', 'destroy']);
     Route::resource('tags', TagController::class)->only(['store', 'update', 'destroy']);
 
-    // Questões
+    // Questões — bulk-status precisa vir ANTES do resource: como é uma
+    // rota literal (/questions/bulk-status) do mesmo verbo PATCH usado por
+    // questions.update (/questions/{question}), se viesse depois o Laravel
+    // casaria "bulk-status" com {question} e nunca chegaria aqui.
+    Route::patch('/questions/bulk-status', [QuestionController::class, 'bulkStatus'])
+        ->name('questions.bulk-status');
     Route::resource('questions', QuestionController::class);
     Route::post('/questions/{question}/copy', [QuestionController::class, 'copy'])
         ->name('questions.copy');

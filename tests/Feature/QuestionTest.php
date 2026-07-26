@@ -82,6 +82,35 @@ class QuestionTest extends TestCase
         );
     }
 
+    public function test_index_sorts_by_a_whitelisted_column(): void
+    {
+        $low = $this->createQuestion(['points' => 1]);
+        $high = $this->createQuestion(['points' => 8]);
+
+        $response = $this->actingAs($this->user)->get(
+            route('questions.index', ['sort' => 'points', 'direction' => 'desc'])
+        );
+
+        $response->assertInertia(
+            fn ($page) => $page
+                ->where('questions.data.0.id', $high->id)
+                ->where('questions.data.1.id', $low->id)
+        );
+    }
+
+    public function test_index_ignores_a_non_whitelisted_sort_column(): void
+    {
+        // 'user_id' não está na whitelist de $sortableColumns — passá-lo não
+        // deve gerar erro nem permitir orderBy() num nome de coluna arbitrário.
+        $this->createQuestion();
+
+        $response = $this->actingAs($this->user)->get(
+            route('questions.index', ['sort' => 'user_id', 'direction' => 'asc'])
+        );
+
+        $response->assertOk();
+    }
+
     public function test_store_creates_multiple_choice_question_with_alternatives(): void
     {
         $payload = [
@@ -205,6 +234,40 @@ class QuestionTest extends TestCase
         $response->assertSessionHas('success');
         $response->assertSessionMissing('error');
         $this->assertSame(2, Question::count());
+    }
+
+    public function test_bulk_status_archives_only_the_authenticated_users_questions(): void
+    {
+        $mine = $this->createQuestion(['is_active' => true]);
+        $other = User::factory()->create();
+        $notMine = Question::factory()->create([
+            'user_id' => $other->id,
+            'question_type_id' => $this->essayType->id,
+            'is_active' => true,
+        ]);
+
+        $response = $this->actingAs($this->user)->patch(route('questions.bulk-status'), [
+            'ids' => [$mine->id, $notMine->id],
+            'is_active' => false,
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+        $this->assertDatabaseHas('questions', ['id' => $mine->id, 'is_active' => false]);
+        $this->assertDatabaseHas('questions', ['id' => $notMine->id, 'is_active' => true]);
+    }
+
+    public function test_bulk_status_reactivates_questions(): void
+    {
+        $question = $this->createQuestion(['is_active' => false]);
+
+        $response = $this->actingAs($this->user)->patch(route('questions.bulk-status'), [
+            'ids' => [$question->id],
+            'is_active' => true,
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('questions', ['id' => $question->id, 'is_active' => true]);
     }
 
     private function createQuestion(array $overrides = []): Question

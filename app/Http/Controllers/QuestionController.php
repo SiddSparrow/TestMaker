@@ -38,6 +38,13 @@ class QuestionController extends Controller
     ];
 
     /**
+     * Colunas pelas quais a listagem pode ser ordenada — evita passar a
+     * coluna do request direto para orderBy() (SQL injection via nome de
+     * coluna arbitrário).
+     */
+    protected $sortableColumns = ['statement', 'difficulty_level', 'points', 'is_active', 'created_at'];
+
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
@@ -53,6 +60,8 @@ class QuestionController extends Controller
             'question_type_id',
             'is_active',
             'per_page',
+            'sort',
+            'direction',
         ]);
 
         // Cache key para a query com filtros + userId (importante!)
@@ -70,14 +79,21 @@ class QuestionController extends Controller
                 'alternatives:id,question_id,content,is_correct',
             ])
                 ->where('user_id', $userId)  // Filtrar por usuário
-                ->orderBy('is_active', 'desc')
                 ->withCount('alternatives');
 
             // Aplicar filtros
             $this->applyFilters($query, $filters);
 
-            // Ordenação padrão
-            $query->latest();
+            // Ordenação: por coluna quando pedido pela UI (whitelist em
+            // $sortableColumns), senão o padrão de sempre.
+            $sort = $filters['sort'] ?? null;
+            $direction = ($filters['direction'] ?? 'asc') === 'desc' ? 'desc' : 'asc';
+
+            if ($sort && in_array($sort, $this->sortableColumns, true)) {
+                $query->orderBy($sort, $direction);
+            } else {
+                $query->orderBy('is_active', 'desc')->latest();
+            }
 
             // Paginação
             $perPage = $filters['per_page'] ?? 15;
@@ -571,6 +587,34 @@ class QuestionController extends Controller
 
         return redirect()->route('questions.index')
             ->with('success', 'Questão inativada com sucesso!');
+    }
+
+    /**
+     * Ativa/inativa uma ou várias questões de uma vez — usado tanto pela
+     * ação "Reativar" de uma linha quanto pela barra de seleção múltipla.
+     * Sem isso, inativar 20 questões exigia 20 confirmações separadas.
+     */
+    public function bulkStatus(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer',
+            'is_active' => 'required|boolean',
+        ]);
+
+        $userId = Auth::id();
+
+        $updated = Question::where('user_id', $userId)
+            ->whereIn('id', $validated['ids'])
+            ->update(['is_active' => $validated['is_active']]);
+
+        $this->clearQuestionCache();
+
+        $message = $validated['is_active']
+            ? "{$updated} questão(ões) reativada(s) com sucesso!"
+            : "{$updated} questão(ões) arquivada(s) com sucesso!";
+
+        return back()->with('success', $message);
     }
 
     /**

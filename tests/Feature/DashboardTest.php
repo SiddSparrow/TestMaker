@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Document;
 use App\Models\Exam;
 use App\Models\Question;
 use App\Models\QuestionType;
@@ -60,5 +61,34 @@ class DashboardTest extends TestCase
         $response = $this->actingAs($user)->get(route('dashboard'));
 
         $response->assertInertia(fn ($page) => $page->where('stats.total_questions', 0));
+    }
+
+    /**
+     * O controller já calculava total_documents e most_used_subjects, mas o
+     * Dashboard.vue descartava os dois — a auditoria pediu para exibir ou
+     * remover. Este teste garante que a prop chega até a view.
+     */
+    public function test_dashboard_surfaces_document_count_and_most_used_subjects(): void
+    {
+        $user = User::factory()->create();
+        $subject = Subject::factory()->create(['user_id' => $user->id, 'name' => 'Matemática']);
+        $type = QuestionType::factory()->create();
+        Question::factory()->count(2)->create([
+            'user_id' => $user->id,
+            'subject_id' => $subject->id,
+            'topic_id' => null,
+            'question_type_id' => $type->id,
+        ]);
+        Document::factory()->create(['user_id' => $user->id, 'status' => 'completed']);
+        Document::factory()->create(['user_id' => $user->id, 'status' => 'pending']);
+
+        $response = $this->actingAs($user)->get(route('dashboard'));
+
+        $response->assertInertia(
+            fn ($page) => $page
+                ->where('stats.total_documents', 1)
+                ->where('most_used_subjects.0.name', 'Matemática')
+                ->where('most_used_subjects.0.question_count', 2)
+        );
     }
 }

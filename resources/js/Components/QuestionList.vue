@@ -1,8 +1,8 @@
 <template>
     <div class="space-y-4">
-        <div v-for="question in questions" :key="question.id"
-             class="p-3 border border-gray-100 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-             @click="$inertia.visit(route('questions.edit', question.id))">
+        <Link v-for="question in questions" :key="question.id"
+              :href="route('questions.show', question.id)"
+              class="block p-3 border border-gray-100 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
             <div class="flex items-start justify-between">
                 <div class="flex-1 min-w-0">
                     <p class="text-sm font-medium text-gray-900 truncate">
@@ -16,21 +16,14 @@
                         <span class="text-xs text-gray-500">{{ question.topic || 'Sem tópico' }}</span>
                     </div>
                 </div>
-                <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                      :class="{
-                          'bg-green-100 text-green-800': question.difficulty_level === 'easy',
-                          'bg-yellow-100 text-yellow-800': question.difficulty_level === 'medium',
-                          'bg-red-100 text-red-800': question.difficulty_level === 'hard'
-                      }">
-                    {{ question.difficulty_level }}
-                </span>
+                <DifficultyBadge class="ml-3 shrink-0" :level="question.difficulty_level" />
             </div>
             <div class="mt-2 flex justify-between text-xs text-gray-500">
                 <span>{{ question.points }} ponto{{ question.points !== 1 ? 's' : '' }}</span>
                 <span>{{ question.created_at }}</span>
             </div>
-        </div>
-        
+        </Link>
+
         <div v-if="questions.length === 0" class="text-center py-8 text-gray-500">
             Nenhuma questão encontrada
         </div>
@@ -38,6 +31,9 @@
 </template>
 
 <script setup>
+import { Link } from '@inertiajs/vue3';
+import DifficultyBadge from '@/Components/UI/DifficultyBadge.vue';
+
 defineProps({
     questions: {
         type: Array,

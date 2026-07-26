@@ -5,15 +5,15 @@
 
         <div class="space-y-6">
             <!-- Cards de estatísticas -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 animate-slide-up delay-150">
-                <StatCard 
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 animate-slide-up delay-150">
+                <StatCard
                     title="Questões Ativas"
                     :value="stats.total_questions"
                     icon="QuestionMarkCircleIcon"
                     color="blue"
                     :link="route('questions.index')"
                 />
-                <StatCard 
+                <StatCard
                     title="Provas Criadas"
                     :value="stats.total_exams"
                     icon="DocumentTextIcon"
@@ -31,16 +31,22 @@
                     title="Tópicos"
                     :value="stats.total_topics"
                     icon="FolderIcon"
-                    color="orange"
+                    color="indigo"
                     :link="route('topics.index')"
                 />
-
                 <StatCard
                     title="Etiquetas"
                     :value="stats.total_tags"
                     icon="TagIcon"
-                    color="orange"
+                    color="pink"
                     :link="route('tags.index')"
+                />
+                <StatCard
+                    title="Documentos Processados"
+                    :value="stats.total_documents"
+                    icon="ArrowUpTrayIcon"
+                    color="orange"
+                    :link="route('documents.index')"
                 />
             </div>
             <!-- Ações rápidas -->
@@ -105,6 +111,33 @@
                 </div>
             </div>
 
+            <!-- Matérias mais usadas -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 animate-slide-up delay-300">
+                <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                    <h3 class="text-lg font-semibold text-gray-800">Matérias Mais Usadas</h3>
+                    <Link :href="route('subjects.index')" class="text-sm text-blue-600 hover:text-blue-800">
+                        Ver todas →
+                    </Link>
+                </div>
+                <div class="p-4">
+                    <ul v-if="most_used_subjects.length" class="divide-y divide-gray-100">
+                        <li v-for="subject in most_used_subjects" :key="subject.id"
+                            class="py-3 flex items-center justify-between">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <span class="w-3 h-3 rounded-full shrink-0" :style="{ backgroundColor: subject.color }" />
+                                <span class="text-sm font-medium text-gray-800 truncate">{{ subject.name }}</span>
+                            </div>
+                            <span class="text-sm text-gray-500 shrink-0">
+                                {{ subject.question_count }} {{ Number(subject.question_count) === 1 ? 'questão' : 'questões' }}
+                            </span>
+                        </li>
+                    </ul>
+                    <div v-else class="text-center py-8 text-gray-500">
+                        Nenhuma matéria com questões ainda
+                    </div>
+                </div>
+            </div>
+
         </div>
     </AppLayout>
 </template>
@@ -120,5 +153,9 @@ defineProps({
     stats: Object,
     recent_questions: Array,
     recent_exams: Array,
+    most_used_subjects: {
+        type: Array,
+        default: () => []
+    },
 });
 </script>

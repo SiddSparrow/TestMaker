@@ -12,6 +12,8 @@
                 color === 'blue' ? 'bg-blue-50 text-blue-600' :
                 color === 'green' ? 'bg-green-50 text-green-600' :
                 color === 'purple' ? 'bg-purple-50 text-purple-600' :
+                color === 'pink' ? 'bg-pink-50 text-pink-600' :
+                color === 'indigo' ? 'bg-indigo-50 text-indigo-600' :
                 'bg-orange-50 text-orange-600'
             ]">
                 <component :is="iconComponent" class="w-6 h-6" />
@@ -41,7 +43,9 @@ import {
     ArrowUpTrayIcon,
     ArrowTrendingUpIcon,
     ArrowTrendingDownIcon,
-    TagIcon
+    TagIcon,
+    FolderIcon,
+    CalendarIcon
 } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
@@ -55,7 +59,7 @@ const props = defineProps({
     color: {
         type: String,
         default: 'blue',
-        validator: (value) => ['blue', 'green', 'purple', 'orange'].includes(value)
+        validator: (value) => ['blue', 'green', 'purple', 'orange', 'pink', 'indigo'].includes(value)
     },
     change: String
 });
@@ -66,7 +70,9 @@ const iconComponent = computed(() => {
         DocumentTextIcon,
         BookOpenIcon,
         ArrowUpTrayIcon,
-        TagIcon
+        TagIcon,
+        FolderIcon,
+        CalendarIcon
     };
     return icons[props.icon] || QuestionMarkCircleIcon;
 });

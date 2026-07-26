@@ -197,6 +197,44 @@ class DocumentTest extends TestCase
     }
 
     /**
+     * Question::clearCache() already runs on Question::create() (model
+     * event), which covers the questions_stats_ key. But importQuestions()
+     * still needed its own explicit invalidation for that key, since the
+     * audit flagged the stats card staying stale up to 30 min after import.
+     */
+    public function test_import_questions_refreshes_the_cached_stats(): void
+    {
+        $document = Document::factory()->create(['user_id' => $this->user->id, 'status' => 'completed']);
+        $subject = Subject::factory()->create(['user_id' => $this->user->id]);
+        QuestionType::factory()->create(['name' => 'Múltipla Escolha', 'slug' => 'multipla-escolha']);
+
+        // Prime the stats cache at zero questions.
+        $this->actingAs($this->user)->get(route('questions.index'));
+
+        $payload = [
+            'questions' => [
+                [
+                    'statement' => 'Questão extraída do documento pela IA?',
+                    'type' => 'Múltipla Escolha',
+                    'subject_id' => $subject->id,
+                    'difficulty_level' => 'medium',
+                    'points' => 2,
+                    'alternatives' => [
+                        ['content' => 'A', 'is_correct' => false],
+                        ['content' => 'B', 'is_correct' => true],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->actingAs($this->user)->post(route('documents.import-questions', $document), $payload);
+
+        $response = $this->actingAs($this->user)->get(route('questions.index'));
+
+        $response->assertInertia(fn ($page) => $page->where('stats.total', 1));
+    }
+
+    /**
      * The import validation now requires subject_id (scoped to the
      * authenticated user's own subjects) instead of declaring it nullable
      * while the questions table enforces NOT NULL.

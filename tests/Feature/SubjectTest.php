@@ -171,4 +171,25 @@ class SubjectTest extends TestCase
 
         $subject->delete();
     }
+
+    /**
+     * QuestionController::create() caches its `subjects` list for 30 min.
+     * A subject created via the catalog screen (this controller) used to
+     * be invisible in the question form's <select> until the cache expired
+     * — the exact symptom the earlier cache fix claimed to have removed,
+     * just one layer further out.
+     */
+    public function test_creating_a_subject_invalidates_the_question_form_cache(): void
+    {
+        // Prime the cache with the "before" state.
+        $this->actingAs($this->user)->get(route('questions.create'));
+
+        $this->actingAs($this->user)->post(route('subjects.store'), ['name' => 'Geografia']);
+
+        $response = $this->actingAs($this->user)->get(route('questions.create'));
+
+        $response->assertInertia(
+            fn ($page) => $page->has('subjects', 1)->where('subjects.0.name', 'Geografia')
+        );
+    }
 }

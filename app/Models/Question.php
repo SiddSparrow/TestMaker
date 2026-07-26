@@ -52,11 +52,17 @@ class Question extends Model
      */
     public function clearCache(): void
     {
-        $tags = ['questions', "question_{$this->id}"];
+        // Cache::tags() só existe em Redis/Memcached/array — com o driver
+        // 'database' (alternativa documentada no .env), lança
+        // BadMethodCallException em TODO save(), quebrando a criação de
+        // questão. As chaves por usuário (QuestionController) são
+        // Cache::forget() diretas, sem depender de tags.
+        Cache::forget('questions_stats_' . $this->user_id);
+        Cache::forget('questions_create_data_' . $this->user_id);
+        Cache::forget('questions_edit_data_' . $this->user_id);
 
-        Cache::tags($tags)->flush();
-
-        // Limpa estatísticas
+        // Limpa estatísticas legadas — nada mais escreve nessas chaves
+        // (ver ClearQuestionsCache), mantidas só por segurança.
         Cache::forget('questions_stats');
         Cache::forget('questions_count_total');
         Cache::forget('questions_count_active');

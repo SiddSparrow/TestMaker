@@ -148,4 +148,24 @@ class TopicTest extends TestCase
         $response->assertNotFound();
         $this->assertDatabaseHas('topics', ['id' => $topic->id]);
     }
+
+    /**
+     * Same cache-invalidation gap as SubjectTest — a topic created here used
+     * to be invisible in the question form until the 30-min cache expired.
+     */
+    public function test_creating_a_topic_invalidates_the_question_form_cache(): void
+    {
+        $this->actingAs($this->user)->get(route('questions.create'));
+
+        $this->actingAs($this->user)->post(route('topics.store'), [
+            'subject_id' => $this->subject->id,
+            'name' => 'Equações',
+        ]);
+
+        $response = $this->actingAs($this->user)->get(route('questions.create'));
+
+        $response->assertInertia(
+            fn ($page) => $page->has('topics', 1)->where('topics.0.name', 'Equações')
+        );
+    }
 }

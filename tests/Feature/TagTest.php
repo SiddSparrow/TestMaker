@@ -118,4 +118,21 @@ class TagTest extends TestCase
 
         $this->assertDatabaseHas('tags', ['id' => $mine->id, 'name' => 'Gramática']);
     }
+
+    /**
+     * Same cache-invalidation gap as SubjectTest — a tag created here used
+     * to be invisible in the question form until the 30-min cache expired.
+     */
+    public function test_creating_a_tag_invalidates_the_question_form_cache(): void
+    {
+        $this->actingAs($this->user)->get(route('questions.create'));
+
+        $this->actingAs($this->user)->post(route('tags.store'), ['name' => 'Revisão']);
+
+        $response = $this->actingAs($this->user)->get(route('questions.create'));
+
+        $response->assertInertia(
+            fn ($page) => $page->has('tags', 1)->where('tags.0.name', 'Revisão')
+        );
+    }
 }

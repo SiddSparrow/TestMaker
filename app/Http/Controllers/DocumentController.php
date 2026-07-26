@@ -10,6 +10,7 @@ use App\Models\QuestionType;
 use App\Models\Subject;
 use App\Models\Topic;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -216,6 +217,14 @@ class DocumentController extends Controller
             }
 
             DB::commit();
+
+            // Sem isto, os cards de estatística (QuestionController::getCachedStats)
+            // continuam com os números de antes da importação por até 30 min —
+            // ver o mesmo padrão em QuestionController::clearQuestionCache().
+            $userId = auth()->id();
+            Cache::forget('questions_stats_' . $userId);
+            Cache::forget('questions_create_data_' . $userId);
+            Cache::forget('questions_edit_data_' . $userId);
 
             // O status permanece 'completed' (fora do enum não existe
             // 'imported'); a importação é registrada em imported_at.

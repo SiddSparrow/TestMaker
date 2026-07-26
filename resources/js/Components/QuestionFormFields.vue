@@ -189,8 +189,9 @@
                            :id="ids.points"
                            v-model.number="localPoints"
                            @input="handlePointsChange"
-                           min="1"
+                           min="0.5"
                            max="10"
+                           step="0.5"
                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"
                            :class="{ 'border-red-500': errors.points }">
                     <span class="text-sm text-gray-500 whitespace-nowrap">
@@ -201,7 +202,7 @@
                     {{ errors.points }}
                 </p>
                 <p class="mt-1 text-xs text-gray-500">
-                    Valor mínimo: 1 | Valor máximo: 10
+                    Valor mínimo: 0,5 | Valor máximo: 10
                 </p>
             </div>
 
@@ -422,8 +423,8 @@ const setDifficulty = (level) => {
 };
 
 const handlePointsChange = () => {
-    // Garante que está entre 1 e 10
-    if (localPoints.value < 1) localPoints.value = 1;
+    // Garante que está entre 0.5 e 10
+    if (localPoints.value < 0.5) localPoints.value = 0.5;
     if (localPoints.value > 10) localPoints.value = 10;
     
     emit('update:points', localPoints.value);

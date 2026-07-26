@@ -212,9 +212,15 @@ class QuestionTest extends TestCase
     {
         $question = $this->createQuestion();
 
-        $response = $this->actingAs($this->user)->delete(route('questions.destroy', $question));
+        // destroy() usa back() para preservar filtros/paginação de onde o
+        // usuário veio, em vez de sempre voltar para questions.index sem filtro.
+        $referer = route('questions.index', ['search' => 'foo', 'page' => 2]);
 
-        $response->assertRedirect(route('questions.index'));
+        $response = $this->actingAs($this->user)
+            ->from($referer)
+            ->delete(route('questions.destroy', $question));
+
+        $response->assertRedirect($referer);
         $this->assertDatabaseHas('questions', ['id' => $question->id, 'is_active' => false]);
         $this->assertNotSoftDeleted($question);
     }

@@ -33,8 +33,6 @@ class QuestionController extends Controller
         'question_types' => 'question_types_all',
         'tags' => 'tags_all',
         'stats' => 'questions_stats',
-        'filters' => 'questions_filters_',
-        'questions_list' => 'questions_list_',
     ];
 
     /**
@@ -64,42 +62,39 @@ class QuestionController extends Controller
             'direction',
         ]);
 
-        // Cache key para a query com filtros + userId (importante!)
-        $filtersHash = md5(serialize($filters) . $userId . $request->input('page', 1));
-        $cacheKey = $this->cacheKeys['filters'] . $filtersHash;
+        // A listagem paginada não é cacheada: a invalidação (clearQuestionCache)
+        // só funcionava de fato com o driver Redis (é um no-op silencioso em
+        // qualquer outro, database incluído) — criar uma questão podia
+        // simplesmente não aparecer na lista por até 30 minutos. É uma query
+        // simples e paginada, cachear aqui não valia esse risco.
+        $query = Question::with([
+            'subject:id,name,color',
+            'topic:id,name',
+            'questionType:id,name',
+            'tags:id,name',
+            'alternatives:id,question_id,content,is_correct',
+        ])
+            ->where('user_id', $userId)  // Filtrar por usuário
+            ->withCount('alternatives');
 
-        // Tenta obter do cache primeiro
-        $questions = Cache::remember($cacheKey, $this->cacheDuration, function () use ($filters, $userId) {
-            // Query base com relacionamentos
-            $query = Question::with([
-                'subject:id,name,color',
-                'topic:id,name',
-                'questionType:id,name',
-                'tags:id,name',
-                'alternatives:id,question_id,content,is_correct',
-            ])
-                ->where('user_id', $userId)  // Filtrar por usuário
-                ->withCount('alternatives');
+        // Aplicar filtros
+        $this->applyFilters($query, $filters);
 
-            // Aplicar filtros
-            $this->applyFilters($query, $filters);
+        // Ordenação: por coluna quando pedido pela UI (whitelist em
+        // $sortableColumns), senão o padrão de sempre.
+        $sort = $filters['sort'] ?? null;
+        $direction = ($filters['direction'] ?? 'asc') === 'desc' ? 'desc' : 'asc';
 
-            // Ordenação: por coluna quando pedido pela UI (whitelist em
-            // $sortableColumns), senão o padrão de sempre.
-            $sort = $filters['sort'] ?? null;
-            $direction = ($filters['direction'] ?? 'asc') === 'desc' ? 'desc' : 'asc';
+        if ($sort && in_array($sort, $this->sortableColumns, true)) {
+            $query->orderBy($sort, $direction);
+        } else {
+            $query->orderBy('is_active', 'desc')->latest();
+        }
 
-            if ($sort && in_array($sort, $this->sortableColumns, true)) {
-                $query->orderBy($sort, $direction);
-            } else {
-                $query->orderBy('is_active', 'desc')->latest();
-            }
+        // Paginação
+        $perPage = $filters['per_page'] ?? 15;
 
-            // Paginação
-            $perPage = $filters['per_page'] ?? 15;
-
-            return $query->paginate($perPage)->withQueryString();
-        });
+        $questions = $query->paginate($perPage)->withQueryString();
 
         // Dados para filtros (com cache)
         $subjects = Cache::remember(
@@ -300,7 +295,7 @@ class QuestionController extends Controller
                 'statement' => 'required|string|min:10',
                 'explanation' => 'nullable|string',
                 'difficulty_level' => 'required|in:easy,medium,hard',
-                'points' => 'required|integer|min:1|max:10',
+                'points' => 'required|numeric|min:0.5|max:10',
                 'is_active' => 'boolean',
                 'tags' => 'nullable|array',
                 'tags.*' => 'exists:tags,id',
@@ -318,7 +313,7 @@ class QuestionController extends Controller
             'statement' => 'required|string|min:10',
             'explanation' => 'nullable|string',
             'difficulty_level' => 'required|in:easy,medium,hard',
-            'points' => 'required|integer|min:1|max:10',
+            'points' => 'required|numeric|min:0.5|max:10',
             'is_active' => 'boolean',
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',
@@ -480,7 +475,7 @@ class QuestionController extends Controller
             'statement' => 'required|string|min:10',
             'explanation' => 'nullable|string',
             'difficulty_level' => 'required|in:easy,medium,hard',
-            'points' => 'required|integer|min:1|max:10',
+            'points' => 'required|numeric|min:0.5|max:10',
             'is_active' => 'boolean',
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id',
@@ -550,8 +545,7 @@ class QuestionController extends Controller
 
             DB::commit();
 
-            // Limpa cache relacionado (passa o ID da questão)
-            $this->clearQuestionCache($question->id);
+            $this->clearQuestionCache();
 
             return redirect()->route('questions.show', $question->id)
                 ->with('success', 'Questão atualizada com sucesso!');
@@ -577,16 +571,16 @@ class QuestionController extends Controller
     {
         $this->authorize('delete', $question);
 
-        $questionId = $question->id;
         // $question->delete();
         $question->is_active = false;
         $question->save();
 
-        // Limpa cache
-        $this->clearQuestionCache($questionId);
+        $this->clearQuestionCache();
 
-        return redirect()->route('questions.index')
-            ->with('success', 'Questão inativada com sucesso!');
+        // back() em vez de redirect()->route('questions.index'): o usuário
+        // filtrado/paginado que arquiva uma questão volta para onde estava,
+        // não para a página 1 sem filtro nenhum.
+        return back()->with('success', 'Questão arquivada com sucesso!');
     }
 
     /**
@@ -620,59 +614,16 @@ class QuestionController extends Controller
     /**
      * Clear all cache related to questions
      */
-    protected function clearQuestionCache(?int $questionId = null): void
+    protected function clearQuestionCache(): void
     {
-        // Padrão de chaves para limpar
-        $patterns = [
-            $this->cacheKeys['filters'] . '*',
-            $this->cacheKeys['questions_list'] . '*',
-        ];
+        $userId = Auth::id();
 
-        if ($questionId) {
-            // Limpa cache específico da questão
-            Cache::forget("question_show_{$questionId}");
-            Cache::forget("question_edit_{$questionId}");
-
-            // Adiciona ao padrão de filtros
-            $patterns[] = "*question_{$questionId}*";
-        }
-
-        // Limpa chaves específicas (escopadas por usuário — ver create()/edit()/getCachedStats())
-        Cache::forget($this->cacheKeys['stats'] . '_' . Auth::id());
-        Cache::forget('questions_create_data_' . Auth::id());
-        Cache::forget('questions_edit_data_' . Auth::id());
-
-        foreach ($patterns as $pattern) {
-            if (str_contains($pattern, '*')) {
-                $this->clearCacheByPattern($pattern);
-            } else {
-                Cache::forget($pattern);
-            }
-        }
-    }
-
-    /**
-     * Clear cache by pattern (usando Redis scan)
-     */
-    protected function clearCacheByPattern(string $pattern): void
-    {
-        // Se estiver usando Redis, podemos usar SCAN
-        if (config('cache.default') === 'redis') {
-            $redis = Cache::getStore()->getRedis();
-
-            // Remove o prefixo do Laravel do pattern
-            $prefix = config('cache.prefix');
-            $pattern = $prefix . ':' . str_replace('*', '*', $pattern);
-
-            // Usa SCAN para encontrar e deletar chaves
-            $cursor = 0;
-            do {
-                [$cursor, $keys] = $redis->scan($cursor, 'MATCH', $pattern);
-                if (!empty($keys)) {
-                    $redis->del($keys);
-                }
-            } while ($cursor != 0);
-        }
+        // Limpa chaves específicas (escopadas por usuário — ver create()/edit()/getCachedStats()).
+        // A listagem paginada (index()) não é mais cacheada, então não há
+        // nada relacionado a filtros/página para limpar aqui — ver index().
+        Cache::forget($this->cacheKeys['stats'] . '_' . $userId);
+        Cache::forget('questions_create_data_' . $userId);
+        Cache::forget('questions_edit_data_' . $userId);
     }
 
     private function createCopyFromRequest(Question $original, array $data)

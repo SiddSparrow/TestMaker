@@ -147,7 +147,7 @@ class DocumentController extends Controller
             'questions.*.subject_id' => ['required', Rule::exists('subjects', 'id')->where('user_id', auth()->id())],
             'questions.*.topic_id' => ['nullable', Rule::exists('topics', 'id')->where('user_id', auth()->id())],
             'questions.*.difficulty_level' => 'required|in:easy,medium,hard',
-            'questions.*.points' => 'nullable|numeric|min:0',
+            'questions.*.points' => 'nullable|numeric|min:0.5|max:10',
             'questions.*.explanation' => 'nullable|string',
             'questions.*.alternatives' => 'array',
             'questions.*.alternatives.*.content' => 'required|string',

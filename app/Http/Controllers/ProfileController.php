@@ -37,7 +37,10 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
-        return Redirect::route('profile.edit');
+        // O feedback era só o texto "Salvo." local do Breeze
+        // (form.recentlySuccessful), fora do sistema de toasts que o resto
+        // do app já usa — duas gramáticas de confirmação diferentes.
+        return Redirect::route('profile.edit')->with('success', 'Perfil atualizado com sucesso!');
     }
 
     /**

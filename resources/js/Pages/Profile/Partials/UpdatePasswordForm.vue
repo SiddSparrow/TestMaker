@@ -101,20 +101,6 @@ const updatePassword = () => {
 
             <div class="flex items-center gap-4">
                 <BaseButton :disabled="form.processing" :loading="form.processing">Salvar</BaseButton>
-
-                <Transition
-                    enter-active-class="transition ease-in-out"
-                    enter-from-class="opacity-0"
-                    leave-active-class="transition ease-in-out"
-                    leave-to-class="opacity-0"
-                >
-                    <p
-                        v-if="form.recentlySuccessful"
-                        class="text-sm text-gray-600"
-                    >
-                        Salvo.
-                    </p>
-                </Transition>
             </div>
         </form>
     </section>

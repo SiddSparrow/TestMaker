@@ -2,7 +2,7 @@
 import AuthLayout from '@/Layouts/AuthLayout.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
+import BaseButton from '@/Components/UI/BaseButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 
@@ -100,13 +100,9 @@ const submit = () => {
                     Já tem uma conta?
                 </Link>
 
-                <PrimaryButton
-                    class="!bg-blue-600 hover:!bg-blue-700 focus:!ring-blue-500 active:!bg-blue-700"
-                    :class="{ 'opacity-25': form.processing }"
-                    :disabled="form.processing"
-                >
+                <BaseButton :disabled="form.processing" :loading="form.processing">
                     Criar Conta
-                </PrimaryButton>
+                </BaseButton>
             </div>
         </form>
     </AuthLayout>

@@ -1,9 +1,8 @@
 <script setup>
-import DangerButton from '@/Components/DangerButton.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import AppModal from '@/Components/UI/AppModal.vue';
-import SecondaryButton from '@/Components/SecondaryButton.vue';
+import BaseButton from '@/Components/UI/BaseButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { useForm } from '@inertiajs/vue3';
 import { nextTick, ref } from 'vue';
@@ -52,7 +51,7 @@ const closeModal = () => {
             </p>
         </header>
 
-        <DangerButton @click="confirmUserDeletion">Excluir Conta</DangerButton>
+        <BaseButton variant="danger" @click="confirmUserDeletion">Excluir Conta</BaseButton>
 
         <AppModal :show="confirmingUserDeletion" title="Tem certeza que deseja excluir sua conta?" @close="closeModal">
             <p class="mt-1 text-sm text-gray-600">
@@ -81,19 +80,19 @@ const closeModal = () => {
                 <InputError :message="form.errors.password" class="mt-2" />
             </div>
 
-            <div class="mt-6 flex justify-end">
-                <SecondaryButton @click="closeModal">
+            <div class="mt-6 flex justify-end gap-3">
+                <BaseButton variant="secondary" @click="closeModal">
                     Cancelar
-                </SecondaryButton>
+                </BaseButton>
 
-                <DangerButton
-                    class="ms-3"
-                    :class="{ 'opacity-25': form.processing }"
+                <BaseButton
+                    variant="danger"
                     :disabled="form.processing"
+                    :loading="form.processing"
                     @click="deleteUser"
                 >
                     Excluir Conta
-                </DangerButton>
+                </BaseButton>
             </div>
         </AppModal>
     </section>

@@ -195,9 +195,8 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                 </svg>
                             </BaseButton>
-                            <BaseButton v-if="row.is_active" variant="outline" size="sm" icon-only
+                            <BaseButton v-if="row.is_active" variant="danger-outline" size="sm" icon-only
                                         :aria-label="`Arquivar questão: ${row.statement.substring(0, 40)}`"
-                                        class="!text-red-600 !border-red-300 hover:!bg-red-50"
                                         @click="confirmArchive(row)">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M9 8V6a2 2 0 012-2h2a2 2 0 012 2v2m2 0v10a2 2 0 01-2 2H9a2 2 0 01-2-2V8h10z"/>

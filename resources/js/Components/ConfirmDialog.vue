@@ -31,12 +31,19 @@
 
         <!-- Actions -->
         <div class="flex gap-3 px-6 pb-6">
-            <button @click="cancel"
-                    class="flex-1 px-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+            <BaseButton variant="secondary" class="flex-1 justify-center" @click="cancel">
                 {{ cancelText }}
-            </button>
-            <button @click="confirm"
-                    class="flex-1 px-4 py-2.5 text-white rounded-lg transition-colors font-medium"
+            </BaseButton>
+            <!-- BaseButton só tem variante "danger" pronta; warning/info/success
+                 (usadas por outras telas deste diálogo) ainda não têm uma
+                 variante equivalente, então mantêm a cor própria — mas com o
+                 mesmo rounded-md do resto do app (era rounded-lg). -->
+            <BaseButton v-if="type === 'danger'" variant="danger" class="flex-1 justify-center" @click="confirm">
+                {{ confirmText }}
+            </BaseButton>
+            <button v-else
+                    @click="confirm"
+                    class="flex-1 px-4 py-2 rounded-md text-sm font-medium text-white transition-colors"
                     :class="confirmButtonClass">
                 {{ confirmText }}
             </button>
@@ -47,6 +54,7 @@
 <script setup>
 import { computed } from 'vue';
 import Modal from '@/Components/Modal.vue';
+import BaseButton from '@/Components/UI/BaseButton.vue';
 
 const props = defineProps({
     show: {
@@ -98,9 +106,9 @@ const iconColorClass = computed(() => {
     return classes[props.type] || classes.warning;
 });
 
+// Só cobre warning/info/success — o tipo "danger" usa a variante pronta do BaseButton.
 const confirmButtonClass = computed(() => {
     const classes = {
-        danger: 'bg-red-600 hover:bg-red-700',
         warning: 'bg-amber-600 hover:bg-amber-700',
         info: 'bg-blue-600 hover:bg-blue-700',
         success: 'bg-green-600 hover:bg-green-700'

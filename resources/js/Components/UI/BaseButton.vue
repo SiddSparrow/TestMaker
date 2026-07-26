@@ -18,7 +18,7 @@ const props = defineProps({
     variant: {
         type: String,
         default: 'primary',
-        validator: (v) => ['primary', 'secondary', 'danger', 'outline', 'ghost'].includes(v),
+        validator: (v) => ['primary', 'secondary', 'danger', 'danger-outline', 'outline', 'ghost'].includes(v),
     },
     size: {
         type: String,
@@ -52,6 +52,7 @@ const variantClasses = computed(() => ({
     primary: 'bg-primary-600 text-white border border-transparent hover:bg-primary-700 focus-visible:ring-primary-500 disabled:bg-primary-300',
     secondary: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus-visible:ring-primary-500 disabled:opacity-50',
     danger: 'bg-red-600 text-white border border-transparent hover:bg-red-700 focus-visible:ring-red-500 disabled:bg-red-300',
+    'danger-outline': 'bg-white text-red-600 border border-red-300 hover:bg-red-50 focus-visible:ring-red-500 disabled:opacity-50',
     outline: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus-visible:ring-primary-500 disabled:opacity-50',
     ghost: 'bg-transparent text-gray-600 border border-transparent hover:bg-gray-100 focus-visible:ring-primary-500 disabled:opacity-50',
 }[props.variant]));

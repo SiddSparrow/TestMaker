@@ -177,7 +177,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ExamBuilder from '@/Components/Exams/ExamBuilder.vue';
@@ -185,6 +185,7 @@ import ExamConfigEditModal from '@/Components/Exams/ExamConfigEditModal.vue';
 import ExamPreview from '@/Components/Exams/ExamPreview.vue';
 import ConfirmDialog from '@/Components/ConfirmDialog.vue';
 import { useFileDownload } from '@/composables/useFileDownload';
+import { useUnsavedChanges } from '@/composables/useUnsavedChanges';
 
 const { download } = useFileDownload();
 
@@ -327,18 +328,11 @@ const exportDOCX = (withAnswers) => {
     download(route('exams.export.docx', { exam: props.exam.id, with_answers: withAnswers ? 1 : 0 }));
 };
 
-// Aviso ao sair com mudanças não salvas — precisa ser registrado/removido no
-// ciclo de vida do componente, senão o listener sobrevive à navegação SPA e
-// passa a disparar em telas onde não há nenhuma mudança pendente.
-const warnOnUnload = (e) => {
-    if (hasUnsavedChanges.value) {
-        e.preventDefault();
-        e.returnValue = '';
-    }
-};
-
-onMounted(() => window.addEventListener('beforeunload', warnOnUnload));
-onBeforeUnmount(() => window.removeEventListener('beforeunload', warnOnUnload));
+// Aviso ao sair com mudanças não salvas — cobre tanto fechar/recarregar a
+// aba quanto navegar para outra tela da SPA via <Link> (antes só o
+// beforeunload nativo era tratado; clicar em "Cancelar" ou na navegação do
+// AppLayout com mudanças pendentes não avisava nada).
+useUnsavedChanges(() => hasUnsavedChanges.value && !form.processing);
 </script>
 
 <style scoped>

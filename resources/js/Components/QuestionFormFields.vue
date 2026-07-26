@@ -5,16 +5,17 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Matéria -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label :for="ids.subject" class="block text-sm font-medium text-gray-700 mb-2">
                     Matéria <span class="text-red-500">*</span>
                 </label>
-                <select v-model="localSubjectId" 
+                <select :id="ids.subject" v-model="localSubjectId"
                         @change="handleSubjectChange"
+                        autofocus
                         class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"
                         :class="{ 'border-red-500': errors.subject_id }">
                     <option value="">Selecione uma matéria</option>
-                    <option v-for="subject in subjects" 
-                            :key="subject.id" 
+                    <option v-for="subject in subjects"
+                            :key="subject.id"
                             :value="subject.id"
                             :style="{ color: subject.color }">
                         {{ subject.name }}
@@ -27,17 +28,17 @@
 
             <!-- Tópico -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label :for="ids.topic" class="block text-sm font-medium text-gray-700 mb-2">
                     Tópico
                 </label>
-                <select v-model="localTopicId"
+                <select :id="ids.topic" v-model="localTopicId"
                         @change="handleTopicChange"
                         :disabled="!localSubjectId || filteredTopics.length === 0"
                         class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors"
                         :class="{ 'border-red-500': errors.topic_id }">
                     <option value="">Selecione um tópico (opcional)</option>
-                    <option v-for="topic in filteredTopics" 
-                            :key="topic.id" 
+                    <option v-for="topic in filteredTopics"
+                            :key="topic.id"
                             :value="topic.id">
                         {{ topic.name }}
                     </option>
@@ -45,7 +46,7 @@
                 <p v-if="errors.topic_id" class="mt-1 text-sm text-red-600">
                     {{ errors.topic_id }}
                 </p>
-                <p v-if="localSubjectId && filteredTopics.length === 0" 
+                <p v-if="localSubjectId && filteredTopics.length === 0"
                    class="mt-1 text-xs text-gray-500">
                     Nenhum tópico disponível para esta matéria
                 </p>
@@ -53,16 +54,16 @@
 
             <!-- Tipo de Questão -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label :for="ids.questionType" class="block text-sm font-medium text-gray-700 mb-2">
                     Tipo de Questão <span class="text-red-500">*</span>
                 </label>
-                <select v-model="localQuestionTypeId"
+                <select :id="ids.questionType" v-model="localQuestionTypeId"
                         @change="handleQuestionTypeChange"
                         class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"
                         :class="{ 'border-red-500': errors.question_type_id }">
                     <option value="">Selecione o tipo</option>
-                    <option v-for="type in questionTypes" 
-                            :key="type.id" 
+                    <option v-for="type in questionTypes"
+                            :key="type.id"
                             :value="type.id">
                         {{ type.name }}
                     </option>
@@ -77,15 +78,17 @@
 
             <!-- Dificuldade -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <span :id="ids.difficulty" class="block text-sm font-medium text-gray-700 mb-2">
                     Dificuldade <span class="text-red-500">*</span>
-                </label>
-                <div class="flex space-x-2">
+                </span>
+                <div class="flex space-x-2" role="radiogroup" :aria-labelledby="ids.difficulty">
                     <button type="button"
+                            role="radio"
+                            :aria-checked="localDifficulty === 'easy'"
                             @click="setDifficulty('easy')"
                             class="flex-1 px-4 py-2 rounded-md border transition-all duration-200 font-medium"
-                            :class="localDifficulty === 'easy' 
-                                ? 'bg-green-100 border-green-500 text-green-700 shadow-sm' 
+                            :class="localDifficulty === 'easy'
+                                ? 'bg-green-100 border-green-500 text-green-700 shadow-sm'
                                 : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400'">
                         <span class="flex items-center justify-center gap-1">
                             <svg v-if="localDifficulty === 'easy'" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -95,10 +98,12 @@
                         </span>
                     </button>
                     <button type="button"
+                            role="radio"
+                            :aria-checked="localDifficulty === 'medium'"
                             @click="setDifficulty('medium')"
                             class="flex-1 px-4 py-2 rounded-md border transition-all duration-200 font-medium"
-                            :class="localDifficulty === 'medium' 
-                                ? 'bg-yellow-100 border-yellow-500 text-yellow-700 shadow-sm' 
+                            :class="localDifficulty === 'medium'
+                                ? 'bg-yellow-100 border-yellow-500 text-yellow-700 shadow-sm'
                                 : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400'">
                         <span class="flex items-center justify-center gap-1">
                             <svg v-if="localDifficulty === 'medium'" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -108,10 +113,12 @@
                         </span>
                     </button>
                     <button type="button"
+                            role="radio"
+                            :aria-checked="localDifficulty === 'hard'"
                             @click="setDifficulty('hard')"
                             class="flex-1 px-4 py-2 rounded-md border transition-all duration-200 font-medium"
-                            :class="localDifficulty === 'hard' 
-                                ? 'bg-red-100 border-red-500 text-red-700 shadow-sm' 
+                            :class="localDifficulty === 'hard'
+                                ? 'bg-red-100 border-red-500 text-red-700 shadow-sm'
                                 : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400'">
                         <span class="flex items-center justify-center gap-1">
                             <svg v-if="localDifficulty === 'hard'" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -130,14 +137,15 @@
         <!-- Pontuação e Status -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label :for="ids.points" class="block text-sm font-medium text-gray-700 mb-2">
                     Pontos <span class="text-red-500">*</span>
                 </label>
                 <div class="flex items-center gap-3">
-                    <input type="number" 
+                    <input type="number"
+                           :id="ids.points"
                            v-model.number="localPoints"
                            @input="handlePointsChange"
-                           min="1" 
+                           min="1"
                            max="10"
                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"
                            :class="{ 'border-red-500': errors.points }">
@@ -154,9 +162,10 @@
             </div>
 
             <div class="flex items-center">
-                <label class="flex items-center space-x-2 cursor-pointer group">
+                <label :for="ids.isActive" class="flex items-center space-x-2 cursor-pointer group">
                     <div class="relative">
-                        <input type="checkbox" 
+                        <input type="checkbox"
+                               :id="ids.isActive"
                                v-model="localIsActive"
                                @change="handleIsActiveChange"
                                class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 transition-colors">
@@ -176,7 +185,17 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, useId } from 'vue';
+
+const uid = useId();
+const ids = {
+    subject: `subject-${uid}`,
+    topic: `topic-${uid}`,
+    questionType: `question-type-${uid}`,
+    points: `points-${uid}`,
+    isActive: `is-active-${uid}`,
+    difficulty: `difficulty-${uid}`,
+};
 
 const props = defineProps({
     subjectId: {

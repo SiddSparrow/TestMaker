@@ -2,9 +2,6 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-@import './theme.css';
-@import './components.css';
-
 /* Estilos personalizados */
 .line-clamp-2 {
     overflow: hidden;
@@ -29,4 +26,38 @@
 .fade-enter-from,
 .fade-leave-to {
     opacity: 0;
+}
+
+/* Animações de entrada usadas em cabeçalhos/cards ao carregar a página.
+   Antes vinham de theme.css (retirado) e dependiam de style="animation-delay"
+   inline em cada elemento — trocado por classes de delay dedicadas. */
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slide-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fade-in 300ms ease-out both;
+}
+
+.animate-slide-up {
+    animation: slide-up 300ms ease-out both;
+}
+
+.delay-100 { animation-delay: 100ms; }
+.delay-150 { animation-delay: 150ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-250 { animation-delay: 250ms; }
+.delay-300 { animation-delay: 300ms; }
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-fade-in,
+    .animate-slide-up {
+        animation: none;
+    }
 }

@@ -2,15 +2,15 @@
     <AppLayout>
         <Head title="Upload de Documento" />
 
-        <div class="space-y-6 fade-in max-w-3xl mx-auto">
+        <div class="space-y-6 animate-fade-in max-w-3xl mx-auto">
             <!-- Cabeçalho -->
-            <div class="slide-up" style="animation-delay: 100ms">
-                <h1 class="page-title-elegant">Upload de Documento</h1>
-                <p class="page-subtitle-elegant">Envie uma prova em PDF ou DOCX para extrair as questões automaticamente</p>
+            <div class="animate-slide-up delay-100">
+                <h1 class="text-2xl font-bold text-gray-900">Upload de Documento</h1>
+                <p class="mt-1 text-sm text-gray-600">Envie uma prova em PDF ou DOCX para extrair as questões automaticamente</p>
             </div>
 
             <!-- Card de Upload -->
-            <div class="card-elegant slide-up" style="animation-delay: 150ms">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 animate-slide-up delay-150">
                 <form @submit.prevent="submit">
                     <!-- Área de Upload -->
                     <div class="space-y-4">
@@ -106,20 +106,13 @@
 
                     <!-- Botões -->
                     <div class="flex items-center justify-between mt-6 pt-6 border-t border-gray-200">
-                        <a :href="route('documents.index')" class="btn-elegant btn-elegant-outline">
+                        <Link :href="route('documents.index')"
+                              class="px-6 py-2.5 text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md transition-colors">
                             Cancelar
-                        </a>
-                        <button
-                            type="submit"
-                            :disabled="!selectedFile || form.processing"
-                            class="btn-elegant btn-elegant-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                        >
-                            <svg v-if="form.processing" class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
+                        </Link>
+                        <BaseButton type="submit" :disabled="!selectedFile" :loading="form.processing">
                             {{ form.processing ? 'Enviando...' : 'Enviar e Processar' }}
-                        </button>
+                        </BaseButton>
                     </div>
                 </form>
             </div>
@@ -130,7 +123,8 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref } from 'vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm } from '@inertiajs/vue3';
+import BaseButton from '@/Components/UI/BaseButton.vue';
 
 const dragover = ref(false);
 const selectedFile = ref(null);

@@ -329,12 +329,9 @@
                                         {{ showAnswers ? 'Com gabarito' : 'Sem gabarito' }}
                                     </p>
                                     <div class="flex justify-center space-x-1">
-                                        <div class="w-3 h-3 bg-blue-600 rounded-full animate-bounce"
-                                            style="animation-delay: 0ms"></div>
-                                        <div class="w-3 h-3 bg-blue-600 rounded-full animate-bounce"
-                                            style="animation-delay: 150ms"></div>
-                                        <div class="w-3 h-3 bg-blue-600 rounded-full animate-bounce"
-                                            style="animation-delay: 300ms"></div>
+                                        <div class="w-3 h-3 bg-blue-600 rounded-full animate-bounce"></div>
+                                        <div class="w-3 h-3 bg-blue-600 rounded-full animate-bounce delay-150"></div>
+                                        <div class="w-3 h-3 bg-blue-600 rounded-full animate-bounce delay-300"></div>
                                     </div>
                                     <p class="text-xs text-gray-500 mt-4">
                                         O download começará em instantes...

@@ -5,7 +5,7 @@
 
         <div class="space-y-6">
             <!-- Cards de estatísticas -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 slide-up" style="animation-delay: 150ms">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 animate-slide-up delay-150">
                 <StatCard 
                     title="Questões Ativas"
                     :value="stats.total_questions"
@@ -44,7 +44,7 @@
                 />
             </div>
             <!-- Ações rápidas -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 slide-up" style="animation-delay: 300ms">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 animate-slide-up delay-300">
                 <div class="px-6 py-4 border-b border-gray-200">
                     <h3 class="text-lg font-semibold text-gray-800">Ações Rápidas</h3>
                 </div>
@@ -77,7 +77,7 @@
 
 
             <!-- Grid de duas colunas -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 slide-up" style="animation-delay: 250ms">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-slide-up delay-250">
                 <!-- Últimas questões -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200">
                     <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">

@@ -2,19 +2,19 @@
     <AppLayout>
         <Head :title="document.original_name" />
 
-        <div class="space-y-6 fade-in">
+        <div class="space-y-6 animate-fade-in">
             <!-- Cabeçalho -->
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 class="page-title-elegant">{{ document.original_name }}</h1>
-                    <p class="page-subtitle-elegant">Revise e edite as questões extraídas antes de importar</p>
+                    <h1 class="text-2xl font-bold text-gray-900">{{ document.original_name }}</h1>
+                    <p class="mt-1 text-sm text-gray-600">Revise e edite as questões extraídas antes de importar</p>
                 </div>
                 <BaseButton :href="route('documents.index')" variant="outline">Voltar</BaseButton>
             </div>
 
             <!-- Status do Processamento -->
             <div v-if="document.status === 'pending' || document.status === 'processing'"
-                 class="card-elegant text-center py-12">
+                 class="bg-white rounded-xl shadow-sm border border-gray-200 text-center py-12">
                 <svg class="animate-spin h-12 w-12 mx-auto text-blue-600 mb-4" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -25,7 +25,7 @@
             </div>
 
             <!-- Erro no Processamento -->
-            <div v-else-if="document.status === 'failed'" class="card-elegant">
+            <div v-else-if="document.status === 'failed'" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <div class="text-center py-12">
                     <svg class="h-12 w-12 mx-auto text-red-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -44,7 +44,7 @@
             <div v-else-if="document.status === 'completed' && extractedQuestions.length > 0" class="space-y-6">
                 <!-- Informações e Avisos -->
                 <div v-if="metadata.warnings && metadata.warnings.length > 0"
-                     class="card-elegant bg-yellow-50 border border-yellow-200">
+                     class="bg-yellow-50 border border-yellow-200 rounded-xl shadow-sm p-6">
                     <div class="flex">
                         <svg class="h-5 w-5 text-yellow-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -61,7 +61,7 @@
 
                 <!-- Erro de Importação -->
                 <div v-if="Object.keys(form.errors).length > 0"
-                     class="card-elegant bg-red-50 border border-red-200">
+                     class="bg-red-50 border border-red-200 rounded-xl shadow-sm p-6">
                     <div class="flex">
                         <svg class="h-5 w-5 text-red-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -77,17 +77,17 @@
                 </div>
 
                 <!-- Aplicar disciplina/tópico a todas as selecionadas -->
-                <div class="card-elegant">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h3 class="text-sm font-semibold text-gray-900 mb-3">Aplicar a todas as selecionadas</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <FormField label="Disciplina" v-slot="{ id }">
-                            <select :id="id" v-model="bulkSubjectId" class="form-control-elegant">
+                            <select :id="id" v-model="bulkSubjectId" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                                 <option :value="null">Selecione...</option>
                                 <option v-for="subject in subjects" :key="subject.id" :value="subject.id">{{ subject.name }}</option>
                             </select>
                         </FormField>
                         <FormField label="Tópico" v-slot="{ id }">
-                            <select :id="id" v-model="bulkTopicId" :disabled="!bulkSubjectId" class="form-control-elegant disabled:bg-gray-100">
+                            <select :id="id" v-model="bulkTopicId" :disabled="!bulkSubjectId" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100">
                                 <option :value="null">Selecione...</option>
                                 <option v-for="topic in getTopicsForSubject(bulkSubjectId)" :key="topic.id" :value="topic.id">{{ topic.name }}</option>
                             </select>
@@ -101,7 +101,7 @@
                 </div>
 
                 <!-- Barra de Ações -->
-                <div class="card-elegant flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div class="text-sm text-gray-600">
                         <span class="font-semibold text-gray-900">{{ selectedQuestions.length }}</span>
                         de
@@ -121,7 +121,7 @@
                 <!-- Lista de Questões (paginada em lotes de 10) -->
                 <div class="space-y-4">
                     <div v-for="{ question, index } in paginatedQuestions" :key="index"
-                         class="card-elegant hover:shadow-lg transition-shadow">
+                         class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-shadow">
                         <div class="flex gap-4">
                             <!-- Checkbox -->
                             <div class="flex-shrink-0 pt-1">
@@ -155,7 +155,7 @@
                                         :id="id"
                                         v-model="question.statement"
                                         rows="3"
-                                        class="form-control-elegant"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                         :class="{ 'border-red-300': !question.statement || question.statement.length < 10 }"
                                     ></textarea>
                                     <p v-if="!question.statement || question.statement.length < 10" class="text-xs text-red-600 mt-1">
@@ -166,14 +166,14 @@
                                 <!-- Tipo, Dificuldade e Pontos -->
                                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                                     <FormField label="Tipo" required v-slot="{ id }">
-                                        <select :id="id" v-model="question.type" class="form-control-elegant">
+                                        <select :id="id" v-model="question.type" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                                             <option value="multiple_choice">Múltipla Escolha</option>
                                             <option value="true_false">Verdadeiro/Falso</option>
                                             <option value="essay">Dissertativa</option>
                                         </select>
                                     </FormField>
                                     <FormField label="Dificuldade" required v-slot="{ id }">
-                                        <select :id="id" v-model="question.difficulty_hint" class="form-control-elegant">
+                                        <select :id="id" v-model="question.difficulty_hint" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                                             <option value="easy">Fácil</option>
                                             <option value="medium">Médio</option>
                                             <option value="hard">Difícil</option>
@@ -186,7 +186,7 @@
                                             type="number"
                                             step="0.5"
                                             min="0"
-                                            class="form-control-elegant"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                         />
                                     </FormField>
                                     <FormField label="Disciplina" required v-slot="{ id }">
@@ -194,7 +194,7 @@
                                             :id="id"
                                             v-model="question.subject_id"
                                             required
-                                            class="form-control-elegant"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                             :class="{ 'border-red-400': selectedQuestions.includes(index) && !question.subject_id && attemptedImport }"
                                         >
                                             <option :value="null">Selecione...</option>
@@ -207,7 +207,7 @@
 
                                 <!-- Tópico -->
                                 <FormField v-if="question.subject_id" label="Tópico" v-slot="{ id }">
-                                    <select :id="id" v-model="question.topic_id" class="form-control-elegant">
+                                    <select :id="id" v-model="question.topic_id" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                                         <option :value="null">Selecione...</option>
                                         <option
                                             v-for="topic in getTopicsForSubject(question.subject_id)"
@@ -222,7 +222,7 @@
                                 <!-- Alternativas -->
                                 <div v-if="question.type === 'multiple_choice' && question.alternatives && question.alternatives.length > 0"
                                      class="space-y-2">
-                                    <span class="form-label-elegant">Alternativas</span>
+                                    <span class="block text-sm font-medium text-gray-700 mb-2">Alternativas</span>
                                     <div v-for="(alt, altIndex) in question.alternatives" :key="altIndex"
                                          class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
                                         <div class="flex items-center gap-2 flex-shrink-0 pt-2">
@@ -239,7 +239,7 @@
                                         <textarea
                                             v-model="alt.content"
                                             rows="2"
-                                            class="flex-1 form-control-elegant"
+                                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                             :class="{ 'bg-green-50 border-green-300': alt.is_correct }"
                                         ></textarea>
                                     </div>
@@ -248,7 +248,7 @@
 
                                 <!-- Explicação -->
                                 <FormField v-if="question.explanation" label="Explicação (opcional)" v-slot="{ id }">
-                                    <textarea :id="id" v-model="question.explanation" rows="2" class="form-control-elegant"></textarea>
+                                    <textarea :id="id" v-model="question.explanation" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
                                 </FormField>
                             </div>
                         </div>
@@ -259,7 +259,7 @@
             </div>
 
             <!-- Nenhuma questão extraída -->
-            <div v-else class="card-elegant text-center py-12">
+            <div v-else class="bg-white rounded-xl shadow-sm border border-gray-200 text-center py-12">
                 <svg class="h-12 w-12 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>

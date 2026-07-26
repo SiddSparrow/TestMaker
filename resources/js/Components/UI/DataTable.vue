@@ -26,7 +26,7 @@
                     <th v-if="selectable" scope="col" class="w-10 px-4 py-3">
                         <input
                             type="checkbox"
-                            class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                             aria-label="Selecionar todas as linhas"
                             :checked="allSelected"
                             :indeterminate="someSelected && !allSelected"
@@ -44,7 +44,7 @@
                         <button
                             v-if="col.sortable"
                             type="button"
-                            class="inline-flex items-center gap-1 hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded"
+                            class="inline-flex items-center gap-1 hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded"
                             @click="toggleSort(col.key)"
                         >
                             {{ col.label }}
@@ -83,7 +83,7 @@
                     <td v-if="selectable" class="px-4 py-4">
                         <input
                             type="checkbox"
-                            class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                             :aria-label="`Selecionar linha ${row[rowKey]}`"
                             :checked="selected.includes(row[rowKey])"
                             @change="toggleRow(row[rowKey])"

@@ -49,11 +49,11 @@ const sizeClasses = computed(() => {
 });
 
 const variantClasses = computed(() => ({
-    primary: 'bg-blue-600 text-white border border-transparent hover:bg-blue-700 focus-visible:ring-blue-500 disabled:bg-blue-300',
-    secondary: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus-visible:ring-blue-500 disabled:opacity-50',
+    primary: 'bg-primary-600 text-white border border-transparent hover:bg-primary-700 focus-visible:ring-primary-500 disabled:bg-primary-300',
+    secondary: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus-visible:ring-primary-500 disabled:opacity-50',
     danger: 'bg-red-600 text-white border border-transparent hover:bg-red-700 focus-visible:ring-red-500 disabled:bg-red-300',
-    outline: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus-visible:ring-blue-500 disabled:opacity-50',
-    ghost: 'bg-transparent text-gray-600 border border-transparent hover:bg-gray-100 focus-visible:ring-blue-500 disabled:opacity-50',
+    outline: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus-visible:ring-primary-500 disabled:opacity-50',
+    ghost: 'bg-transparent text-gray-600 border border-transparent hover:bg-gray-100 focus-visible:ring-primary-500 disabled:opacity-50',
 }[props.variant]));
 </script>
 

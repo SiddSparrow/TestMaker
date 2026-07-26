@@ -14,7 +14,7 @@
                     v-if="closeable"
                     type="button"
                     aria-label="Fechar"
-                    class="ml-auto rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                    class="ml-auto rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
                     @click="$emit('close')"
                 >
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

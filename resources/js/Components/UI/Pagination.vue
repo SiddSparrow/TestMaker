@@ -19,7 +19,7 @@
                     :class="[
                         'inline-flex min-w-[2.25rem] items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
                         link.active
-                            ? 'bg-blue-600 text-white'
+                            ? 'bg-primary-600 text-white'
                             : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50',
                     ]"
                     v-html="link.label"

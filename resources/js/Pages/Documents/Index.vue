@@ -2,27 +2,21 @@
     <AppLayout>
         <Head title="Documentos" />
 
-        <div class="space-y-6 fade-in">
-            <!-- Cabeçalho -->
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 ml-mr-1">
-                <div class="slide-up" style="animation-delay: 100ms">
-                    <h1 class="page-title-elegant">Documentos</h1>
-                    <p class="page-subtitle-elegant">Extraia questões de provas em PDF ou DOCX</p>
-                </div>
-                <div class="slide-up" style="animation-delay: 200ms">
-                    <a :href="route('documents.create')"
-                       class="btn-elegant btn-elegant-primary flex items-center gap-2">
+        <div class="space-y-6">
+            <PageHeader title="Documentos" subtitle="Extraia questões de provas em PDF ou DOCX">
+                <template #actions>
+                    <BaseButton :href="route('documents.create')">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M16 6l-3-3m0 0l-3 3m3-3v12"/>
                         </svg>
                         Upload Documento
-                    </a>
-                </div>
-            </div>
+                    </BaseButton>
+                </template>
+            </PageHeader>
 
             <!-- Info sobre atualização automática -->
-            <div v-if="hasProcessingDocuments()" class="slide-up bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg" style="animation-delay: 100ms">
+            <div v-if="hasProcessingDocuments" class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
                 <div class="flex items-center">
                     <svg class="animate-spin h-5 w-5 text-blue-500 mr-3" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -34,181 +28,201 @@
                 </div>
             </div>
 
+            <!-- Filtros -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <FormField label="Buscar" v-slot="{ id }" class="md:col-span-2">
+                        <input :id="id" v-model="form.search" type="text" placeholder="Buscar por nome do arquivo..."
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    </FormField>
+                    <FormField label="Status" v-slot="{ id }">
+                        <select :id="id" v-model="form.status" @change="applyFilters"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Todos os status</option>
+                            <option value="pending">Aguardando</option>
+                            <option value="processing">Processando</option>
+                            <option value="completed">Concluído</option>
+                            <option value="failed">Falhou</option>
+                        </select>
+                    </FormField>
+                </div>
+            </div>
+
             <!-- Lista de Documentos -->
-            <div class="card-elegant slide-up" style="animation-delay: 150ms">
-                <div v-if="documents.data.length === 0" class="text-center py-12">
-                    <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
-                    <p class="text-gray-500 mb-4">Nenhum documento enviado ainda</p>
-                    <a :href="route('documents.create')" class="btn-elegant btn-elegant-primary">
-                        Enviar Primeiro Documento
-                    </a>
-                </div>
-
-                <div v-else class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Arquivo
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Status
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Questões
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Data
-                                </th>
-                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Ações
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            <tr v-for="document in documents.data" :key="document.id" class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-10 w-10 flex items-center justify-center bg-blue-100 rounded-lg">
-                                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                            </svg>
-                                        </div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900">
-                                                {{ document.original_name }}
-                                            </div>
-                                            <div class="text-sm text-gray-500">
-                                                {{ formatFileSize(document.file_size) }} • {{ document.file_type.toUpperCase() }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span :class="getStatusClass(document.status)" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full items-center gap-1">
-                                        <svg v-if="document.status === 'processing' || document.status === 'pending'" class="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
-                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        {{ getStatusLabel(document.status) }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ getQuestionCount(document) }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ formatDate(document.created_at) }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                                    <a v-if="document.status === 'completed'"
-                                       :href="route('documents.show', document.id)"
-                                       class="text-blue-600 hover:text-blue-900">
-                                        Revisar
-                                    </a>
-                                    <button v-if="document.status === 'failed'"
-                                            @click="reprocess(document.id)"
-                                            class="text-orange-600 hover:text-orange-900">
-                                        Reprocessar
-                                    </button>
-                                    <button @click="deleteDocument(document.id)"
-                                            class="text-red-600 hover:text-red-900">
-                                        Excluir
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Paginação -->
-                <div v-if="documents.data.length > 0" class="px-6 py-4 border-t border-gray-200">
-                    <div class="flex items-center justify-between">
-                        <div class="text-sm text-gray-700">
-                            Mostrando {{ documents.from }} a {{ documents.to }} de {{ documents.total }} documentos
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                <DataTable :columns="columns" :rows="documents.data" :loading="isLoading">
+                    <template #cell-file="{ row }">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10 flex items-center justify-center bg-blue-100 rounded-lg">
+                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">{{ row.original_name }}</div>
+                                <div class="text-sm text-gray-500">{{ formatFileSize(row.file_size) }} • {{ row.file_type.toUpperCase() }}</div>
+                            </div>
                         </div>
-                        <div class="flex gap-2">
-                            <a v-for="link in documents.links" :key="link.label"
-                               :href="link.url"
-                               v-html="link.label"
-                               :class="[
-                                   'px-3 py-1 text-sm border rounded',
-                                   link.active ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50',
-                                   !link.url ? 'opacity-50 cursor-not-allowed' : ''
-                               ]">
-                            </a>
+                    </template>
+
+                    <template #cell-status="{ row }">
+                        <StatusBadge :label="getStatusLabel(row.status)" :tone="getStatusTone(row.status)" />
+                    </template>
+
+                    <template #cell-questions="{ row }">
+                        <span class="text-sm text-gray-500">{{ getQuestionCount(row) }}</span>
+                    </template>
+
+                    <template #cell-created_at="{ row }">
+                        <span class="text-sm text-gray-500">{{ formatDate(row.created_at) }}</span>
+                    </template>
+
+                    <template #cell-actions="{ row }">
+                        <div class="flex items-center justify-end gap-1">
+                            <BaseButton v-if="row.status === 'completed'" :href="route('documents.show', row.id)"
+                                        variant="outline" size="sm" icon-only :aria-label="`Revisar documento: ${row.original_name}`">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                            </BaseButton>
+                            <BaseButton v-if="row.status === 'failed'" variant="outline" size="sm" icon-only
+                                        :aria-label="`Reprocessar documento: ${row.original_name}`"
+                                        @click="confirmReprocess(row)">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                </svg>
+                            </BaseButton>
+                            <BaseButton variant="outline" size="sm" icon-only
+                                        :aria-label="`Excluir documento: ${row.original_name}`"
+                                        class="!text-red-600 !border-red-300 hover:!bg-red-50"
+                                        @click="confirmDelete(row)">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </BaseButton>
                         </div>
-                    </div>
+                    </template>
+
+                    <template #empty>
+                        <EmptyState :title="hasFilters ? 'Nenhum documento encontrado' : 'Nenhum documento enviado ainda'"
+                                    :description="hasFilters ? 'Tente ajustar a busca ou o filtro de status.' : 'Envie uma prova em PDF ou DOCX para começar.'">
+                            <template #icon>
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                            </template>
+                            <template #actions>
+                                <BaseButton v-if="hasFilters" variant="secondary" @click="resetFilters">Limpar Filtros</BaseButton>
+                                <BaseButton v-else :href="route('documents.create')">Enviar Primeiro Documento</BaseButton>
+                            </template>
+                        </EmptyState>
+                    </template>
+                </DataTable>
+
+                <div v-if="documents.links.length > 3" class="px-6 py-4 border-t border-gray-200">
+                    <Pagination :links="documents.links"
+                                :summary="`Mostrando ${documents.from} a ${documents.to} de ${documents.total} documentos`" />
                 </div>
             </div>
         </div>
+
+        <ConfirmDialog
+            v-model:show="showDeleteConfirm"
+            title="Excluir documento"
+            :message="`Tem certeza que deseja excluir o documento &quot;${documentToDelete?.original_name}&quot;? Esta ação não pode ser desfeita.`"
+            confirm-text="Sim, excluir"
+            cancel-text="Cancelar"
+            type="danger"
+            @confirm="deleteDocument"
+        />
+
+        <ConfirmDialog
+            v-model:show="showReprocessConfirm"
+            title="Reprocessar documento"
+            :message="`Deseja reprocessar o documento &quot;${documentToReprocess?.original_name}&quot;? A extração anterior será descartada.`"
+            confirm-text="Sim, reprocessar"
+            cancel-text="Cancelar"
+            type="warning"
+            @confirm="reprocessDocument"
+        />
     </AppLayout>
 </template>
 
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { Head, router } from '@inertiajs/vue3';
-import { onMounted, onUnmounted, ref } from 'vue';
+import { Head, router, useForm } from '@inertiajs/vue3';
+import { computed, onMounted, onUnmounted, onBeforeUnmount, ref, watch } from 'vue';
+import { debounce } from 'lodash-es';
+import PageHeader from '@/Components/UI/PageHeader.vue';
+import BaseButton from '@/Components/UI/BaseButton.vue';
+import DataTable from '@/Components/UI/DataTable.vue';
+import Pagination from '@/Components/UI/Pagination.vue';
+import EmptyState from '@/Components/UI/EmptyState.vue';
+import FormField from '@/Components/UI/FormField.vue';
+import StatusBadge from '@/Components/UI/StatusBadge.vue';
+import ConfirmDialog from '@/Components/ConfirmDialog.vue';
 
 const props = defineProps({
-    documents: Object
-
+    documents: Object,
+    filters: { type: Object, default: () => ({}) },
 });
 
-// Auto-refresh se houver documentos em processamento
-const refreshInterval = ref(null);
+const columns = [
+    { key: 'file', label: 'Arquivo' },
+    { key: 'status', label: 'Status' },
+    { key: 'questions', label: 'Questões' },
+    { key: 'created_at', label: 'Data' },
+    { key: 'actions', label: 'Ações', align: 'right' },
+];
 
-const hasProcessingDocuments = () => {
-    return props.documents.data.some(doc =>
-        doc.status === 'pending' || doc.status === 'processing'
-    );
-};
+const isLoading = ref(false);
+const showDeleteConfirm = ref(false);
+const documentToDelete = ref(null);
+const showReprocessConfirm = ref(false);
+const documentToReprocess = ref(null);
 
-const startAutoRefresh = () => {
-    if (hasProcessingDocuments()) {
-        refreshInterval.value = setInterval(() => {
-            router.reload({ only: ['documents'], preserveScroll: true });
-        }, 5000); // Atualiza a cada 5 segundos
-    }
-};
-
-onMounted(() => {
-    startAutoRefresh();
+const form = useForm({
+    search: props.filters.search || '',
+    status: props.filters.status || '',
+    per_page: props.filters.per_page || 15,
 });
 
-onUnmounted(() => {
-    if (refreshInterval.value) {
-        clearInterval(refreshInterval.value);
-    }
-});
+const hasFilters = computed(() => form.search !== '' || form.status !== '');
 
-const getStatusClass = (status) => {
-    const classes = {
-        pending: 'bg-yellow-100 text-yellow-800',
-        processing: 'bg-blue-100 text-blue-800',
-        completed: 'bg-green-100 text-green-800',
-        failed: 'bg-red-100 text-red-800',
-    };
-    return classes[status] || 'bg-gray-100 text-gray-800';
+const hasProcessingDocuments = computed(() =>
+    props.documents.data.some((doc) => doc.status === 'pending' || doc.status === 'processing')
+);
+
+const applyFilters = () => {
+    form.get(route('documents.index'), { preserveState: true, preserveScroll: true });
 };
 
-const getStatusLabel = (status) => {
-    const labels = {
-        pending: 'Aguardando',
-        processing: 'Processando...',
-        completed: 'Concluído',
-        failed: 'Falhou',
-    };
-    return labels[status] || status;
+const resetFilters = () => {
+    form.reset();
+    applyFilters();
 };
+
+watch(() => form.search, debounce(applyFilters, 500));
+
+const getStatusLabel = (status) => ({
+    pending: 'Aguardando',
+    processing: 'Processando...',
+    completed: 'Concluído',
+    failed: 'Falhou',
+}[status] || status);
+
+const getStatusTone = (status) => ({
+    pending: 'yellow',
+    processing: 'blue',
+    completed: 'green',
+    failed: 'red',
+}[status] || 'gray');
 
 const getQuestionCount = (document) => {
-    if (document.status !== 'completed' || !document.extraction_result) {
-        return '-';
-    }
+    if (document.status !== 'completed' || !document.extraction_result) return '—';
     const count = document.extraction_result.questions?.length || 0;
     return `${count} questão${count !== 1 ? 'ões' : ''}`;
 };
@@ -222,23 +236,64 @@ const formatFileSize = (bytes) => {
 const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('pt-BR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+        day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
     });
 };
 
-const reprocess = (id) => {
-    if (confirm('Deseja reprocessar este documento?')) {
-        router.post(route('documents.reprocess', id));
+const confirmReprocess = (document) => {
+    documentToReprocess.value = document;
+    showReprocessConfirm.value = true;
+};
+
+const reprocessDocument = () => {
+    if (documentToReprocess.value) {
+        router.post(route('documents.reprocess', documentToReprocess.value.id), {}, {
+            onSuccess: () => { showReprocessConfirm.value = false; },
+        });
     }
 };
 
-const deleteDocument = (id) => {
-    if (confirm('Tem certeza que deseja excluir este documento? Esta ação não pode ser desfeita.')) {
-        router.delete(route('documents.destroy', id));
+const confirmDelete = (document) => {
+    documentToDelete.value = document;
+    showDeleteConfirm.value = true;
+};
+
+const deleteDocument = () => {
+    if (documentToDelete.value) {
+        router.delete(route('documents.destroy', documentToDelete.value.id), {
+            onSuccess: () => { showDeleteConfirm.value = false; },
+        });
     }
 };
+
+// Auto-refresh enquanto houver documentos em processamento
+const refreshInterval = ref(null);
+
+const startAutoRefresh = () => {
+    if (hasProcessingDocuments.value) {
+        refreshInterval.value = setInterval(() => {
+            router.reload({ only: ['documents'], preserveScroll: true });
+        }, 5000);
+    }
+};
+
+onMounted(startAutoRefresh);
+
+onUnmounted(() => {
+    if (refreshInterval.value) clearInterval(refreshInterval.value);
+});
+
+// Estado de carregamento durante navegações Inertia (filtro, paginação)
+let stopStart;
+let stopFinish;
+
+onMounted(() => {
+    stopStart = router.on('start', () => { isLoading.value = true; });
+    stopFinish = router.on('finish', () => { isLoading.value = false; });
+});
+
+onBeforeUnmount(() => {
+    stopStart?.();
+    stopFinish?.();
+});
 </script>

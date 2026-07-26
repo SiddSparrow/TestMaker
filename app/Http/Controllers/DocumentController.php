@@ -20,14 +20,32 @@ class DocumentController extends Controller
     /**
      * Mostra a lista de documentos do usuário
      */
-    public function index()
+    public function index(Request $request)
     {
-        $documents = Document::where('user_id', auth()->id())
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
+        // Antes não havia nenhum filtro nesta tela — com 200 arquivos
+        // enviados não havia como achar um documento específico a não ser
+        // rolando a lista inteira.
+        $filters = $request->only(['search', 'status', 'per_page']);
+
+        $query = Document::where('user_id', auth()->id());
+
+        if (!empty($filters['search'])) {
+            $query->where('original_name', 'like', '%' . $filters['search'] . '%');
+        }
+
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        $perPage = $filters['per_page'] ?? 15;
+
+        $documents = $query->orderBy('created_at', 'desc')
+            ->paginate($perPage)
+            ->withQueryString();
 
         return Inertia::render('Documents/Index', [
             'documents' => $documents,
+            'filters' => $filters,
         ]);
     }
 

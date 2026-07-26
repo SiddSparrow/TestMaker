@@ -5,33 +5,27 @@
         <div class="space-y-6 fade-in">
             <!-- Cabeçalho -->
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div class="slide-up" style="animation-delay: 100ms">
+                <div>
                     <h1 class="page-title-elegant">{{ document.original_name }}</h1>
                     <p class="page-subtitle-elegant">Revise e edite as questões extraídas antes de importar</p>
                 </div>
-                <div class="slide-up" style="animation-delay: 200ms">
-                    <a :href="route('documents.index')" class="btn-elegant btn-elegant-outline">
-                        Voltar
-                    </a>
-                </div>
+                <BaseButton :href="route('documents.index')" variant="outline">Voltar</BaseButton>
             </div>
 
             <!-- Status do Processamento -->
             <div v-if="document.status === 'pending' || document.status === 'processing'"
-                 class="card-elegant slide-up text-center py-12">
+                 class="card-elegant text-center py-12">
                 <svg class="animate-spin h-12 w-12 mx-auto text-blue-600 mb-4" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
                 <h3 class="text-lg font-semibold text-gray-900 mb-2">Processando documento...</h3>
-                <p class="text-gray-600 mb-4">Estamos extraindo as questões usando IA. Isso pode levar alguns minutos.</p>
-                <button @click="refreshPage" class="btn-elegant btn-elegant-outline">
-                    Atualizar Página
-                </button>
+                <p class="text-gray-600 mb-1">Estamos extraindo as questões usando IA. Isso pode levar alguns minutos.</p>
+                <p class="text-sm text-gray-400">Processando há {{ elapsedLabel }} — esta página se atualiza sozinha, não precisa recarregar.</p>
             </div>
 
             <!-- Erro no Processamento -->
-            <div v-else-if="document.status === 'failed'" class="card-elegant slide-up">
+            <div v-else-if="document.status === 'failed'" class="card-elegant">
                 <div class="text-center py-12">
                     <svg class="h-12 w-12 mx-auto text-red-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -39,22 +33,18 @@
                     </svg>
                     <h3 class="text-lg font-semibold text-gray-900 mb-2">Falha no processamento</h3>
                     <p class="text-gray-600 mb-4">{{ document.error_message }}</p>
-                    <div class="space-x-3">
-                        <button @click="reprocess" class="btn-elegant btn-elegant-primary">
-                            Tentar Novamente
-                        </button>
-                        <a :href="route('documents.index')" class="btn-elegant btn-elegant-outline">
-                            Voltar
-                        </a>
+                    <div class="flex items-center justify-center gap-3">
+                        <BaseButton @click="reprocess">Tentar Novamente</BaseButton>
+                        <BaseButton :href="route('documents.index')" variant="outline">Voltar</BaseButton>
                     </div>
                 </div>
             </div>
 
             <!-- Questões Extraídas -->
-            <div v-else-if="document.status === 'completed' && extractedQuestions.length > 0">
+            <div v-else-if="document.status === 'completed' && extractedQuestions.length > 0" class="space-y-6">
                 <!-- Informações e Avisos -->
                 <div v-if="metadata.warnings && metadata.warnings.length > 0"
-                     class="card-elegant slide-up bg-yellow-50 border border-yellow-200">
+                     class="card-elegant bg-yellow-50 border border-yellow-200">
                     <div class="flex">
                         <svg class="h-5 w-5 text-yellow-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -71,7 +61,7 @@
 
                 <!-- Erro de Importação -->
                 <div v-if="Object.keys(form.errors).length > 0"
-                     class="card-elegant slide-up bg-red-50 border border-red-200">
+                     class="card-elegant bg-red-50 border border-red-200">
                     <div class="flex">
                         <svg class="h-5 w-5 text-red-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -86,8 +76,32 @@
                     </div>
                 </div>
 
+                <!-- Aplicar disciplina/tópico a todas as selecionadas -->
+                <div class="card-elegant">
+                    <h3 class="text-sm font-semibold text-gray-900 mb-3">Aplicar a todas as selecionadas</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <FormField label="Disciplina" v-slot="{ id }">
+                            <select :id="id" v-model="bulkSubjectId" class="form-control-elegant">
+                                <option :value="null">Selecione...</option>
+                                <option v-for="subject in subjects" :key="subject.id" :value="subject.id">{{ subject.name }}</option>
+                            </select>
+                        </FormField>
+                        <FormField label="Tópico" v-slot="{ id }">
+                            <select :id="id" v-model="bulkTopicId" :disabled="!bulkSubjectId" class="form-control-elegant disabled:bg-gray-100">
+                                <option :value="null">Selecione...</option>
+                                <option v-for="topic in getTopicsForSubject(bulkSubjectId)" :key="topic.id" :value="topic.id">{{ topic.name }}</option>
+                            </select>
+                        </FormField>
+                        <div class="flex items-end">
+                            <BaseButton class="w-full" :disabled="selectedQuestions.length === 0 || !bulkSubjectId" @click="applyBulkSubjectTopic">
+                                Aplicar às {{ selectedQuestions.length }} selecionada{{ selectedQuestions.length !== 1 ? 's' : '' }}
+                            </BaseButton>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Barra de Ações -->
-                <div class="card-elegant slide-up flex items-center justify-between">
+                <div class="card-elegant flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div class="text-sm text-gray-600">
                         <span class="font-semibold text-gray-900">{{ selectedQuestions.length }}</span>
                         de
@@ -95,35 +109,29 @@
                         questões selecionadas
                     </div>
                     <div class="flex gap-3">
-                        <button @click="selectAll" class="btn-elegant btn-elegant-outline btn-elegant-sm">
+                        <BaseButton variant="outline" size="sm" @click="selectAll">
                             {{ selectedQuestions.length === extractedQuestions.length ? 'Desmarcar Todas' : 'Selecionar Todas' }}
-                        </button>
-                        <button
-                            @click="importQuestions"
-                            :disabled="selectedQuestions.length === 0 || form.processing"
-                            class="btn-elegant btn-elegant-primary btn-elegant-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                        >
-                            <svg v-if="form.processing" class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
+                        </BaseButton>
+                        <BaseButton size="sm" :loading="form.processing" :disabled="selectedQuestions.length === 0" @click="importQuestions">
                             {{ form.processing ? 'Importando...' : 'Importar Selecionadas' }}
-                        </button>
+                        </BaseButton>
                     </div>
                 </div>
 
-                <!-- Lista de Questões -->
+                <!-- Lista de Questões (paginada em lotes de 10) -->
                 <div class="space-y-4">
-                    <div v-for="(question, index) in extractedQuestions" :key="index"
-                         class="card-elegant slide-up hover:shadow-lg transition-shadow">
+                    <div v-for="{ question, index } in paginatedQuestions" :key="index"
+                         class="card-elegant hover:shadow-lg transition-shadow">
                         <div class="flex gap-4">
                             <!-- Checkbox -->
                             <div class="flex-shrink-0 pt-1">
                                 <input
                                     type="checkbox"
+                                    :id="`question-${index}-select`"
                                     :checked="selectedQuestions.includes(index)"
                                     @change="toggleQuestion(index)"
                                     class="h-5 w-5 text-blue-600 rounded focus:ring-blue-500"
+                                    :aria-label="`Selecionar questão ${question.number || index + 1}`"
                                 />
                             </div>
 
@@ -142,9 +150,9 @@
                                 </div>
 
                                 <!-- Enunciado -->
-                                <div class="form-group-elegant">
-                                    <label class="form-label-elegant">Enunciado *</label>
+                                <FormField label="Enunciado" required v-slot="{ id }">
                                     <textarea
+                                        :id="id"
                                         v-model="question.statement"
                                         rows="3"
                                         class="form-control-elegant"
@@ -153,39 +161,37 @@
                                     <p v-if="!question.statement || question.statement.length < 10" class="text-xs text-red-600 mt-1">
                                         Enunciado deve ter pelo menos 10 caracteres
                                     </p>
-                                </div>
+                                </FormField>
 
                                 <!-- Tipo, Dificuldade e Pontos -->
                                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                    <div class="form-group-elegant">
-                                        <label class="form-label-elegant">Tipo *</label>
-                                        <select v-model="question.type" class="form-control-elegant">
+                                    <FormField label="Tipo" required v-slot="{ id }">
+                                        <select :id="id" v-model="question.type" class="form-control-elegant">
                                             <option value="multiple_choice">Múltipla Escolha</option>
                                             <option value="true_false">Verdadeiro/Falso</option>
                                             <option value="essay">Dissertativa</option>
                                         </select>
-                                    </div>
-                                    <div class="form-group-elegant">
-                                        <label class="form-label-elegant">Dificuldade *</label>
-                                        <select v-model="question.difficulty_hint" class="form-control-elegant">
+                                    </FormField>
+                                    <FormField label="Dificuldade" required v-slot="{ id }">
+                                        <select :id="id" v-model="question.difficulty_hint" class="form-control-elegant">
                                             <option value="easy">Fácil</option>
                                             <option value="medium">Médio</option>
                                             <option value="hard">Difícil</option>
                                         </select>
-                                    </div>
-                                    <div class="form-group-elegant">
-                                        <label class="form-label-elegant">Pontos</label>
+                                    </FormField>
+                                    <FormField label="Pontos" v-slot="{ id }">
                                         <input
+                                            :id="id"
                                             v-model.number="question.points"
                                             type="number"
                                             step="0.5"
                                             min="0"
                                             class="form-control-elegant"
                                         />
-                                    </div>
-                                    <div class="form-group-elegant">
-                                        <label class="form-label-elegant">Disciplina *</label>
+                                    </FormField>
+                                    <FormField label="Disciplina" required v-slot="{ id }">
                                         <select
+                                            :id="id"
                                             v-model="question.subject_id"
                                             required
                                             class="form-control-elegant"
@@ -196,13 +202,12 @@
                                                 {{ subject.name }}
                                             </option>
                                         </select>
-                                    </div>
+                                    </FormField>
                                 </div>
 
                                 <!-- Tópico -->
-                                <div v-if="question.subject_id" class="form-group-elegant">
-                                    <label class="form-label-elegant">Tópico</label>
-                                    <select v-model="question.topic_id" class="form-control-elegant">
+                                <FormField v-if="question.subject_id" label="Tópico" v-slot="{ id }">
+                                    <select :id="id" v-model="question.topic_id" class="form-control-elegant">
                                         <option :value="null">Selecione...</option>
                                         <option
                                             v-for="topic in getTopicsForSubject(question.subject_id)"
@@ -212,12 +217,12 @@
                                             {{ topic.name }}
                                         </option>
                                     </select>
-                                </div>
+                                </FormField>
 
                                 <!-- Alternativas -->
                                 <div v-if="question.type === 'multiple_choice' && question.alternatives && question.alternatives.length > 0"
                                      class="space-y-2">
-                                    <label class="form-label-elegant">Alternativas</label>
+                                    <span class="form-label-elegant">Alternativas</span>
                                     <div v-for="(alt, altIndex) in question.alternatives" :key="altIndex"
                                          class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
                                         <div class="flex items-center gap-2 flex-shrink-0 pt-2">
@@ -228,7 +233,7 @@
                                                 :checked="alt.is_correct"
                                                 @change="setCorrectAlternative(index, altIndex)"
                                                 class="h-4 w-4 text-green-600"
-                                                title="Marcar como correta"
+                                                :aria-label="`Marcar alternativa ${alt.letter} como correta`"
                                             />
                                         </div>
                                         <textarea
@@ -238,37 +243,30 @@
                                             :class="{ 'bg-green-50 border-green-300': alt.is_correct }"
                                         ></textarea>
                                     </div>
-                                    <p class="text-xs text-gray-500 mt-1">
-                                        ✓ = Alternativa correta
-                                    </p>
+                                    <p class="text-xs text-gray-500 mt-1">✓ = Alternativa correta</p>
                                 </div>
 
                                 <!-- Explicação -->
-                                <div v-if="question.explanation" class="form-group-elegant">
-                                    <label class="form-label-elegant">Explicação (opcional)</label>
-                                    <textarea
-                                        v-model="question.explanation"
-                                        rows="2"
-                                        class="form-control-elegant"
-                                    ></textarea>
-                                </div>
+                                <FormField v-if="question.explanation" label="Explicação (opcional)" v-slot="{ id }">
+                                    <textarea :id="id" v-model="question.explanation" rows="2" class="form-control-elegant"></textarea>
+                                </FormField>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <Pagination v-if="paginationLinks.length > 3" :links="paginationLinks" :summary="paginationSummary" />
             </div>
 
             <!-- Nenhuma questão extraída -->
-            <div v-else class="card-elegant slide-up text-center py-12">
+            <div v-else class="card-elegant text-center py-12">
                 <svg class="h-12 w-12 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
                 <h3 class="text-lg font-semibold text-gray-900 mb-2">Nenhuma questão encontrada</h3>
                 <p class="text-gray-600 mb-4">O documento não contém questões que pudemos extrair.</p>
-                <a :href="route('documents.index')" class="btn-elegant btn-elegant-outline">
-                    Voltar
-                </a>
+                <BaseButton :href="route('documents.index')" variant="outline">Voltar</BaseButton>
             </div>
         </div>
     </AppLayout>
@@ -276,8 +274,11 @@
 
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { ref, computed } from 'vue';
+import { ref, reactive, computed, watch, onMounted, onUnmounted } from 'vue';
 import { Head, useForm, router } from '@inertiajs/vue3';
+import BaseButton from '@/Components/UI/BaseButton.vue';
+import FormField from '@/Components/UI/FormField.vue';
+import Pagination from '@/Components/UI/Pagination.vue';
 
 const props = defineProps({
     document: Object,
@@ -286,14 +287,55 @@ const props = defineProps({
     questionTypes: Array,
 });
 
-const extractedQuestions = ref(props.document.extraction_result?.questions || []);
-const metadata = ref(props.document.extraction_result?.metadata || {});
-const selectedQuestions = ref(extractedQuestions.value.map((_, i) => i));
+// `extractedQuestions`/`metadata` só são derivados de `props.document` na
+// primeira vez que ele chega "completed" — depois disso o usuário edita os
+// campos localmente (v-model), então não podemos simplesmente recalcular a
+// partir da prop a cada poll, ou perderíamos as edições em andamento.
+const extractedQuestions = reactive([]);
+const metadata = ref({});
+const selectedQuestions = ref([]);
 const attemptedImport = ref(false);
+const bulkSubjectId = ref(null);
+const bulkTopicId = ref(null);
+const currentPage = ref(1);
+const perBatch = 10;
+const startedAt = ref(Date.now());
+const elapsedSeconds = ref(0);
+
+const hydrateFromDocument = () => {
+    if (props.document.status !== 'completed' || extractedQuestions.length > 0) return;
+
+    const questions = props.document.extraction_result?.questions || [];
+    extractedQuestions.push(...questions);
+    metadata.value = props.document.extraction_result?.metadata || {};
+    selectedQuestions.value = questions.map((_, i) => i);
+};
+
+hydrateFromDocument();
 
 const form = useForm({
     questions: [],
 });
+
+const paginatedQuestions = computed(() => {
+    const start = (currentPage.value - 1) * perBatch;
+    return extractedQuestions
+        .map((question, index) => ({ question, index }))
+        .slice(start, start + perBatch);
+});
+
+const totalPages = computed(() => Math.max(1, Math.ceil(extractedQuestions.length / perBatch)));
+
+const paginationLinks = computed(() => {
+    const links = [{ url: currentPage.value > 1 ? '#prev' : null, label: '&laquo; Anterior', active: false }];
+    for (let page = 1; page <= totalPages.value; page++) {
+        links.push({ url: `#${page}`, label: String(page), active: page === currentPage.value });
+    }
+    links.push({ url: currentPage.value < totalPages.value ? '#next' : null, label: 'Próxima &raquo;', active: false });
+    return links;
+});
+
+const paginationSummary = computed(() => `Lote ${currentPage.value} de ${totalPages.value} (${extractedQuestions.length} questões no total)`);
 
 const getConfidenceClass = (confidence) => {
     if (confidence >= 0.9) return 'bg-green-100 text-green-800';
@@ -315,16 +357,23 @@ const toggleQuestion = (index) => {
 };
 
 const selectAll = () => {
-    if (selectedQuestions.value.length === extractedQuestions.value.length) {
+    if (selectedQuestions.value.length === extractedQuestions.length) {
         selectedQuestions.value = [];
     } else {
-        selectedQuestions.value = extractedQuestions.value.map((_, i) => i);
+        selectedQuestions.value = extractedQuestions.map((_, i) => i);
     }
 };
 
 const setCorrectAlternative = (questionIndex, altIndex) => {
-    extractedQuestions.value[questionIndex].alternatives.forEach((alt, i) => {
+    extractedQuestions[questionIndex].alternatives.forEach((alt, i) => {
         alt.is_correct = i === altIndex;
+    });
+};
+
+const applyBulkSubjectTopic = () => {
+    selectedQuestions.value.forEach((index) => {
+        extractedQuestions[index].subject_id = bulkSubjectId.value;
+        extractedQuestions[index].topic_id = bulkTopicId.value;
     });
 };
 
@@ -332,7 +381,7 @@ const importQuestions = () => {
     attemptedImport.value = true;
 
     const missingSubject = selectedQuestions.value.some(
-        index => !extractedQuestions.value[index].subject_id
+        index => !extractedQuestions[index].subject_id
     );
 
     if (missingSubject) {
@@ -343,7 +392,7 @@ const importQuestions = () => {
     form.clearErrors();
 
     const questionsToImport = selectedQuestions.value.map(index => {
-        const question = extractedQuestions.value[index];
+        const question = extractedQuestions[index];
         return {
             statement: question.statement,
             type: question.type,
@@ -360,11 +409,50 @@ const importQuestions = () => {
     form.post(route('documents.import-questions', props.document.id));
 };
 
-const refreshPage = () => {
-    router.reload();
-};
-
 const reprocess = () => {
     router.post(route('documents.reprocess', props.document.id));
 };
+
+// Polling automático enquanto o documento está sendo processado — antes,
+// esta era a única tela do fluxo de documentos que exigia recarregar na
+// mão para ver o resultado (a listagem já fazia polling havia tempo).
+const pollInterval = ref(null);
+let elapsedTimer = null;
+
+const startPolling = () => {
+    if (props.document.status === 'pending' || props.document.status === 'processing') {
+        pollInterval.value = setInterval(() => {
+            router.reload({ only: ['document'], preserveScroll: true });
+        }, 5000);
+
+        elapsedTimer = setInterval(() => {
+            elapsedSeconds.value = Math.floor((Date.now() - startedAt.value) / 1000);
+        }, 1000);
+    }
+};
+
+const elapsedLabel = computed(() => {
+    if (elapsedSeconds.value < 60) return `${elapsedSeconds.value}s`;
+    const minutes = Math.floor(elapsedSeconds.value / 60);
+    const seconds = elapsedSeconds.value % 60;
+    return `${minutes}min ${seconds}s`;
+});
+
+watch(() => props.document.status, (status) => {
+    if (status === 'completed') {
+        hydrateFromDocument();
+    }
+
+    if (status !== 'pending' && status !== 'processing') {
+        if (pollInterval.value) clearInterval(pollInterval.value);
+        if (elapsedTimer) clearInterval(elapsedTimer);
+    }
+});
+
+onMounted(startPolling);
+
+onUnmounted(() => {
+    if (pollInterval.value) clearInterval(pollInterval.value);
+    if (elapsedTimer) clearInterval(elapsedTimer);
+});
 </script>

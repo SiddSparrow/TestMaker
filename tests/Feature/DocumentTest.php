@@ -28,6 +28,45 @@ class DocumentTest extends TestCase
         Storage::fake('local');
     }
 
+    public function test_index_filters_by_search_and_status(): void
+    {
+        $match = Document::factory()->create([
+            'user_id' => $this->user->id,
+            'original_name' => 'prova-geografia.pdf',
+            'status' => 'completed',
+        ]);
+        Document::factory()->create([
+            'user_id' => $this->user->id,
+            'original_name' => 'prova-historia.pdf',
+            'status' => 'failed',
+        ]);
+
+        $response = $this->actingAs($this->user)->get(
+            route('documents.index', ['search' => 'geografia', 'status' => 'completed'])
+        );
+
+        $response->assertInertia(
+            fn ($page) => $page
+                ->has('documents.data', 1)
+                ->where('documents.data.0.id', $match->id)
+        );
+    }
+
+    public function test_index_lists_only_the_authenticated_users_documents(): void
+    {
+        $mine = Document::factory()->create(['user_id' => $this->user->id]);
+        $other = User::factory()->create();
+        Document::factory()->create(['user_id' => $other->id]);
+
+        $response = $this->actingAs($this->user)->get(route('documents.index'));
+
+        $response->assertInertia(
+            fn ($page) => $page
+                ->has('documents.data', 1)
+                ->where('documents.data.0.id', $mine->id)
+        );
+    }
+
     public function test_store_uploads_a_valid_document_and_dispatches_the_extraction_job(): void
     {
         Queue::fake();

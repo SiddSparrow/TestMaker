@@ -75,6 +75,7 @@ import ExamConfigForm from '@/Components/Exams/ExamConfigForm.vue';
 import ExamBuilder from '@/Components/Exams/ExamBuilder.vue';
 import ExamPreview from '@/Components/Exams/ExamPreview.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import { useToast } from '@/composables/useToast';
 
 const props = defineProps({
     questions: {
@@ -171,6 +172,7 @@ const examConfig = ref(draft?.examConfig ?? {
 
 const examQuestions = ref(draft?.examQuestions ?? []);
 const configCompleted = ref(draft?.configCompleted ?? false);
+const toast = useToast();
 
 watch([examConfig, examQuestions, configCompleted], () => {
     try {
@@ -251,7 +253,7 @@ const handleCancel = () => {
 
 const saveExam = () => {
     if (examQuestions.value.length === 0) {
-        alert('Adicione pelo menos uma questão à prova');
+        toast.error('Adicione pelo menos uma questão à prova');
         return;
     }
 

@@ -121,7 +121,7 @@ const showDeleteConfirm = ref(false);
 const subjectToDelete = ref(null);
 const deleteMessage = computed(() => {
     const name = subjectToDelete.value?.name || '';
-    return `Tem certeza que deseja excluir a matéria "${name}"? Todos os tópicos e questões relacionados serão mantidos, mas não estarão mais vinculados a esta matéria.`;
+    return `Tem certeza que deseja excluir a matéria "${name}"? Os tópicos dessa matéria são excluídos junto. Só é possível excluir se não houver nenhuma questão vinculada a ela.`;
 });
 
 const form = useForm({

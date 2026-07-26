@@ -282,7 +282,7 @@
                 </Link>
                 
                 <div class="flex gap-3">
-                    <button @click="deleteExam"
+                    <button @click="showDeleteConfirm = true"
                             class="inline-flex items-center px-4 py-2.5 text-red-600 hover:bg-red-50 border border-red-200 rounded-lg transition-colors">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
@@ -313,6 +313,16 @@
             @export-pdf="exportPDF"
             @export-docx="exportDOCX"
         />
+
+        <ConfirmDialog
+            v-model:show="showDeleteConfirm"
+            title="Excluir prova"
+            :message="`Tem certeza que deseja excluir a prova &quot;${exam.title}&quot;? Isso remove os vínculos com as questões e apaga a prova definitivamente do banco de dados — não é possível desfazer.`"
+            confirm-text="Sim, excluir"
+            cancel-text="Cancelar"
+            type="danger"
+            @confirm="deleteExam"
+        />
     </AppLayout>
 </template>
 
@@ -321,6 +331,7 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ExamPreview from '@/Components/Exams/ExamPreview.vue';
+import ConfirmDialog from '@/Components/ConfirmDialog.vue';
 import { useFileDownload } from '@/composables/useFileDownload';
 
 const { download } = useFileDownload();
@@ -371,10 +382,10 @@ const exportDOCX = (withAnswers = false) => {
     showExportMenu.value = false;
 };
 
+const showDeleteConfirm = ref(false);
+
 const deleteExam = () => {
-    if (confirm(`Tem certeza que deseja excluir a prova "${props.exam.title}"?\n\nEsta ação não pode ser desfeita.`)) {
-        router.delete(route('exams.destroy', props.exam.id));
-    }
+    router.delete(route('exams.destroy', props.exam.id));
 };
 
 // Fechar menu de exportação ao clicar fora — precisa ser removido no unmount,

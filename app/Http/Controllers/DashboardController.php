@@ -20,7 +20,9 @@ class DashboardController extends Controller
         $userId = Auth::id();
 
         $stats = [
-            'total_questions' => Question::where('user_id', $userId)->count(),
+            // O card se chama "Questões Ativas" — contar todas (inclusive
+            // arquivadas) faria o KPI mentir sobre o próprio rótulo.
+            'total_questions' => Question::where('user_id', $userId)->where('is_active', true)->count(),
             'total_exams' => Exam::where('user_id', $userId)->count(),
             'total_subjects' => Subject::where('user_id', $userId)->count(),
             'total_documents' => Document::where('user_id', $userId)

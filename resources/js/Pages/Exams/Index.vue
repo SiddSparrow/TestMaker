@@ -89,7 +89,10 @@
                     </template>
 
                     <template #cell-status="{ row }">
-                        <StatusBadge :label="getExamStatus(row)" :tone="getStatusTone(row)" dot />
+                        <div class="flex flex-col items-start gap-1">
+                            <StatusBadge :label="getExamStatus(row)" :tone="getStatusTone(row)" dot />
+                            <StatusBadge :label="row.is_published ? 'Publicada' : 'Rascunho'" :tone="row.is_published ? 'green' : 'gray'" />
+                        </div>
                     </template>
 
                     <template #cell-actions="{ row }">

@@ -91,4 +91,35 @@ class DashboardTest extends TestCase
                 ->where('most_used_subjects.0.question_count', 2)
         );
     }
+
+    /**
+     * O card se chama "Questões Ativas" mas contava todas as questões,
+     * inclusive arquivadas — dois números diferentes para a mesma coisa
+     * entre o Dashboard e Questions/Index.vue (que já separa ativas de
+     * inativas). Garante que o KPI filtra por is_active.
+     */
+    public function test_dashboard_active_questions_count_excludes_archived(): void
+    {
+        $user = User::factory()->create();
+        $subject = Subject::factory()->create(['user_id' => $user->id]);
+        $type = QuestionType::factory()->create();
+        Question::factory()->count(2)->create([
+            'user_id' => $user->id,
+            'subject_id' => $subject->id,
+            'topic_id' => null,
+            'question_type_id' => $type->id,
+            'is_active' => true,
+        ]);
+        Question::factory()->create([
+            'user_id' => $user->id,
+            'subject_id' => $subject->id,
+            'topic_id' => null,
+            'question_type_id' => $type->id,
+            'is_active' => false,
+        ]);
+
+        $response = $this->actingAs($user)->get(route('dashboard'));
+
+        $response->assertInertia(fn ($page) => $page->where('stats.total_questions', 2));
+    }
 }

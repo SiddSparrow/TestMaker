@@ -88,6 +88,7 @@ class DashboardController extends Controller
                     'question_count' => $subject->question_count,
                 ];
             });
+
         return Inertia::render('Dashboard', [
             'stats' => $stats,
             'recent_questions' => $recentQuestions,

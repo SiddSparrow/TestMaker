@@ -18,6 +18,10 @@ use Inertia\Inertia;
 
 class DocumentController extends Controller
 {
+    // Mesmo padrão de whitelist do QuestionController — Questões e Provas já
+    // ordenavam por coluna, Documentos era a única das três sem isso.
+    protected $sortableColumns = ['original_name', 'status', 'created_at'];
+
     /**
      * Mostra a lista de documentos do usuário
      */
@@ -26,7 +30,7 @@ class DocumentController extends Controller
         // Antes não havia nenhum filtro nesta tela — com 200 arquivos
         // enviados não havia como achar um documento específico a não ser
         // rolando a lista inteira.
-        $filters = $request->only(['search', 'status', 'per_page']);
+        $filters = $request->only(['search', 'status', 'per_page', 'sort', 'direction']);
 
         $query = Document::where('user_id', auth()->id());
 
@@ -38,11 +42,18 @@ class DocumentController extends Controller
             $query->where('status', $filters['status']);
         }
 
+        $sort = $filters['sort'] ?? null;
+        $direction = ($filters['direction'] ?? 'desc') === 'asc' ? 'asc' : 'desc';
+
+        if ($sort && in_array($sort, $this->sortableColumns, true)) {
+            $query->orderBy($sort, $direction);
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
         $perPage = $filters['per_page'] ?? 15;
 
-        $documents = $query->orderBy('created_at', 'desc')
-            ->paginate($perPage)
-            ->withQueryString();
+        $documents = $query->paginate($perPage)->withQueryString();
 
         return Inertia::render('Documents/Index', [
             'documents' => $documents,

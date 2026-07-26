@@ -50,8 +50,9 @@
 
             <!-- Lista de Documentos -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200">
-                <DataTable :columns="columns" :rows="documents.data" :loading="isLoading">
-                    <template #cell-file="{ row }">
+                <DataTable :columns="columns" :rows="documents.data" :loading="isLoading"
+                           :sort-key="form.sort" :sort-direction="form.direction" @sort="handleSort">
+                    <template #cell-original_name="{ row }">
                         <div class="flex items-center">
                             <div class="flex-shrink-0 h-10 w-10 flex items-center justify-center bg-blue-100 rounded-lg">
                                 <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -170,10 +171,10 @@ const props = defineProps({
 });
 
 const columns = [
-    { key: 'file', label: 'Arquivo' },
-    { key: 'status', label: 'Status' },
+    { key: 'original_name', label: 'Arquivo', sortable: true },
+    { key: 'status', label: 'Status', sortable: true },
     { key: 'questions', label: 'Questões' },
-    { key: 'created_at', label: 'Data' },
+    { key: 'created_at', label: 'Data', sortable: true },
     { key: 'actions', label: 'Ações', align: 'right' },
 ];
 
@@ -187,6 +188,8 @@ const form = useForm({
     search: props.filters.search || '',
     status: props.filters.status || '',
     per_page: props.filters.per_page || 15,
+    sort: props.filters.sort || '',
+    direction: props.filters.direction || 'desc',
 });
 
 const hasFilters = computed(() => form.search !== '' || form.status !== '');
@@ -201,6 +204,12 @@ const applyFilters = () => {
 
 const resetFilters = () => {
     form.reset();
+    applyFilters();
+};
+
+const handleSort = ({ key, direction }) => {
+    form.sort = key;
+    form.direction = direction;
     applyFilters();
 };
 
@@ -286,8 +295,14 @@ onUnmounted(() => {
 let stopStart;
 let stopFinish;
 
+// Só liga quando o destino da navegação é esta mesma rota — sem isso,
+// sair da tela por qualquer link fazia a tabela piscar em skeleton.
 onMounted(() => {
-    stopStart = router.on('start', () => { isLoading.value = true; });
+    stopStart = router.on('start', (event) => {
+        if (event.detail.visit.url.pathname === window.location.pathname) {
+            isLoading.value = true;
+        }
+    });
     stopFinish = router.on('finish', () => { isLoading.value = false; });
 });
 

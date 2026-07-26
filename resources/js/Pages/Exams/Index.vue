@@ -372,8 +372,14 @@ watch(() => form.search, debounce(applyFilters, 500));
 let stopStart;
 let stopFinish;
 
+// Só liga quando o destino da navegação é esta mesma rota — sem isso,
+// sair da tela por qualquer link fazia a tabela piscar em skeleton.
 onMounted(() => {
-    stopStart = router.on('start', () => { isLoading.value = true; });
+    stopStart = router.on('start', (event) => {
+        if (event.detail.visit.url.pathname === window.location.pathname) {
+            isLoading.value = true;
+        }
+    });
     stopFinish = router.on('finish', () => { isLoading.value = false; });
 });
 

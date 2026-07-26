@@ -23,18 +23,38 @@
 
             <!-- Painel de filtros -->
             <div v-if="showFilters" class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     <FormField label="Buscar" v-slot="{ id }">
                         <input :id="id" v-model="form.search" type="text" placeholder="Digite para buscar..."
                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                     </FormField>
 
                     <FormField label="Matéria" v-slot="{ id }">
-                        <select :id="id" v-model="form.subject_id"
+                        <select :id="id" v-model="form.subject_id" @change="form.topic_id = ''"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                             <option value="">Todas as matérias</option>
                             <option v-for="subject in subjects" :key="subject.id" :value="subject.id">
                                 {{ subject.name }}
+                            </option>
+                        </select>
+                    </FormField>
+
+                    <FormField label="Tópico" v-slot="{ id }">
+                        <select :id="id" v-model="form.topic_id"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Todos os tópicos</option>
+                            <option v-for="topic in filteredTopics" :key="topic.id" :value="topic.id">
+                                {{ topic.name }}
+                            </option>
+                        </select>
+                    </FormField>
+
+                    <FormField label="Tipo de Questão" v-slot="{ id }">
+                        <select :id="id" v-model="form.question_type_id"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Todos os tipos</option>
+                            <option v-for="type in question_types" :key="type.id" :value="type.id">
+                                {{ type.name }}
                             </option>
                         </select>
                     </FormField>
@@ -313,6 +333,15 @@ const form = useForm({
     direction: props.filters.direction || 'asc',
 });
 
+// topic_id/question_type_id já eram enviados no payload da busca, mas sem
+// nenhum campo correspondente na tela — filtro fantasma que o usuário não
+// alcançava. filteredTopics restringe pela matéria selecionada, igual ao
+// formulário de questão.
+const filteredTopics = computed(() => {
+    if (!form.subject_id) return props.topics;
+    return props.topics.filter((topic) => topic.subject_id == form.subject_id);
+});
+
 // Computed — `per_page`/`sort`/`direction` sempre vêm preenchidos, então não
 // contam como "filtro aplicado" para efeito da mensagem de estado vazio.
 const hasFilters = computed(() => {
@@ -417,8 +446,16 @@ watch(
 let stopStart;
 let stopFinish;
 
+// isLoading era ligado a router.on('start') global — sair desta tela por
+// qualquer link (nav, breadcrumb etc.) fazia a tabela piscar em skeleton
+// mesmo saindo da página. Só liga quando o destino da navegação é esta
+// mesma rota (filtro/ordenação/paginação continuam nela).
 onMounted(() => {
-    stopStart = router.on('start', () => { isLoading.value = true; });
+    stopStart = router.on('start', (event) => {
+        if (event.detail.visit.url.pathname === window.location.pathname) {
+            isLoading.value = true;
+        }
+    });
     stopFinish = router.on('finish', () => { isLoading.value = false; });
 });
 

@@ -52,6 +52,33 @@ class DocumentTest extends TestCase
         );
     }
 
+    public function test_index_sorts_by_a_whitelisted_column(): void
+    {
+        $older = Document::factory()->create(['user_id' => $this->user->id, 'original_name' => 'a-prova.pdf']);
+        $newer = Document::factory()->create(['user_id' => $this->user->id, 'original_name' => 'z-prova.pdf']);
+
+        $response = $this->actingAs($this->user)->get(
+            route('documents.index', ['sort' => 'original_name', 'direction' => 'asc'])
+        );
+
+        $response->assertInertia(
+            fn ($page) => $page
+                ->where('documents.data.0.id', $older->id)
+                ->where('documents.data.1.id', $newer->id)
+        );
+    }
+
+    public function test_index_ignores_a_non_whitelisted_sort_column(): void
+    {
+        Document::factory()->create(['user_id' => $this->user->id]);
+
+        $response = $this->actingAs($this->user)->get(
+            route('documents.index', ['sort' => 'user_id', 'direction' => 'asc'])
+        );
+
+        $response->assertOk();
+    }
+
     public function test_index_lists_only_the_authenticated_users_documents(): void
     {
         $mine = Document::factory()->create(['user_id' => $this->user->id]);

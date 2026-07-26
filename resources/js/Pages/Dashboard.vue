@@ -4,6 +4,8 @@
         <Head title="Dashboard" />
 
         <div class="space-y-6">
+            <PageHeader title="Dashboard" subtitle="Visão geral do seu banco de questões, provas e documentos" />
+
             <!-- Cards de estatísticas -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 animate-slide-up delay-150">
                 <StatCard
@@ -146,6 +148,7 @@ import QuestionList from '@/Components/QuestionList.vue';
 import ExamList from '@/Components/ExamList.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import BaseButton from '@/Components/UI/BaseButton.vue';
+import PageHeader from '@/Components/UI/PageHeader.vue';
 
 defineProps({
     stats: Object,

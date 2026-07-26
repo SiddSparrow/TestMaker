@@ -12,10 +12,8 @@
                     </li>
                 </ul>
             </div>
-            <div class="mb-6">
-                <h1 class="text-3xl font-bold text-gray-900">Nova Questão</h1>
-                <p class="mt-2 text-sm text-gray-600">Preencha os campos abaixo para criar uma nova questão</p>
-            </div>
+            <PageHeader title="Nova Questão" subtitle="Preencha os campos abaixo para criar uma nova questão"
+                        :breadcrumb="[{ label: 'Questões', href: route('questions.index') }, { label: 'Nova Questão' }]" class="mb-6" />
 
             <form @submit.prevent="submit" class="space-y-6">
                 <!-- Informações Básicas -->
@@ -122,6 +120,7 @@ import AlternativesManager from '@/Components/AlternativesManager.vue';
 import QuestionFormFields from '@/Components/QuestionFormFields.vue';
 import FormField from '@/Components/UI/FormField.vue';
 import BaseButton from '@/Components/UI/BaseButton.vue';
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import { humanizeField } from '@/utils/fieldLabels';
 import { useUnsavedChanges } from '@/composables/useUnsavedChanges';
 

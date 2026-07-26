@@ -10,7 +10,7 @@
                     </p>
                     <div class="mt-2 flex items-center space-x-2">
                         <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
-                              :style="{ backgroundColor: question.subject.color + '20', color: question.subject.color }">
+                              :style="{ backgroundColor: question.subject.color + '20', color: getReadableTextColor(question.subject.color, { light: question.subject.color, dark: '#1f2937' }) }">
                             {{ question.subject.name }}
                         </span>
                         <span class="text-xs text-gray-500">{{ question.topic || 'Sem tópico' }}</span>
@@ -33,6 +33,7 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
 import DifficultyBadge from '@/Components/UI/DifficultyBadge.vue';
+import { getReadableTextColor } from '@/utils/color';
 
 defineProps({
     questions: {

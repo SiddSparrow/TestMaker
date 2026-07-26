@@ -12,7 +12,7 @@
                                 </label>
                                 <input type="text"
                                        v-model="localConfig.title"
-                                       class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                       class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                        :class="{ 'border-red-500': errors.title }">
                                 <p v-if="errors.title" class="mt-1 text-sm text-red-600">{{ errors.title }}</p>
                             </div>
@@ -24,7 +24,7 @@
                                 </label>
                                 <textarea v-model="localConfig.description"
                                           rows="3"
-                                          class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                          class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                           placeholder="Adicione instruções para os alunos..."></textarea>
                             </div>
 
@@ -36,7 +36,7 @@
                                     </label>
                                     <input type="date"
                                            v-model="localConfig.exam_date"
-                                           class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                           class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                 </div>
 
                                 <div>
@@ -46,7 +46,7 @@
                                     <input type="number"
                                            v-model.number="localConfig.target_total_points"
                                            min="1"
-                                           class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                           class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                 </div>
                             </div>
 
@@ -61,7 +61,7 @@
                                         </label>
                                         <input type="text"
                                                v-model="localConfig.header_config.school_name"
-                                               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                               class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                placeholder="Ex: Colégio ABC">
                                     </div>
 
@@ -94,7 +94,7 @@
                                         </label>
                                         <input type="text"
                                                v-model="localConfig.footer_config.custom_text"
-                                               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                               class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                                placeholder="Ex: Boa prova!">
                                     </div>
 
@@ -111,11 +111,11 @@
                             <div class="flex justify-end gap-3 pt-6 border-t border-gray-200">
                                 <button type="button"
                                         @click="close"
-                                        class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                                        class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
                                     Cancelar
                                 </button>
                                 <button type="submit"
-                                        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                        class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
                                     Salvar Alterações
                                 </button>
                             </div>

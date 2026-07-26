@@ -39,7 +39,7 @@
                     <option v-for="subject in localSubjects"
                             :key="subject.id"
                             :value="subject.id"
-                            :style="{ color: subject.color }">
+                            :style="{ color: getReadableTextColor(subject.color, { light: subject.color, dark: '#1f2937' }) }">
                         {{ subject.name }}
                     </option>
                 </select>
@@ -231,6 +231,7 @@
 
 <script setup>
 import { ref, computed, watch, useId } from 'vue';
+import { getReadableTextColor } from '@/utils/color';
 
 const uid = useId();
 const ids = {

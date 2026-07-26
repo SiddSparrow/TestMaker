@@ -12,13 +12,13 @@
                            v-model="localConfig.title"
                            autofocus
                            placeholder="Ex: Prova de Matemática - 1º Bimestre"
-                           class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                           class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                            :class="{ 'border-red-500': errors.title }">
                 </FormField>
 
                 <FormField label="Matéria Principal" required :error="errors.main_subject_id" v-slot="{ id }">
                     <select :id="id" v-model="localConfig.main_subject_id"
-                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                             :class="{ 'border-red-500': errors.main_subject_id }">
                         <option value="">Selecione a matéria</option>
                         <option v-for="subject in subjects" :key="subject.id" :value="subject.id">
@@ -30,7 +30,7 @@
                 <FormField label="Data da Prova" v-slot="{ id }">
                     <input :id="id" type="date"
                            v-model="localConfig.exam_date"
-                           class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                           class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
                 </FormField>
 
                 <FormField class="md:col-span-2" label="Descrição/Instruções" v-slot="{ id }">
@@ -38,7 +38,7 @@
                               v-model="localConfig.description"
                               rows="3"
                               placeholder="Adicione instruções ou observações para os alunos..."
-                              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"></textarea>
+                              class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"></textarea>
                 </FormField>
             </div>
 
@@ -63,7 +63,7 @@
                                        v-model.number="localConfig.target_total_points"
                                        min="1"
                                        placeholder="100"
-                                       class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                                       class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
                                 <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">pontos</span>
                             </div>
                         </FormField>
@@ -73,7 +73,7 @@
                                    v-model.number="localConfig.target_question_count"
                                    min="1"
                                    placeholder="10"
-                                   class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                                   class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
                         </FormField>
                     </div>
 

@@ -4,25 +4,27 @@
 
         <div class="max-w-5xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
             <!-- Header -->
-            <div class="mb-6 flex items-center justify-between">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Detalhes da Questão</h1>
-                    <p class="mt-2 text-sm text-gray-600">Visualização completa da questão</p>
+            <DetailHeader class="mb-6">
+                <div class="flex items-center justify-between gap-4">
+                    <div>
+                        <h1 class="text-3xl font-bold mb-1">Detalhes da Questão</h1>
+                        <p class="text-blue-100 text-sm">Visualização completa da questão</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <Link :href="route('questions.edit', question.id)"
+                           class="px-4 py-2 bg-white text-blue-600 hover:bg-gray-50 font-medium rounded-lg transition-colors">
+                            Editar
+                        </Link>
+                        <Link :href="route('questions.index')"
+                           class="px-4 py-2 bg-white/20 hover:bg-white/30 border border-white/30 rounded-lg transition-colors">
+                            Voltar
+                        </Link>
+                    </div>
                 </div>
-                <div class="flex space-x-3">
-                    <Link :href="route('questions.edit', question.id)"
-                       class="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors">
-                        Editar
-                    </Link>
-                    <Link :href="route('questions.index')"
-                       class="px-4 py-2 text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md transition-colors">
-                        Voltar
-                    </Link>
-                </div>
-            </div>
+            </DetailHeader>
 
             <!-- Informações Básicas -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">Informações Básicas</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -82,7 +84,7 @@
             </div>
 
             <!-- Enunciado -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">Enunciado</h2>
                 <div class="prose max-w-none">
                     <p class="text-gray-900 whitespace-pre-wrap">{{ question.statement }}</p>
@@ -91,7 +93,7 @@
 
             <!-- Alternativas -->
             <div v-if="question.alternatives?.length > 0" 
-                 class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+                 class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">
                     {{ isVerdadeiroFalso ? 'Afirmações (Verdadeiro/Falso)' : 'Alternativas' }}
                 </h2>
@@ -147,7 +149,7 @@
 
             <!-- Explicação -->
             <div v-if="question.explanation" 
-                 class="bg-blue-50 rounded-lg border border-blue-200 p-6 mb-6">
+                 class="bg-blue-50 rounded-xl border border-blue-200 p-6 mb-6">
                 <h2 class="text-lg font-semibold text-blue-900 mb-3 flex items-center">
                     <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
@@ -161,7 +163,7 @@
 
             <!-- Etiquetas -->
             <div v-if="question.tags?.length > 0"
-                 class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                 class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h2 class="text-lg font-semibold text-gray-900 mb-3">Etiquetas</h2>
                 <div class="flex flex-wrap gap-2">
                     <span v-for="tag in question.tags"
@@ -179,6 +181,7 @@
 import { computed } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import DetailHeader from '@/Components/UI/DetailHeader.vue';
 
 const props = defineProps({
     question: Object,

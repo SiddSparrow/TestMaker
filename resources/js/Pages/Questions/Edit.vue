@@ -20,13 +20,9 @@
                     :original-label="'Questão original'"
                     @dismiss="isCopy = false"
                 />
-            <div class="mb-6 flex items-center justify-between">
-                
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Editar Questão</h1>
-                    <p class="mt-2 text-sm text-gray-600">Atualize os campos necessários</p>
-                </div>
-                <div class="flex space-x-3">
+            <PageHeader title="Editar Questão" subtitle="Atualize os campos necessários"
+                        :breadcrumb="[{ label: 'Questões', href: route('questions.index') }, { label: 'Editar' }]" class="mb-6">
+                <template #actions>
                     <!-- BOTÃO DE CRIAR CÓPIA -->
                     <button @click="handleCreateCopyClick"
                             :disabled="isCopying"
@@ -57,17 +53,17 @@
                         </span>
                         
                         <!-- Seta que aparece durante o loading -->
-                        <svg v-if="isCopying" 
-                            class="h-3 w-3 ml-1 animate-bounce-right" 
-                            fill="none" 
-                            stroke="currentColor" 
+                        <svg v-if="isCopying"
+                            class="h-3 w-3 ml-1 animate-bounce-right"
+                            fill="none"
+                            stroke="currentColor"
                             viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                         </svg>
                     </button>
-                </div>
-            </div>
-            
+                </template>
+            </PageHeader>
+
 
             <form @submit.prevent="submit" class="space-y-6">
                 <!-- Informações Básicas -->
@@ -185,6 +181,7 @@ import AlternativesManager from '@/Components/AlternativesManager.vue';
 import QuestionFormFields from '@/Components/QuestionFormFields.vue';
 import FormField from '@/Components/UI/FormField.vue';
 import BaseButton from '@/Components/UI/BaseButton.vue';
+import PageHeader from '@/Components/UI/PageHeader.vue';
 import ConfirmDialog from '@/Components/ConfirmDialog.vue';
 import { humanizeField } from '@/utils/fieldLabels';
 import { useUnsavedChanges } from '@/composables/useUnsavedChanges';

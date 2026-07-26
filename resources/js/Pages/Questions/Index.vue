@@ -153,8 +153,8 @@
 
                     <template #cell-subject="{ row }">
                         <div v-if="row.subject" class="flex items-center">
-                            <div class="h-8 w-8 rounded-full mr-3 flex items-center justify-center text-white font-medium text-xs shadow-sm"
-                                 :style="{ backgroundColor: row.subject.color }">
+                            <div class="h-8 w-8 rounded-full mr-3 flex items-center justify-center font-medium text-xs shadow-sm"
+                                 :style="{ backgroundColor: row.subject.color, color: getReadableTextColor(row.subject.color) }">
                                 {{ row.subject.name.charAt(0) }}
                             </div>
                             <div>
@@ -267,6 +267,7 @@ import FormField from '@/Components/UI/FormField.vue';
 import DifficultyBadge from '@/Components/UI/DifficultyBadge.vue';
 import StatusBadge from '@/Components/UI/StatusBadge.vue';
 import ConfirmDialog from '@/Components/ConfirmDialog.vue';
+import { getReadableTextColor } from '@/utils/color';
 
 const props = defineProps({
     questions: Object,

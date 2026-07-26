@@ -4,7 +4,7 @@
 
         <div class="max-w-7xl mx-auto py-6 px-4">
             <!-- Header de Edição -->
-            <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl shadow-lg p-6 mb-6">
+            <DetailHeader class="mb-6">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-4">
                         <div class="p-3 bg-white/20 rounded-lg">
@@ -58,7 +58,7 @@
                         <div class="text-2xl font-bold">{{ form.target_total_points || '--' }}</div>
                     </div>
                 </div>
-            </div>
+            </DetailHeader>
 
             <!-- Status de Mudanças -->
             <div v-if="hasUnsavedChanges" 
@@ -184,6 +184,7 @@ import ExamBuilder from '@/Components/Exams/ExamBuilder.vue';
 import ExamConfigEditModal from '@/Components/Exams/ExamConfigEditModal.vue';
 import ExamPreview from '@/Components/Exams/ExamPreview.vue';
 import ConfirmDialog from '@/Components/ConfirmDialog.vue';
+import DetailHeader from '@/Components/UI/DetailHeader.vue';
 import { useFileDownload } from '@/composables/useFileDownload';
 import { useUnsavedChanges } from '@/composables/useUnsavedChanges';
 

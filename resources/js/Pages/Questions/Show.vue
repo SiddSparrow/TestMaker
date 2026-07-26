@@ -45,14 +45,7 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-500 mb-1">Dificuldade</label>
-                        <span class="inline-flex px-3 py-1 rounded-full text-sm font-medium"
-                              :class="{
-                                  'bg-green-100 text-green-700': question.difficulty_level === 'easy',
-                                  'bg-yellow-100 text-yellow-700': question.difficulty_level === 'medium',
-                                  'bg-red-100 text-red-700': question.difficulty_level === 'hard'
-                              }">
-                            {{ getDifficultyLabel(question.difficulty_level) }}
-                        </span>
+                        <DifficultyBadge :level="question.difficulty_level" />
                     </div>
 
                     <div>
@@ -62,12 +55,7 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-500 mb-1">Status</label>
-                        <span class="inline-flex px-3 py-1 rounded-full text-sm font-medium"
-                              :class="question.is_active 
-                                  ? 'bg-green-100 text-green-700' 
-                                  : 'bg-gray-100 text-gray-700'">
-                            {{ question.is_active ? 'Ativa' : 'Inativa' }}
-                        </span>
+                        <StatusBadge :label="question.is_active ? 'Ativa' : 'Inativa'" :tone="question.is_active ? 'green' : 'gray'" />
                     </div>
                 </div>
 
@@ -182,6 +170,8 @@ import { computed } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import DetailHeader from '@/Components/UI/DetailHeader.vue';
+import DifficultyBadge from '@/Components/UI/DifficultyBadge.vue';
+import StatusBadge from '@/Components/UI/StatusBadge.vue';
 
 const props = defineProps({
     question: Object,
@@ -210,14 +200,5 @@ const formatDate = (date) => {
     });
 };
 
-// Label de dificuldade
-const getDifficultyLabel = (level) => {
-    const labels = {
-        'easy': 'Fácil',
-        'medium': 'Médio',
-        'hard': 'Difícil'
-    };
-    return labels[level] || level;
-};
 
 </script>

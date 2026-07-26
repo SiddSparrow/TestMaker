@@ -395,25 +395,3 @@ const closeExportMenuOnOutsideClick = (e) => {
 onMounted(() => document.addEventListener('click', closeExportMenuOnOutsideClick));
 onBeforeUnmount(() => document.removeEventListener('click', closeExportMenuOnOutsideClick));
 </script>
-
-<style scoped>
-.line-clamp-2 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-}
-
-.line-clamp-3 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-}
-
-.transition-all {
-    transition-property: all;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 150ms;
-}
-</style>

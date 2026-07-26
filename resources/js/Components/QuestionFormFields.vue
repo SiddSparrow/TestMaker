@@ -135,7 +135,7 @@
                                 ? 'bg-green-100 border-green-500 text-green-700 shadow-sm'
                                 : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400'">
                         <span class="flex items-center justify-center gap-1">
-                            <svg v-if="localDifficulty === 'easy'" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <svg v-if="localDifficulty === 'easy'" class="w-4 h-4 difficulty-check-icon" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                             </svg>
                             Fácil
@@ -150,7 +150,7 @@
                                 ? 'bg-yellow-100 border-yellow-500 text-yellow-700 shadow-sm'
                                 : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400'">
                         <span class="flex items-center justify-center gap-1">
-                            <svg v-if="localDifficulty === 'medium'" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <svg v-if="localDifficulty === 'medium'" class="w-4 h-4 difficulty-check-icon" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                             </svg>
                             Médio
@@ -165,7 +165,7 @@
                                 ? 'bg-red-100 border-red-500 text-red-700 shadow-sm'
                                 : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400'">
                         <span class="flex items-center justify-center gap-1">
-                            <svg v-if="localDifficulty === 'hard'" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <svg v-if="localDifficulty === 'hard'" class="w-4 h-4 difficulty-check-icon" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                             </svg>
                             Difícil
@@ -467,7 +467,7 @@ select, input, button {
 }
 
 /* Animação de check nos botões de dificuldade */
-button svg {
+.difficulty-check-icon {
     animation: checkmark-pop 0.3s ease;
 }
 

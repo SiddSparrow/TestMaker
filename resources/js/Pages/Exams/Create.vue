@@ -46,10 +46,13 @@
                         Visualizar Prova
                     </button>
                     
-                    <button @click="saveExam" 
+                    <button @click="saveExam"
                             :disabled="examQuestions.length === 0"
-                            class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed">
-                        💾 Salvar Prova
+                            class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Salvar Prova
                     </button>
                 </div>
             </div>

@@ -2,20 +2,8 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-/* Estilos personalizados */
-.line-clamp-2 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-}
-
-.line-clamp-3 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-}
+/* line-clamp-2/3 são utilitários nativos do Tailwind 3.4 — não precisam
+   ser redeclarados aqui (nem em <style scoped> de componentes). */
 
 /* Animações */
 .fade-enter-active,

@@ -79,10 +79,7 @@
                                             </span>
                                             
                                             <!-- Badge Dificuldade -->
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
-                                                  :class="getDifficultyClass(question.difficulty_level)">
-                                                {{ getDifficultyLabel(question.difficulty_level) }}
-                                            </span>
+                                            <DifficultyBadge :level="question.difficulty_level" />
                                             
                                             <!-- Pontos -->
                                             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
@@ -106,8 +103,11 @@
                                 <!-- Overlay se já está na prova -->
                                 <div v-if="isQuestionInExam(question.id)"
                                      class="absolute inset-0 bg-gray-100 bg-opacity-70 rounded-lg flex items-center justify-center pointer-events-none">
-                                    <span class="text-xs font-medium text-gray-600 bg-white px-2 py-1 rounded shadow-sm">
-                                        ✓ Já adicionada
+                                    <span class="text-xs font-medium text-gray-600 bg-white px-2 py-1 rounded shadow-sm inline-flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        Já adicionada
                                     </span>
                                 </div>
                             </div>
@@ -198,10 +198,7 @@
                                             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
                                                 {{ getQuestionTypeName(question.question_type_id) }}
                                             </span>
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
-                                                  :class="getDifficultyClass(question.difficulty_level)">
-                                                {{ getDifficultyLabel(question.difficulty_level) }}
-                                            </span>
+                                            <DifficultyBadge :level="question.difficulty_level" />
                                         </div>
                                     </div>
                                     
@@ -295,6 +292,7 @@
 <script setup>
 import { ref, computed, watch, nextTick } from 'vue';
 import draggable from 'vuedraggable';
+import DifficultyBadge from '@/Components/UI/DifficultyBadge.vue';
 
 const props = defineProps({
     modelValue: {
@@ -465,29 +463,9 @@ const getQuestionTypeName = (typeId) => {
     return props.questionTypes.find(t => t.id === typeId)?.name || 'N/A';
 };
 
-const getDifficultyLabel = (level) => {
-    const labels = { easy: 'Fácil', medium: 'Médio', hard: 'Difícil' };
-    return labels[level] || level;
-};
-
-const getDifficultyClass = (level) => {
-    const classes = {
-        easy: 'bg-green-100 text-green-800',
-        medium: 'bg-yellow-100 text-yellow-800',
-        hard: 'bg-red-100 text-red-800'
-    };
-    return classes[level] || 'bg-gray-100 text-gray-800';
-};
 </script>
 
 <style scoped>
-.line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
 /* Animação de drag */
 .sortable-ghost {
     opacity: 0.5;

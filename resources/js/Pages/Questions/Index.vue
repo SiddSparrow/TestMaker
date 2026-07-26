@@ -178,6 +178,10 @@
                         <StatusBadge :label="row.is_active ? 'Ativa' : 'Inativa'" :tone="row.is_active ? 'green' : 'red'" />
                     </template>
 
+                    <template #cell-created_at="{ row }">
+                        <span class="text-sm text-gray-500 whitespace-nowrap">{{ formatDate(row.created_at) }}</span>
+                    </template>
+
                     <template #cell-actions="{ row }">
                         <div class="flex items-center justify-end gap-2">
                             <BaseButton :href="route('questions.show', row.id)" variant="outline" size="sm" icon-only :aria-label="`Visualizar questão: ${row.statement.substring(0, 40)}`">
@@ -277,11 +281,12 @@ const props = defineProps({
 });
 
 const columns = [
-    { key: 'statement', label: 'Enunciado' },
+    { key: 'statement', label: 'Enunciado', sortable: true },
     { key: 'subject', label: 'Matéria' },
     { key: 'difficulty_level', label: 'Dificuldade', sortable: true },
     { key: 'points', label: 'Pontos', sortable: true, align: 'center' },
     { key: 'is_active', label: 'Status', sortable: true },
+    { key: 'created_at', label: 'Criada em', sortable: true },
     { key: 'actions', label: 'Ações', align: 'right' },
 ];
 

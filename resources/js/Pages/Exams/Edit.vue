@@ -167,7 +167,7 @@
         <ConfirmDialog
             v-model:show="showDeleteConfirm"
             title="Excluir Prova"
-            :message="`Tem certeza que deseja excluir a prova &quot;${exam.title}&quot;? Esta ação não pode ser desfeita.`"
+            :message='`Tem certeza que deseja excluir a prova "${exam.title}"? Esta ação não pode ser desfeita.`'
             confirm-text="Sim, Excluir"
             cancel-text="Cancelar"
             type="danger"
@@ -263,10 +263,6 @@ watch(examQuestions, () => {
 }, { deep: true });
 
 // Métodos
-const markAsChanged = () => {
-    hasUnsavedChanges.value = true;
-};
-
 const handleConfigUpdate = (config) => {
     form.title = config.title;
     form.description = config.description;
@@ -334,21 +330,3 @@ const exportDOCX = (withAnswers) => {
 // AppLayout com mudanças pendentes não avisava nada).
 useUnsavedChanges(() => hasUnsavedChanges.value && !form.processing);
 </script>
-
-<style scoped>
-/* Animações */
-@keyframes slideIn {
-    from {
-        transform: translateY(-10px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-.slide-in {
-    animation: slideIn 0.3s ease-out;
-}
-</style>

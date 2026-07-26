@@ -133,14 +133,6 @@ const showPassword = ref(false);
                 </button>
             </div>
 
-            <!-- Demo Credentials (opcional - para desenvolvimento) -->
-            <div v-if="$page.props.demo" class="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
-                <p class="text-xs text-blue-800 font-medium">Dados para teste:</p>
-                <p class="text-xs text-blue-600 mt-1">
-                    Email: <span class="font-mono">demo@testmaker.com</span><br>
-                    Senha: <span class="font-mono">password</span>
-                </p>
-            </div>
         </form>
 
         <!-- Register Link (opcional) -->

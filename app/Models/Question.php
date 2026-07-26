@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
 
 class Question extends Model
@@ -68,20 +67,6 @@ class Question extends Model
         Cache::forget('questions_count_active');
         Cache::forget('questions_count_inactive');
         Cache::forget('questions_by_difficulty');
-    }
-
-    /**
-     * Get cached paginator from array
-     */
-    public static function hydratePaginator(array $data): LengthAwarePaginator
-    {
-        return \App\Helpers\CacheHelper::arrayToPaginator(
-            $data['data'],
-            $data['per_page'],
-            $data['current_page'],
-            $data['total'],
-            ['path' => $data['path'] ?? url()->current()]
-        );
     }
 
     public function user(): BelongsTo

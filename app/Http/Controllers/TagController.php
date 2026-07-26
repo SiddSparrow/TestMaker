@@ -43,7 +43,7 @@ class TagController extends Controller
 
         $this->clearQuestionFormCache();
 
-        return back()->with('success', 'Tag criada com sucesso!');
+        return back()->with('success', 'Etiqueta criada com sucesso!');
     }
 
     public function update(Request $request, Tag $tag)
@@ -65,7 +65,7 @@ class TagController extends Controller
 
         $this->clearQuestionFormCache();
 
-        return back()->with('success', 'Tag atualizada com sucesso!');
+        return back()->with('success', 'Etiqueta atualizada com sucesso!');
     }
 
     public function destroy(Tag $tag)
@@ -74,7 +74,7 @@ class TagController extends Controller
 
         $this->clearQuestionFormCache();
 
-        return back()->with('success', 'Tag excluída com sucesso!');
+        return back()->with('success', 'Etiqueta excluída com sucesso!');
     }
 
     /**

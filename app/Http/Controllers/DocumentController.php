@@ -154,8 +154,8 @@ class DocumentController extends Controller
             'questions.*.alternatives.*.content' => 'required|string',
             'questions.*.alternatives.*.is_correct' => 'required|boolean',
         ], [
-            'questions.*.subject_id.required' => 'Selecione uma disciplina para cada questão antes de importar.',
-            'questions.*.subject_id.exists' => 'A disciplina selecionada em uma das questões não é válida.',
+            'questions.*.subject_id.required' => 'Selecione uma matéria para cada questão antes de importar.',
+            'questions.*.subject_id.exists' => 'A matéria selecionada em uma das questões não é válida.',
             'questions.*.topic_id.exists' => 'O tópico selecionado em uma das questões não é válido.',
             'questions.*.statement.required' => 'O enunciado de uma das questões está vazio.',
             'questions.*.statement.min' => 'O enunciado de uma das questões é curto demais.',

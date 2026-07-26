@@ -132,7 +132,7 @@
         <ConfirmDialog
             v-model:show="showDeleteConfirm"
             title="Excluir documento"
-            :message="`Tem certeza que deseja excluir o documento &quot;${documentToDelete?.original_name}&quot;? Esta ação não pode ser desfeita.`"
+            :message='`Tem certeza que deseja excluir o documento "${documentToDelete?.original_name}"? Esta ação não pode ser desfeita.`'
             confirm-text="Sim, excluir"
             cancel-text="Cancelar"
             type="danger"
@@ -142,7 +142,7 @@
         <ConfirmDialog
             v-model:show="showReprocessConfirm"
             title="Reprocessar documento"
-            :message="`Deseja reprocessar o documento &quot;${documentToReprocess?.original_name}&quot;? A extração anterior será descartada.`"
+            :message='`Deseja reprocessar o documento "${documentToReprocess?.original_name}"? A extração anterior será descartada.`'
             confirm-text="Sim, reprocessar"
             cancel-text="Cancelar"
             type="warning"

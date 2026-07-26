@@ -11,7 +11,7 @@ const FIELD_LABELS = {
     difficulty_level: 'Dificuldade',
     points: 'Pontos',
     is_active: 'Status',
-    tags: 'Tags',
+    tags: 'Etiquetas',
     alternatives: 'Alternativas',
     title: 'Título',
     description: 'Descrição',

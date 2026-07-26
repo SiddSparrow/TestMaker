@@ -76,7 +76,7 @@
                     </div>
                 </div>
 
-                <!-- Aplicar disciplina/tópico a todas as selecionadas -->
+                <!-- Aplicar matéria/tópico a todas as selecionadas -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h3 class="text-sm font-semibold text-gray-900 mb-3">Aplicar a todas as selecionadas</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -414,7 +414,7 @@ const importQuestions = () => {
     );
 
     if (missingSubject) {
-        form.setError('questions', 'Selecione uma disciplina para cada questão selecionada antes de importar.');
+        form.setError('questions', 'Selecione uma matéria para cada questão selecionada antes de importar.');
         return;
     }
 

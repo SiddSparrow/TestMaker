@@ -26,7 +26,7 @@
             <h3 class="text-xl font-semibold text-gray-900 mb-3">
                 {{ title }}
             </h3>
-            <div class="text-sm text-gray-600 leading-relaxed" v-html="message"></div>
+            <div class="text-sm text-gray-600 leading-relaxed">{{ message }}</div>
         </div>
 
         <!-- Actions -->

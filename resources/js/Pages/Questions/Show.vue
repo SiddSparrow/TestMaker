@@ -10,14 +10,14 @@
                     <p class="mt-2 text-sm text-gray-600">Visualização completa da questão</p>
                 </div>
                 <div class="flex space-x-3">
-                    <a :href="route('questions.edit', question.id)"
+                    <Link :href="route('questions.edit', question.id)"
                        class="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors">
                         Editar
-                    </a>
-                    <a :href="route('questions.index')"
+                    </Link>
+                    <Link :href="route('questions.index')"
                        class="px-4 py-2 text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md transition-colors">
                         Voltar
-                    </a>
+                    </Link>
                 </div>
             </div>
 
@@ -177,7 +177,7 @@
 
 <script setup>
 import { computed } from 'vue';
-import { Head } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 const props = defineProps({

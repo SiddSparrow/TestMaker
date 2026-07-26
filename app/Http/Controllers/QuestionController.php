@@ -133,7 +133,7 @@ class QuestionController extends Controller
         // Dificuldades para filtro
         $difficultyLevels = [
             ['value' => 'easy', 'label' => 'Fácil'],
-            ['value' => 'medium', 'label' => 'Média'],
+            ['value' => 'medium', 'label' => 'Médio'],
             ['value' => 'hard', 'label' => 'Difícil'],
         ];
 

@@ -210,8 +210,9 @@
                                         <input type="number"
                                                v-model.number="question.points_override"
                                                @input="updatePoints"
-                                               min="1"
+                                               min="0.5"
                                                max="10"
+                                               step="0.5"
                                                class="w-16 px-2 py-1 text-sm text-center border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
                                                :placeholder="question.points.toString()"
                                                :aria-label="`Pontuação da questão ${index + 1}`">

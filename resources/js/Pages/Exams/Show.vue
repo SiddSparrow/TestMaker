@@ -317,7 +317,7 @@
         <ConfirmDialog
             v-model:show="showDeleteConfirm"
             title="Excluir prova"
-            :message="`Tem certeza que deseja excluir a prova &quot;${exam.title}&quot;? Isso remove os vínculos com as questões e apaga a prova definitivamente do banco de dados — não é possível desfazer.`"
+            :message='`Tem certeza que deseja excluir a prova "${exam.title}"? Isso remove os vínculos com as questões e apaga a prova definitivamente do banco de dados — não é possível desfazer.`'
             confirm-text="Sim, excluir"
             cancel-text="Cancelar"
             type="danger"

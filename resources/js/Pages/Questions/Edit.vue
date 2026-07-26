@@ -278,23 +278,6 @@ const currentQuestionType = computed(() => {
     return props.question_types.find(t => t.id === form.question_type_id) || {};
 });
 
-// Verifica se é tipo múltipla resposta
-const isMultipleAnswer = computed(() => {
-    const type = props.question_types.find(t => t.id === form.question_type_id);
-    return type?.slug === 'multipla-resposta';
-});
-
-// Verifica se é tipo verdadeiro/falso
-const isVerdadeiroFalso = computed(() => {
-    const type = props.question_types.find(t => t.id === form.question_type_id);
-    return type?.slug === 'verdadeiro-falso';
-});
-
-// Verifica se há resposta correta marcada
-const hasCorrectAnswer = computed(() => {
-    return form.alternatives.some(alt => alt.is_correct);
-});
-
 // Tags disponíveis (não selecionadas)
 const availableTags = computed(() => {
     return props.tags.filter(tag => !form.tags.includes(tag.id));
@@ -316,31 +299,6 @@ const onQuestionTypeChange = () => {
             { content: '', is_correct: false, order: 2 },
         ];
     }
-};
-
-// Adiciona alternativa
-const addAlternative = () => {
-    form.alternatives.push({
-        content: '',
-        is_correct: false,
-        order: form.alternatives.length + 1,
-    });
-};
-
-// Remove alternativa
-const removeAlternative = (index) => {
-    form.alternatives.splice(index, 1);
-    // Reordena
-    form.alternatives.forEach((alt, i) => {
-        alt.order = i + 1;
-    });
-};
-
-// Define resposta correta (radio button)
-const setCorrectAnswer = (index) => {
-    form.alternatives.forEach((alt, i) => {
-        alt.is_correct = i === index;
-    });
 };
 
 // Adiciona tag

@@ -47,7 +47,7 @@ const open = ref(false);
 <template>
     <div class="relative">
         <div @click="open = !open">
-            <slot name="trigger" />
+            <slot name="trigger" :open="open" />
         </div>
 
         <!-- Full Screen Dropdown Overlay -->
@@ -73,6 +73,7 @@ const open = ref(false);
                 @click="open = false"
             >
                 <div
+                    role="menu"
                     class="rounded-md ring-1 ring-black ring-opacity-5"
                     :class="contentClasses"
                 >

@@ -20,10 +20,23 @@ const isCatalogActive = computed(() =>
 const logout = () => {
     router.post(route('logout'));
 };
+
+// Foco visível some ao trocar de página (o <main> não é um elemento
+// focável por padrão) — usuário de teclado ficava sem indicação de onde
+// o foco estava depois de uma navegação. router.on('navigate') só dispara
+// numa troca de página de verdade (não em toda requisição/reload parcial).
+const mainRef = ref(null);
+router.on('navigate', () => {
+    mainRef.value?.focus();
+});
 </script>
 
 <template>
     <div class="min-h-screen bg-gray-50">
+        <a href="#main-content"
+           class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-2 focus:left-2 focus:bg-white focus:text-gray-900 focus:px-4 focus:py-2 focus:rounded-md focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+            Pular para o conteúdo
+        </a>
         <!-- Navegação principal — antes só existia no AuthenticatedLayout usado
              pelo Perfil; sem isso, sair de uma tela interna exigia voltar ao
              Dashboard a cada troca de contexto. -->
@@ -52,9 +65,11 @@ const logout = () => {
                                 Documentos
                             </NavLink>
                             <Dropdown align="left" width="48">
-                                <template #trigger>
+                                <template #trigger="{ open }">
                                     <button
                                         type="button"
+                                        aria-haspopup="true"
+                                        :aria-expanded="open"
                                         class="group flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-lg transition-colors"
                                         :class="isCatalogActive
                                             ? 'bg-primary-50 text-primary-700 border-l-4 border-primary-600 pl-2.5'
@@ -77,9 +92,11 @@ const logout = () => {
 
                     <div class="hidden sm:flex sm:items-center sm:ml-6">
                         <Dropdown align="right" width="48">
-                            <template #trigger>
+                            <template #trigger="{ open }">
                                 <button
                                     type="button"
+                                    aria-haspopup="true"
+                                    :aria-expanded="open"
                                     class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150"
                                 >
                                     {{ user?.name }}
@@ -173,7 +190,7 @@ const logout = () => {
         </header>
 
         <!-- Conteúdo Principal -->
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main id="main-content" ref="mainRef" tabindex="-1" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 focus:outline-none">
             <Transition name="page-transition" mode="out-in">
                 <div>
                     <slot />

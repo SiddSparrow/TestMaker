@@ -7,14 +7,14 @@
                         :breadcrumb="[{ label: 'Tópicos' }]" />
 
             <!-- Form -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div ref="formRef" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h2 class="text-sm font-semibold text-gray-700 mb-4">
                     {{ editingTopic ? 'Editar Tópico' : 'Novo Tópico' }}
                 </h2>
                 <form @submit.prevent="saveTopic" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField label="Matéria" required :error="form.errors.subject_id" v-slot="{ id }">
-                            <select :id="id" v-model="form.subject_id" required
+                            <select :id="id" ref="firstFieldRef" v-model="form.subject_id" required
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                 <option value="">Selecione uma matéria</option>
                                 <option v-for="subject in subjects" :key="subject.id" :value="subject.id">{{ subject.name }}</option>
@@ -111,7 +111,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, nextTick } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
@@ -125,6 +125,8 @@ const props = defineProps({
     subjects: { type: Array, default: () => [] },
 });
 
+const formRef = ref(null);
+const firstFieldRef = ref(null);
 const editingTopic = ref(null);
 const filterSubjectId = ref('');
 const showDeleteConfirm = ref(false);
@@ -159,11 +161,16 @@ const saveTopic = () => {
     }
 };
 
+// Clicar em "Editar" só preenchia o formulário no topo, sem mover a tela
+// nem o foco — em lista longa, parecia que nada tinha acontecido.
 const editTopic = (topic) => {
     editingTopic.value = topic;
     form.subject_id = topic.subject_id;
     form.name = topic.name;
     form.description = topic.description || '';
+
+    formRef.value?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    nextTick(() => firstFieldRef.value?.focus());
 };
 
 const cancelEdit = () => {

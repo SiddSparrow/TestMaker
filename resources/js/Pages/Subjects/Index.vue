@@ -7,14 +7,14 @@
                         :breadcrumb="[{ label: 'Matérias' }]" />
 
             <!-- Form -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div ref="formRef" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h2 class="text-sm font-semibold text-gray-700 mb-4">
                     {{ editingSubject ? 'Editar Matéria' : 'Nova Matéria' }}
                 </h2>
                 <form @submit.prevent="saveSubject" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField label="Nome da Matéria" required :error="form.errors.name" v-slot="{ id }">
-                            <input :id="id" type="text" v-model="form.name" required
+                            <input :id="id" ref="firstFieldRef" type="text" v-model="form.name" required
                                    placeholder="Ex: Matemática"
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         </FormField>
@@ -48,9 +48,20 @@
 
             <!-- List -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h2 class="text-sm font-semibold text-gray-700 mb-4">Matérias Cadastradas ({{ subjects.length }})</h2>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                    <h2 class="text-sm font-semibold text-gray-700">Matérias Cadastradas ({{ filteredSubjects.length }})</h2>
+                    <div class="relative sm:w-64">
+                        <label for="subject-search" class="sr-only">Buscar matéria</label>
+                        <input id="subject-search" type="text" v-model="searchQuery" placeholder="Buscar matéria..."
+                               class="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <svg class="absolute left-3 top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                </div>
 
-                <EmptyState v-if="subjects.length === 0" title="Nenhuma matéria cadastrada ainda">
+                <EmptyState v-if="filteredSubjects.length === 0"
+                            :title="searchQuery ? 'Nenhuma matéria encontrada' : 'Nenhuma matéria cadastrada ainda'">
                     <template #icon>
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
@@ -59,7 +70,7 @@
                 </EmptyState>
 
                 <div v-else class="space-y-2">
-                    <div v-for="subject in subjects" :key="subject.id"
+                    <div v-for="subject in filteredSubjects" :key="subject.id"
                          class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
                         <div class="flex items-center gap-3 flex-1 min-w-0">
                             <div class="w-4 h-4 rounded-full flex-shrink-0" :style="{ backgroundColor: subject.color || '#6B7280' }"></div>
@@ -103,7 +114,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, nextTick } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
@@ -112,10 +123,21 @@ import FormField from '@/Components/UI/FormField.vue';
 import EmptyState from '@/Components/UI/EmptyState.vue';
 import ConfirmDialog from '@/Components/ConfirmDialog.vue';
 
-defineProps({
+const props = defineProps({
     subjects: { type: Array, default: () => [] },
 });
 
+const searchQuery = ref('');
+const filteredSubjects = computed(() => {
+    if (!searchQuery.value) return props.subjects;
+    const query = searchQuery.value.toLowerCase();
+    return props.subjects.filter((subject) =>
+        subject.name.toLowerCase().includes(query) || (subject.description || '').toLowerCase().includes(query)
+    );
+});
+
+const formRef = ref(null);
+const firstFieldRef = ref(null);
 const editingSubject = ref(null);
 const showDeleteConfirm = ref(false);
 const subjectToDelete = ref(null);
@@ -144,11 +166,16 @@ const saveSubject = () => {
     }
 };
 
+// Clicar em "Editar" só preenchia o formulário no topo, sem mover a tela
+// nem o foco — em lista longa, parecia que nada tinha acontecido.
 const editSubject = (subject) => {
     editingSubject.value = subject;
     form.name = subject.name;
     form.description = subject.description || '';
     form.color = subject.color || '#3B82F6';
+
+    formRef.value?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    nextTick(() => firstFieldRef.value?.focus());
 };
 
 const cancelEdit = () => {

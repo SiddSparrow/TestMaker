@@ -7,13 +7,13 @@
                         :breadcrumb="[{ label: 'Etiquetas' }]" />
 
             <!-- Form -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div ref="formRef" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h2 class="text-sm font-semibold text-gray-700 mb-4">
                     {{ editingTag ? 'Editar Etiqueta' : 'Nova Etiqueta' }}
                 </h2>
                 <form @submit.prevent="saveTag" class="flex flex-col sm:flex-row sm:items-end gap-4">
                     <FormField label="Nome da Etiqueta" required :error="form.errors.name" class="flex-1" v-slot="{ id }">
-                        <input :id="id" type="text" v-model="form.name" required
+                        <input :id="id" ref="firstFieldRef" type="text" v-model="form.name" required
                                placeholder="Ex: Importante, Revisão, Difícil"
                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     </FormField>
@@ -99,7 +99,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, nextTick } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PageHeader from '@/Components/UI/PageHeader.vue';
@@ -112,6 +112,8 @@ const props = defineProps({
     tags: { type: Array, default: () => [] },
 });
 
+const formRef = ref(null);
+const firstFieldRef = ref(null);
 const editingTag = ref(null);
 const searchQuery = ref('');
 const showDeleteConfirm = ref(false);
@@ -159,9 +161,14 @@ const saveTag = () => {
     }
 };
 
+// Clicar em "Editar" só preenchia o formulário no topo, sem mover a tela
+// nem o foco — em lista longa, parecia que nada tinha acontecido.
 const editTag = (tag) => {
     editingTag.value = tag;
     form.name = tag.name;
+
+    formRef.value?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    nextTick(() => firstFieldRef.value?.focus());
 };
 
 const cancelEdit = () => {

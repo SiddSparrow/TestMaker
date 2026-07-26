@@ -274,22 +274,37 @@ const deleteDocument = () => {
     }
 };
 
-// Auto-refresh enquanto houver documentos em processamento
+// Auto-refresh enquanto houver documentos em processamento. Antes só
+// verificava hasProcessingDocuments uma vez, na montagem: se um documento
+// entrava em processamento depois, o polling nunca começava; se todos
+// terminavam, o setInterval residual continuava rodando (só era limpo no
+// unmount). Documents/Show.vue já fazia certo com um watch — replicado aqui.
 const refreshInterval = ref(null);
 
 const startAutoRefresh = () => {
-    if (hasProcessingDocuments.value) {
-        refreshInterval.value = setInterval(() => {
-            router.reload({ only: ['documents'], preserveScroll: true });
-        }, 5000);
+    if (refreshInterval.value) return;
+
+    refreshInterval.value = setInterval(() => {
+        router.reload({ only: ['documents'], preserveScroll: true });
+    }, 5000);
+};
+
+const stopAutoRefresh = () => {
+    if (refreshInterval.value) {
+        clearInterval(refreshInterval.value);
+        refreshInterval.value = null;
     }
 };
 
-onMounted(startAutoRefresh);
+watch(hasProcessingDocuments, (processing) => {
+    if (processing) {
+        startAutoRefresh();
+    } else {
+        stopAutoRefresh();
+    }
+}, { immediate: true });
 
-onUnmounted(() => {
-    if (refreshInterval.value) clearInterval(refreshInterval.value);
-});
+onUnmounted(stopAutoRefresh);
 
 // Estado de carregamento durante navegações Inertia (filtro, paginação)
 let stopStart;

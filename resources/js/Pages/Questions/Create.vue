@@ -4,7 +4,10 @@
 
         <div class="max-w-5xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
             <div v-if="Object.keys(form.errors).length > 0"
-                 class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+                 ref="errorSummaryRef"
+                 tabindex="-1"
+                 role="alert"
+                 class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 focus:outline-none">
                 <h3 class="text-red-800 font-bold mb-2">Erros de validação</h3>
                 <ul class="list-disc list-inside text-red-700 text-sm space-y-1">
                     <li v-for="(error, field) in form.errors" :key="field">
@@ -113,7 +116,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, nextTick } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import AlternativesManager from '@/Components/AlternativesManager.vue';
@@ -208,13 +211,20 @@ const getTagName = (tagId) => {
 };
 
 // Submit do formulário
+const errorSummaryRef = ref(null);
+
 const submit = () => {
     form.post(route('questions.store'), {
         preserveScroll: true,
         onSuccess: () => {
             form.reset();
         },
-        // Erros são automaticamente injetados em form.errors.
+        // Erros são automaticamente injetados em form.errors. O resumo no
+        // topo não recebia foco nem era anunciado — num formulário longo,
+        // o usuário só via os erros inline se rolasse a tela toda.
+        onError: () => {
+            nextTick(() => errorSummaryRef.value?.focus());
+        },
     });
 };
 </script>

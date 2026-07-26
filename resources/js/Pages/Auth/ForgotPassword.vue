@@ -1,5 +1,5 @@
 <script setup>
-import GuestLayout from '@/Layouts/GuestLayout.vue';
+import AuthLayout from '@/Layouts/AuthLayout.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
@@ -22,13 +22,12 @@ const submit = () => {
 </script>
 
 <template>
-    <GuestLayout>
-        <Head title="Forgot Password" />
+    <Head title="Esqueci Minha Senha" />
 
+    <AuthLayout subtitle="Recupere o acesso à sua conta">
         <div class="mb-4 text-sm text-gray-600">
-            Forgot your password? No problem. Just let us know your email
-            address and we will email you a password reset link that will allow
-            you to choose a new one.
+            Esqueceu sua senha? Sem problemas. Informe seu e-mail e enviaremos
+            um link para você escolher uma nova.
         </div>
 
         <div
@@ -40,7 +39,7 @@ const submit = () => {
 
         <form @submit.prevent="submit">
             <div>
-                <InputLabel for="email" value="Email" />
+                <InputLabel for="email" value="E-mail" />
 
                 <TextInput
                     id="email"
@@ -57,12 +56,13 @@ const submit = () => {
 
             <div class="mt-4 flex items-center justify-end">
                 <PrimaryButton
+                    class="!bg-blue-600 hover:!bg-blue-700 focus:!ring-blue-500 active:!bg-blue-700"
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >
-                    Email Password Reset Link
+                    Enviar Link de Redefinição
                 </PrimaryButton>
             </div>
         </form>
-    </GuestLayout>
+    </AuthLayout>
 </template>

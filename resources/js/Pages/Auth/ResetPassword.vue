@@ -1,5 +1,5 @@
 <script setup>
-import GuestLayout from '@/Layouts/GuestLayout.vue';
+import AuthLayout from '@/Layouts/AuthLayout.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
@@ -32,12 +32,12 @@ const submit = () => {
 </script>
 
 <template>
-    <GuestLayout>
-        <Head title="Reset Password" />
+    <Head title="Redefinir Senha" />
 
+    <AuthLayout subtitle="Escolha uma nova senha">
         <form @submit.prevent="submit">
             <div>
-                <InputLabel for="email" value="Email" />
+                <InputLabel for="email" value="E-mail" />
 
                 <TextInput
                     id="email"
@@ -53,7 +53,7 @@ const submit = () => {
             </div>
 
             <div class="mt-4">
-                <InputLabel for="password" value="Password" />
+                <InputLabel for="password" value="Nova Senha" />
 
                 <TextInput
                     id="password"
@@ -70,7 +70,7 @@ const submit = () => {
             <div class="mt-4">
                 <InputLabel
                     for="password_confirmation"
-                    value="Confirm Password"
+                    value="Confirmar Nova Senha"
                 />
 
                 <TextInput
@@ -90,12 +90,13 @@ const submit = () => {
 
             <div class="mt-4 flex items-center justify-end">
                 <PrimaryButton
+                    class="!bg-blue-600 hover:!bg-blue-700 focus:!ring-blue-500 active:!bg-blue-700"
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >
-                    Reset Password
+                    Redefinir Senha
                 </PrimaryButton>
             </div>
         </form>
-    </GuestLayout>
+    </AuthLayout>
 </template>

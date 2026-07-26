@@ -80,7 +80,7 @@
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h3 class="text-sm font-semibold text-gray-900 mb-3">Aplicar a todas as selecionadas</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <FormField label="Disciplina" v-slot="{ id }">
+                        <FormField label="Matéria" v-slot="{ id }">
                             <select :id="id" v-model="bulkSubjectId" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                                 <option :value="null">Selecione...</option>
                                 <option v-for="subject in subjects" :key="subject.id" :value="subject.id">{{ subject.name }}</option>
@@ -189,7 +189,7 @@
                                             class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                         />
                                     </FormField>
-                                    <FormField label="Disciplina" required v-slot="{ id }">
+                                    <FormField label="Matéria" required v-slot="{ id }">
                                         <select
                                             :id="id"
                                             v-model="question.subject_id"

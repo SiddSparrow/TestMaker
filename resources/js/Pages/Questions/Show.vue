@@ -159,10 +159,10 @@
                 </div>
             </div>
 
-            <!-- Tags -->
-            <div v-if="question.tags?.length > 0" 
+            <!-- Etiquetas -->
+            <div v-if="question.tags?.length > 0"
                  class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-3">Tags</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-3">Etiquetas</h2>
                 <div class="flex flex-wrap gap-2">
                     <span v-for="tag in question.tags"
                           :key="tag.id"

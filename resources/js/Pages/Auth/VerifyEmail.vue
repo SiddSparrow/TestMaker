@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import GuestLayout from '@/Layouts/GuestLayout.vue';
+import AuthLayout from '@/Layouts/AuthLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 
@@ -22,40 +22,41 @@ const verificationLinkSent = computed(
 </script>
 
 <template>
-    <GuestLayout>
-        <Head title="Email Verification" />
+    <Head title="Verificar E-mail" />
 
+    <AuthLayout subtitle="Confirme seu endereço de e-mail">
         <div class="mb-4 text-sm text-gray-600">
-            Thanks for signing up! Before getting started, could you verify your
-            email address by clicking on the link we just emailed to you? If you
-            didn't receive the email, we will gladly send you another.
+            Obrigado por se cadastrar! Antes de começar, você pode confirmar seu
+            e-mail clicando no link que acabamos de enviar? Se não recebeu o
+            e-mail, teremos prazer em enviar outro.
         </div>
 
         <div
             class="mb-4 text-sm font-medium text-green-600"
             v-if="verificationLinkSent"
         >
-            A new verification link has been sent to the email address you
-            provided during registration.
+            Um novo link de verificação foi enviado para o e-mail informado no
+            cadastro.
         </div>
 
         <form @submit.prevent="submit">
             <div class="mt-4 flex items-center justify-between">
                 <PrimaryButton
+                    class="!bg-blue-600 hover:!bg-blue-700 focus:!ring-blue-500 active:!bg-blue-700"
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >
-                    Resend Verification Email
+                    Reenviar E-mail de Verificação
                 </PrimaryButton>
 
                 <Link
                     :href="route('logout')"
                     method="post"
                     as="button"
-                    class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    >Log Out</Link
+                    class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    >Sair</Link
                 >
             </div>
         </form>
-    </GuestLayout>
+    </AuthLayout>
 </template>

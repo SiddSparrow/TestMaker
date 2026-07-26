@@ -1,5 +1,5 @@
 <script setup>
-import GuestLayout from '@/Layouts/GuestLayout.vue';
+import AuthLayout from '@/Layouts/AuthLayout.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
@@ -21,12 +21,12 @@ const submit = () => {
 </script>
 
 <template>
-    <GuestLayout>
-        <Head title="Register" />
+    <Head title="Criar Conta" />
 
-        <form @submit.prevent="submit">
+    <AuthLayout subtitle="Crie sua conta para começar">
+        <form @submit.prevent="submit" class="space-y-4">
             <div>
-                <InputLabel for="name" value="Name" />
+                <InputLabel for="name" value="Nome" />
 
                 <TextInput
                     id="name"
@@ -41,8 +41,8 @@ const submit = () => {
                 <InputError class="mt-2" :message="form.errors.name" />
             </div>
 
-            <div class="mt-4">
-                <InputLabel for="email" value="Email" />
+            <div>
+                <InputLabel for="email" value="E-mail" />
 
                 <TextInput
                     id="email"
@@ -56,8 +56,8 @@ const submit = () => {
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
-            <div class="mt-4">
-                <InputLabel for="password" value="Password" />
+            <div>
+                <InputLabel for="password" value="Senha" />
 
                 <TextInput
                     id="password"
@@ -71,10 +71,10 @@ const submit = () => {
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>
 
-            <div class="mt-4">
+            <div>
                 <InputLabel
                     for="password_confirmation"
-                    value="Confirm Password"
+                    value="Confirmar Senha"
                 />
 
                 <TextInput
@@ -92,22 +92,22 @@ const submit = () => {
                 />
             </div>
 
-            <div class="mt-4 flex items-center justify-end">
+            <div class="flex items-center justify-between pt-2">
                 <Link
                     :href="route('login')"
-                    class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 >
-                    Already registered?
+                    Já tem uma conta?
                 </Link>
 
                 <PrimaryButton
-                    class="ms-4"
+                    class="!bg-blue-600 hover:!bg-blue-700 focus:!ring-blue-500 active:!bg-blue-700"
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >
-                    Register
+                    Criar Conta
                 </PrimaryButton>
             </div>
         </form>
-    </GuestLayout>
+    </AuthLayout>
 </template>

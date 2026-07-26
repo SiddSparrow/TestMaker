@@ -119,15 +119,15 @@
                     :errors="form.errors"
                 />
 
-                <!-- Tags -->
+                <!-- Etiquetas -->
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Tags</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Etiquetas</h2>
 
-                    <FormField label="Adicionar tags (opcional)" v-slot="{ id }">
+                    <FormField label="Adicionar etiquetas (opcional)" v-slot="{ id }">
                         <select :id="id" v-model="selectedTag"
                                 @change="addTag"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">Selecione uma tag</option>
+                            <option value="">Selecione uma etiqueta</option>
                             <option v-for="tag in availableTags"
                                     :key="tag.id"
                                     :value="tag.id">

@@ -69,8 +69,8 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { Head, router } from '@inertiajs/vue3';
+import { ref, computed, watch } from 'vue';
+import { Head, router, usePage } from '@inertiajs/vue3';
 import ExamConfigForm from '@/Components/Exams/ExamConfigForm.vue';
 import ExamBuilder from '@/Components/Exams/ExamBuilder.vue';
 import ExamPreview from '@/Components/Exams/ExamPreview.vue';
@@ -95,11 +95,36 @@ const props = defineProps({
     }
 });
 
+// Rascunho em localStorage — antes um F5 no meio da montagem apagava tudo
+// (config preenchida + questões já escolhidas). Restaurado ao abrir a tela
+// e limpo só quando a prova é salva com sucesso.
+const draftKey = `exam-create-draft:${usePage().props.auth.user.id}`;
+
+const loadDraft = () => {
+    try {
+        const raw = localStorage.getItem(draftKey);
+        return raw ? JSON.parse(raw) : null;
+    } catch {
+        return null;
+    }
+};
+
+const draft = loadDraft();
+
+const clearDraft = () => {
+    try {
+        localStorage.removeItem(draftKey);
+    } catch {
+        // Storage indisponível (modo privado, cota excedida) — sem problema,
+        // só significa que não há rascunho para restaurar da próxima vez.
+    }
+};
+
 // Estados
 
 const showPreview = ref(false);
 // examConfig atualizado com todas as configurações
-const examConfig = ref({
+const examConfig = ref(draft?.examConfig ?? {
     title: '',
     description: '',
     exam_date: '',
@@ -144,8 +169,20 @@ const examConfig = ref({
     }
 });
 
-const examQuestions = ref([]);
-const configCompleted = ref(false);
+const examQuestions = ref(draft?.examQuestions ?? []);
+const configCompleted = ref(draft?.configCompleted ?? false);
+
+watch([examConfig, examQuestions, configCompleted], () => {
+    try {
+        localStorage.setItem(draftKey, JSON.stringify({
+            examConfig: examConfig.value,
+            examQuestions: examQuestions.value,
+            configCompleted: configCompleted.value,
+        }));
+    } catch {
+        // Idem: sem storage disponível, seguimos sem rascunho.
+    }
+}, { deep: true });
 
 // Computed: dados da prova para preview
 const examData = computed(() => ({
@@ -208,6 +245,7 @@ const editConfig = () => {
 };
 
 const handleCancel = () => {
+    clearDraft();
     router.visit(route('exams.index'));
 };
 
@@ -227,6 +265,8 @@ const saveExam = () => {
         total_points: examData.value.total_points
     };
 
-    router.post(route('exams.store'), examPayload);
+    router.post(route('exams.store'), examPayload, {
+        onSuccess: clearDraft,
+    });
 };
 </script>

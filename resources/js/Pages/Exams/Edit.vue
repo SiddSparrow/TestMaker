@@ -40,7 +40,7 @@
                 </div>
 
                 <!-- Info Cards -->
-                <div class="grid grid-cols-4 gap-4 mt-6">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
                     <div class="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
                         <div class="text-white/70 text-xs mb-1">Questões</div>
                         <div class="text-2xl font-bold">{{ examQuestions.length }}</div>
@@ -119,22 +119,22 @@
                             Salvando...
                         </div>
 
-                        <button @click="saveAndContinue"
+                        <button @click="handleSave"
                                 :disabled="form.processing || !hasUnsavedChanges"
                                 class="inline-flex items-center px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
                             </svg>
-                            Salvar e Continuar
+                            Salvar
                         </button>
 
-                        <button @click="saveAndExit"
+                        <button @click="handleFinish"
                                 :disabled="form.processing"
                                 class="inline-flex items-center px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                             </svg>
-                            Salvar e Sair
+                            Concluir
                         </button>
                     </div>
                 </div>
@@ -293,11 +293,11 @@ const saveChanges = () => {
     });
 };
 
-const saveAndContinue = () => {
+const handleSave = () => {
     saveChanges();
 };
 
-const saveAndExit = () => {
+const handleFinish = () => {
     form.questions = examQuestions.value.map((q, index) => ({
         question_id: q.id,
         order: index + 1,

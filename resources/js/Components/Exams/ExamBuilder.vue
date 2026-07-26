@@ -1,7 +1,7 @@
 <template>
-    <div class="grid grid-cols-12 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <!-- COLUNA ESQUERDA: Banco de Questões -->
-        <div class="col-span-5">
+        <div class="lg:col-span-5">
             <div class="bg-white rounded-lg shadow-sm border border-gray-200">
                 <!-- Header do Banco -->
                 <div class="p-4 border-b border-gray-200 bg-gray-50">
@@ -42,7 +42,7 @@
                 </div>
 
                 <!-- Lista de Questões Disponíveis -->
-                <div class="p-4 max-h-[600px] overflow-y-auto">
+                <div class="p-4 max-h-[70vh] overflow-y-auto">
                     <draggable
                         :model-value="filteredQuestions"
                         :group="{ name: 'questions', pull: 'clone', put: false }"
@@ -90,10 +90,21 @@
                                             </span>
                                         </div>
                                     </div>
+
+                                    <!-- Alternativa ao drag & drop: adicionar por teclado/clique -->
+                                    <button v-if="!isQuestionInExam(question.id)"
+                                            type="button"
+                                            @click="addQuestion(question)"
+                                            :aria-label="`Adicionar questão à prova: ${question.statement.substring(0, 40)}`"
+                                            class="flex-shrink-0 p-1.5 text-blue-600 hover:bg-blue-50 rounded-md transition-colors">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                        </svg>
+                                    </button>
                                 </div>
-                                
+
                                 <!-- Overlay se já está na prova -->
-                                <div v-if="isQuestionInExam(question.id)" 
+                                <div v-if="isQuestionInExam(question.id)"
                                      class="absolute inset-0 bg-gray-100 bg-opacity-70 rounded-lg flex items-center justify-center pointer-events-none">
                                     <span class="text-xs font-medium text-gray-600 bg-white px-2 py-1 rounded shadow-sm">
                                         ✓ Já adicionada
@@ -117,7 +128,7 @@
         </div>
 
         <!-- COLUNA DIREITA: Prova sendo Montada -->
-        <div class="col-span-7">
+        <div class="lg:col-span-7">
             <div class="bg-white rounded-lg shadow-sm border border-gray-200">
                 <!-- Header da Prova -->
                 <div class="p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
@@ -149,7 +160,7 @@
                 </div>
 
                 <!-- Lista de Questões da Prova -->
-                <div class="p-4 min-h-[600px]">
+                <div class="p-4 min-h-[50vh]">
                     <draggable
                         v-model="localExamQuestions"
                         group="questions"
@@ -195,18 +206,41 @@
                                     </div>
                                     
                                     <!-- Pontos e Ações -->
-                                    <div class="flex items-start gap-2">
+                                    <div class="flex items-start gap-1">
                                         <input type="number"
                                                v-model.number="question.points_override"
                                                @input="updatePoints"
                                                min="1"
                                                max="10"
                                                class="w-16 px-2 py-1 text-sm text-center border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
-                                               :placeholder="question.points.toString()">
-                                        
+                                               :placeholder="question.points.toString()"
+                                               :aria-label="`Pontuação da questão ${index + 1}`">
+
+                                        <div class="flex flex-col">
+                                            <button type="button"
+                                                    @click="moveQuestion(index, -1)"
+                                                    :disabled="index === 0"
+                                                    aria-label="Mover questão para cima"
+                                                    class="p-0.5 text-gray-500 hover:bg-gray-100 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+                                                </svg>
+                                            </button>
+                                            <button type="button"
+                                                    @click="moveQuestion(index, 1)"
+                                                    :disabled="index === localExamQuestions.length - 1"
+                                                    aria-label="Mover questão para baixo"
+                                                    class="p-0.5 text-gray-500 hover:bg-gray-100 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+
                                         <button @click="removeQuestion(index)"
-                                                class="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
-                                                title="Remover questão">
+                                                type="button"
+                                                aria-label="Remover questão"
+                                                class="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                             </svg>
@@ -379,9 +413,27 @@ const cloneQuestion = (original) => {
     };
 };
 
+// Adiciona questão por clique/teclado — alternativa ao drag & drop, que
+// antes era a única forma de montar a prova (inutilizável por teclado e em
+// telas de toque sem suporte a drag).
+const addQuestion = (question) => {
+    if (isQuestionInExam(question.id)) return;
+    localExamQuestions.value.push(cloneQuestion(question));
+};
+
 // Remove questão da prova
 const removeQuestion = (index) => {
     localExamQuestions.value.splice(index, 1);
+    updateOrder();
+};
+
+// Move questão para cima/baixo — mesma razão do addQuestion acima.
+const moveQuestion = (index, direction) => {
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= localExamQuestions.value.length) return;
+
+    const [moved] = localExamQuestions.value.splice(index, 1);
+    localExamQuestions.value.splice(targetIndex, 0, moved);
     updateOrder();
 };
 

@@ -30,7 +30,7 @@
                                 <div class="flex items-center gap-1 mr-2">
                                     <button @click="zoomOut"
                                         class="p-2 text-gray-600 hover:bg-gray-100 rounded transition-colors"
-                                        :disabled="zoom <= 50">
+                                        :disabled="zoom <= 30">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
@@ -67,7 +67,7 @@
                         </div>
 
                         <!-- Preview Content (Scrollable) -->
-                        <div class="flex-1 overflow-y-auto p-6 bg-gray-100">
+                        <div ref="previewContainer" class="flex-1 overflow-auto p-6 bg-gray-100">
                             <div ref="previewContent"
                                 class="mx-auto bg-white shadow-lg transition-transform duration-200"
                                 :class="getPageOrientationClass()" :style="getPageStyle()">
@@ -355,7 +355,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue';
 
 const props = defineProps({
     show: {
@@ -383,6 +383,8 @@ const showAnswers = ref(false);
 const zoom = ref(100);
 const isDownloading = ref(false);
 const downloadType = ref('');
+const previewContent = ref(null);
+const previewContainer = ref(null);
 
 // Computed
 const totalPoints = computed(() => {
@@ -474,10 +476,46 @@ const zoomIn = () => {
 };
 
 const zoomOut = () => {
-    if (zoom.value > 50) {
+    if (zoom.value > 30) {
         zoom.value -= 10;
     }
 };
+
+// Ajusta o zoom automaticamente para caber na tela ao abrir — antes a
+// página A4 de largura fixa (21cm ≈ 794px) sempre abria a 100%, garantindo
+// overflow horizontal em qualquer tela menor que isso (todo celular).
+const fitToContainer = () => {
+    nextTick(() => {
+        const content = previewContent.value;
+        const container = previewContainer.value;
+        if (!content || !container) return;
+
+        // offsetWidth ignora o transform: scale já aplicado, é a largura
+        // "real" da página antes de qualquer zoom.
+        const naturalWidth = content.offsetWidth;
+        const availableWidth = container.clientWidth - 48; // folga de padding
+        if (naturalWidth <= 0 || availableWidth <= 0) return;
+
+        const fitRatio = Math.min(1, availableWidth / naturalWidth);
+        zoom.value = Math.max(30, Math.min(100, Math.round(fitRatio * 100)));
+    });
+};
+
+let resizeTimeout;
+const handleResize = () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(fitToContainer, 150);
+};
+
+onMounted(() => {
+    fitToContainer();
+    window.addEventListener('resize', handleResize);
+});
+
+onUnmounted(() => {
+    window.removeEventListener('resize', handleResize);
+    clearTimeout(resizeTimeout);
+});
 
 const handleExportPDF = () => {
     isDownloading.value = true;

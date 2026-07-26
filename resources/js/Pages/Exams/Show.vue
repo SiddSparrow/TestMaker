@@ -309,8 +309,6 @@
             :question-types="questionTypes"
             @close="showPreview = false"
             @edit="$inertia.visit(route('exams.edit', exam.id))"
-            @export-pdf="exportPDF"
-            @export-docx="exportDOCX"
         />
 
         <ConfirmDialog

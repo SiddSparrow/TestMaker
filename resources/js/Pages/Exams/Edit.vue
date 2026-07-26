@@ -160,8 +160,6 @@
             :question-types="questionTypes"
             @close="showPreview = false"
             @edit="showPreview = false"
-            @export-pdf="exportPDF"
-            @export-docx="exportDOCX"
         />
 
         <!-- Delete Confirmation -->
@@ -186,10 +184,7 @@ import ExamConfigEditModal from '@/Components/Exams/ExamConfigEditModal.vue';
 import ExamPreview from '@/Components/Exams/ExamPreview.vue';
 import ConfirmDialog from '@/Components/ConfirmDialog.vue';
 import DetailHeader from '@/Components/UI/DetailHeader.vue';
-import { useFileDownload } from '@/composables/useFileDownload';
 import { useUnsavedChanges } from '@/composables/useUnsavedChanges';
-
-const { download } = useFileDownload();
 
 const props = defineProps({
     exam: Object,
@@ -325,14 +320,6 @@ const deleteExam = () => {
             router.visit(route('exams.index'));
         }
     });
-};
-
-const exportPDF = (withAnswers) => {
-    download(route('exams.export.pdf', { exam: props.exam.id, with_answers: withAnswers ? 1 : 0 }));
-};
-
-const exportDOCX = (withAnswers) => {
-    download(route('exams.export.docx', { exam: props.exam.id, with_answers: withAnswers ? 1 : 0 }));
 };
 
 // Aviso ao sair com mudanças não salvas — cobre tanto fechar/recarregar a

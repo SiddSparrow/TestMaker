@@ -355,6 +355,7 @@
 <script setup>
 import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue';
 import Modal from '@/Components/Modal.vue';
+import { useFileDownload } from '@/composables/useFileDownload';
 
 const props = defineProps({
     show: {
@@ -375,7 +376,9 @@ const props = defineProps({
     }
 });
 
-const emit = defineEmits(['close', 'edit', 'export-pdf', 'export-docx']);
+const emit = defineEmits(['close', 'edit']);
+
+const { download } = useFileDownload();
 
 // Estados
 const showAnswers = ref(false);
@@ -516,28 +519,33 @@ onUnmounted(() => {
     clearTimeout(resizeTimeout);
 });
 
-const handleExportPDF = () => {
+// O overlay ficava 3s fixos na tela, sem relação com o download real —
+// sumia antes de terminar em arquivo grande, ou continuava visível mesmo
+// depois de useFileDownload já ter mostrado um toast de erro. Agora
+// espera a promise de verdade (que só resolve depois do try/catch interno
+// do composable, sucesso ou erro).
+const handleExportPDF = async () => {
+    if (!props.exam?.id) return;
+
     isDownloading.value = true;
     downloadType.value = 'pdf';
 
-    emit('export-pdf', showAnswers.value);
+    await download(route('exams.export.pdf', { exam: props.exam.id, with_answers: showAnswers.value ? 1 : 0 }));
 
-    setTimeout(() => {
-        isDownloading.value = false;
-        downloadType.value = '';
-    }, 3000);
+    isDownloading.value = false;
+    downloadType.value = '';
 };
 
-const handleExportDOCX = () => {
+const handleExportDOCX = async () => {
+    if (!props.exam?.id) return;
+
     isDownloading.value = true;
     downloadType.value = 'docx';
 
-    emit('export-docx', showAnswers.value);
+    await download(route('exams.export.docx', { exam: props.exam.id, with_answers: showAnswers.value ? 1 : 0 }));
 
-    setTimeout(() => {
-        isDownloading.value = false;
-        downloadType.value = '';
-    }, 3000);
+    isDownloading.value = false;
+    downloadType.value = '';
 };
 
 const getQuestionPoints = (question) => {

@@ -125,10 +125,12 @@
                 <span :id="ids.difficulty" class="block text-sm font-medium text-gray-700 mb-2">
                     Dificuldade <span class="text-red-500">*</span>
                 </span>
-                <div class="flex space-x-2" role="radiogroup" :aria-labelledby="ids.difficulty">
+                <div class="flex space-x-2" role="radiogroup" :aria-labelledby="ids.difficulty" @keydown="onDifficultyKeydown">
                     <button type="button"
+                            ref="difficultyEasyRef"
                             role="radio"
                             :aria-checked="localDifficulty === 'easy'"
+                            :tabindex="localDifficulty === 'easy' ? 0 : -1"
                             @click="setDifficulty('easy')"
                             class="flex-1 px-4 py-2 rounded-md border transition-all duration-200 font-medium"
                             :class="localDifficulty === 'easy'
@@ -142,8 +144,10 @@
                         </span>
                     </button>
                     <button type="button"
+                            ref="difficultyMediumRef"
                             role="radio"
                             :aria-checked="localDifficulty === 'medium'"
+                            :tabindex="localDifficulty === 'medium' ? 0 : -1"
                             @click="setDifficulty('medium')"
                             class="flex-1 px-4 py-2 rounded-md border transition-all duration-200 font-medium"
                             :class="localDifficulty === 'medium'
@@ -157,8 +161,10 @@
                         </span>
                     </button>
                     <button type="button"
+                            ref="difficultyHardRef"
                             role="radio"
                             :aria-checked="localDifficulty === 'hard'"
+                            :tabindex="localDifficulty === 'hard' ? 0 : -1"
                             @click="setDifficulty('hard')"
                             class="flex-1 px-4 py-2 rounded-md border transition-all duration-200 font-medium"
                             :class="localDifficulty === 'hard'
@@ -421,6 +427,28 @@ const handleQuestionTypeChange = () => {
 const setDifficulty = (level) => {
     localDifficulty.value = level;
     emit('update:difficultyLevel', level);
+};
+
+// Roving tabindex do radiogroup de dificuldade: só o item selecionado fica
+// na ordem de tabulação (padrão ARIA), e as setas movem seleção + foco
+// entre Fácil/Médio/Difícil, como num <input type="radio"> nativo.
+const DIFFICULTY_LEVELS = ['easy', 'medium', 'hard'];
+const difficultyEasyRef = ref(null);
+const difficultyMediumRef = ref(null);
+const difficultyHardRef = ref(null);
+const difficultyRefs = { easy: difficultyEasyRef, medium: difficultyMediumRef, hard: difficultyHardRef };
+
+const onDifficultyKeydown = (e) => {
+    if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return;
+
+    e.preventDefault();
+    const currentIndex = DIFFICULTY_LEVELS.indexOf(localDifficulty.value);
+    const direction = ['ArrowLeft', 'ArrowUp'].includes(e.key) ? -1 : 1;
+    const nextIndex = (currentIndex + direction + DIFFICULTY_LEVELS.length) % DIFFICULTY_LEVELS.length;
+    const nextLevel = DIFFICULTY_LEVELS[nextIndex];
+
+    setDifficulty(nextLevel);
+    difficultyRefs[nextLevel].value?.focus();
 };
 
 const handlePointsChange = () => {

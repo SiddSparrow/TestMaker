@@ -47,12 +47,16 @@
                     </button>
                     
                     <button @click="saveExam"
-                            :disabled="examQuestions.length === 0"
+                            :disabled="examQuestions.length === 0 || isSaving"
                             class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg v-if="!isSaving" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        Salvar Prova
+                        <svg v-else class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        {{ isSaving ? 'Salvando...' : 'Salvar Prova' }}
                     </button>
                 </div>
             </div>
@@ -67,6 +71,16 @@
                 @close="showPreview = false"
                 @edit="showPreview = false"
             />
+
+            <ConfirmDialog
+                v-model:show="showCancelConfirm"
+                title="Descartar prova em andamento?"
+                message="Isso apaga a configuração preenchida e as questões já escolhidas. Não é possível desfazer."
+                confirm-text="Sim, descartar"
+                cancel-text="Continuar editando"
+                type="danger"
+                @confirm="discardDraftAndLeave"
+            />
         </div>
     </AppLayout>
 </template>
@@ -78,6 +92,7 @@ import ExamConfigForm from '@/Components/Exams/ExamConfigForm.vue';
 import ExamBuilder from '@/Components/Exams/ExamBuilder.vue';
 import ExamPreview from '@/Components/Exams/ExamPreview.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import ConfirmDialog from '@/Components/ConfirmDialog.vue';
 import { useToast } from '@/composables/useToast';
 
 const props = defineProps({
@@ -249,10 +264,28 @@ const editConfig = () => {
     configCompleted.value = false;
 };
 
+// "Cancelar" descartava o rascunho (config preenchida + questões já
+// escolhidas) sem aviso, ao contrário dos formulários menores (protegidos
+// por useUnsavedChanges). Só confirma quando há de fato algo a perder.
+const showCancelConfirm = ref(false);
+const hasDraftInProgress = computed(() =>
+    !!examConfig.value.title || configCompleted.value || examQuestions.value.length > 0
+);
+
 const handleCancel = () => {
+    if (hasDraftInProgress.value) {
+        showCancelConfirm.value = true;
+        return;
+    }
+    discardDraftAndLeave();
+};
+
+const discardDraftAndLeave = () => {
     clearDraft();
     router.visit(route('exams.index'));
 };
+
+const isSaving = ref(false);
 
 const saveExam = () => {
     if (examQuestions.value.length === 0) {
@@ -270,8 +303,16 @@ const saveExam = () => {
         total_points: examData.value.total_points
     };
 
+    isSaving.value = true;
+
     router.post(route('exams.store'), examPayload, {
         onSuccess: clearDraft,
+        onError: () => {
+            toast.error('Não foi possível salvar a prova. Verifique os dados e tente novamente.');
+        },
+        onFinish: () => {
+            isSaving.value = false;
+        },
     });
 };
 </script>

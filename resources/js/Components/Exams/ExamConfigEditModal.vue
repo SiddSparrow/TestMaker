@@ -1,29 +1,23 @@
 <template>
-    <Teleport to="body">
-        <Transition name="modal">
-            <div v-if="show" 
-                 class="fixed inset-0 z-50 overflow-y-auto"
-                 @click.self="close">
-                <div class="flex min-h-screen items-center justify-center p-4">
-                    <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
-                    
-                    <div class="relative bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                        <!-- Header -->
-                        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
-                            <div>
-                                <h3 class="text-lg font-semibold text-gray-900">Configurações da Prova</h3>
-                                <p class="text-sm text-gray-600 mt-1">Edite as informações básicas</p>
-                            </div>
-                            <button @click="close"
-                                    class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
-                            </button>
-                        </div>
+    <Modal :show="show" max-width="2xl" @close="close">
+        <div class="max-h-[90vh] overflow-y-auto">
+            <!-- Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">Configurações da Prova</h3>
+                    <p class="text-sm text-gray-600 mt-1">Edite as informações básicas</p>
+                </div>
+                <button @click="close"
+                        aria-label="Fechar"
+                        class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
 
-                        <!-- Content -->
-                        <form @submit.prevent="save" class="p-6 space-y-6">
+            <!-- Content -->
+            <form @submit.prevent="save" class="p-6 space-y-6">
                             <!-- Título -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -139,15 +133,13 @@
                                 </button>
                             </div>
                         </form>
-                    </div>
-                </div>
-            </div>
-        </Transition>
-    </Teleport>
+        </div>
+    </Modal>
 </template>
 
 <script setup>
 import { ref, watch } from 'vue';
+import Modal from '@/Components/Modal.vue';
 
 const props = defineProps({
     show: Boolean,
@@ -214,15 +206,3 @@ const save = () => {
     close();
 };
 </script>
-
-<style scoped>
-.modal-enter-active,
-.modal-leave-active {
-    transition: opacity 0.3s ease;
-}
-
-.modal-enter-from,
-.modal-leave-to {
-    opacity: 0;
-}
-</style>

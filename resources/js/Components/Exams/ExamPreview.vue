@@ -1,15 +1,7 @@
 <template>
-    <!-- Modal Overlay -->
-    <Teleport to="body">
-        <Transition name="modal">
-            <div v-if="show" class="fixed inset-0 z-50 overflow-y-auto" @click.self="closePreview">
-                <div class="flex min-h-screen items-center justify-center p-4">
-                    <!-- Background Overlay -->
-                    <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
-
-                    <!-- Modal Content -->
-                    <div class="relative bg-white rounded-lg shadow-2xl max-w-5xl w-full max-h-[90vh] flex flex-col">
-                        <!-- Header -->
+    <Modal :show="show" max-width="5xl" @close="closePreview">
+        <div class="relative max-h-[90vh] flex flex-col">
+            <!-- Header -->
                         <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50">
                             <div class="flex items-center gap-3">
                                 <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor"
@@ -29,6 +21,7 @@
                                 <!-- Zoom Controls -->
                                 <div class="flex items-center gap-1 mr-2">
                                     <button @click="zoomOut"
+                                        aria-label="Diminuir zoom"
                                         class="p-2 text-gray-600 hover:bg-gray-100 rounded transition-colors"
                                         :disabled="zoom <= 30">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -38,6 +31,7 @@
                                     </button>
                                     <span class="text-sm text-gray-600 w-16 text-center">{{ zoom }}%</span>
                                     <button @click="zoomIn"
+                                        aria-label="Aumentar zoom"
                                         class="p-2 text-gray-600 hover:bg-gray-100 rounded transition-colors"
                                         :disabled="zoom >= 150">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -57,6 +51,7 @@
 
                                 <!-- Close Button -->
                                 <button @click="closePreview"
+                                    aria-label="Fechar"
                                     class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -347,15 +342,13 @@
                                 </div>
                             </div>
                         </Transition>
-                    </div>
-                </div>
-            </div>
-        </Transition>
-    </Teleport>
+        </div>
+    </Modal>
 </template>
 
 <script setup>
 import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue';
+import Modal from '@/Components/Modal.vue';
 
 const props = defineProps({
     show: {
@@ -562,30 +555,6 @@ const formatDate = (date) => {
 </script>
 
 <style scoped>
-/* Modal Transitions */
-.modal-enter-active,
-.modal-leave-active {
-    transition: opacity 0.3s ease;
-}
-
-.modal-enter-from,
-.modal-leave-to {
-    opacity: 0;
-}
-
-.modal-enter-active .relative,
-.modal-leave-active .relative {
-    transition: transform 0.3s ease;
-}
-
-.modal-enter-from .relative {
-    transform: scale(0.95);
-}
-
-.modal-leave-to .relative {
-    transform: scale(0.95);
-}
-
 /* Fade transition for loading overlay */
 .fade-enter-active,
 .fade-leave-active {

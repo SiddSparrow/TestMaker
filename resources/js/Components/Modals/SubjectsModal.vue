@@ -1,28 +1,22 @@
 <template>
-    <Teleport to="body">
-        <Transition name="modal">
-            <div v-if="show" 
-                 class="fixed inset-0 z-50 overflow-y-auto"
-                 @click.self="closeModal">
-                <div class="flex min-h-screen items-center justify-center p-4">
-                    <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
-                    
-                    <div class="relative bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col">
-                        <!-- Header -->
-                        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-                            <div>
-                                <h3 class="text-xl font-bold text-gray-900">Gerenciar Matérias</h3>
-                                <p class="text-sm text-gray-600 mt-1">Crie e organize suas matérias</p>
-                            </div>
-                            <button @click="closeModal"
-                                    class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
-                            </button>
-                        </div>
+    <Modal :show="show" max-width="4xl" @close="closeModal">
+        <div class="max-h-[90vh] flex flex-col">
+            <!-- Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                <div>
+                    <h3 id="subjects-modal-title" class="text-xl font-bold text-gray-900">Gerenciar Matérias</h3>
+                    <p class="text-sm text-gray-600 mt-1">Crie e organize suas matérias</p>
+                </div>
+                <button @click="closeModal"
+                        aria-label="Fechar"
+                        class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
 
-                        <!-- Content -->
+            <!-- Content -->
                         <div class="flex-1 overflow-y-auto p-6">
                             <!-- Form -->
                             <div class="bg-gray-50 rounded-lg p-4 mb-6">
@@ -141,23 +135,32 @@
                             </div>
                         </div>
 
-                        <!-- Footer -->
-                        <div class="flex items-center justify-end px-6 py-4 border-t border-gray-200 bg-gray-50">
-                            <button @click="closeModal"
-                                    class="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
-                                Fechar
-                            </button>
-                        </div>
-                    </div>
-                </div>
+            <!-- Footer -->
+            <div class="flex items-center justify-end px-6 py-4 border-t border-gray-200 bg-gray-50">
+                <button @click="closeModal"
+                        class="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
+                    Fechar
+                </button>
             </div>
-        </Transition>
-    </Teleport>
+        </div>
+    </Modal>
+
+    <ConfirmDialog
+        v-model:show="showDeleteConfirm"
+        title="Excluir matéria"
+        :message="deleteMessage"
+        confirm-text="Sim, excluir"
+        cancel-text="Cancelar"
+        type="danger"
+        @confirm="confirmDeleteSubject"
+    />
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { useForm } from '@inertiajs/vue3';
+import Modal from '@/Components/Modal.vue';
+import ConfirmDialog from '@/Components/ConfirmDialog.vue';
 
 const props = defineProps({
     show: Boolean,
@@ -170,6 +173,12 @@ const props = defineProps({
 const emit = defineEmits(['update:show']);
 
 const editingSubject = ref(null);
+const showDeleteConfirm = ref(false);
+const subjectToDelete = ref(null);
+const deleteMessage = computed(() => {
+    const name = subjectToDelete.value?.name || '';
+    return `Tem certeza que deseja excluir a matéria "${name}"? Todos os tópicos e questões relacionados serão mantidos, mas não estarão mais vinculados a esta matéria.`;
+});
 
 const form = useForm({
     name: '',
@@ -214,11 +223,20 @@ const cancelEdit = () => {
 };
 
 const deleteSubject = (subject) => {
-    if (confirm(`Tem certeza que deseja excluir a matéria "${subject.name}"?\n\nTodos os tópicos e questões relacionados serão mantidos, mas não estarão mais vinculados a esta matéria.`)) {
-        form.delete(route('subjects.destroy', subject.id), {
-            preserveScroll: true,
-        });
-    }
+    subjectToDelete.value = subject;
+    showDeleteConfirm.value = true;
+};
+
+const confirmDeleteSubject = () => {
+    if (!subjectToDelete.value) return;
+
+    form.delete(route('subjects.destroy', subjectToDelete.value.id), {
+        preserveScroll: true,
+        onSuccess: () => {
+            showDeleteConfirm.value = false;
+            subjectToDelete.value = null;
+        },
+    });
 };
 
 watch(() => props.show, (newValue) => {
@@ -227,28 +245,3 @@ watch(() => props.show, (newValue) => {
     }
 });
 </script>
-
-<style scoped>
-.modal-enter-active,
-.modal-leave-active {
-    transition: opacity 0.3s ease;
-}
-
-.modal-enter-from,
-.modal-leave-to {
-    opacity: 0;
-}
-
-.modal-enter-active .relative,
-.modal-leave-active .relative {
-    transition: transform 0.3s ease;
-}
-
-.modal-enter-from .relative {
-    transform: scale(0.95);
-}
-
-.modal-leave-to .relative {
-    transform: scale(0.95);
-}
-</style>

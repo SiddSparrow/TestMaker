@@ -450,6 +450,8 @@ class QuestionController extends Controller
 
         return Inertia::render('Questions/Edit', array_merge($data, [
             'question' => $question,
+            'is_copy' => $question->copied_from_id !== null,
+            'original_question_id' => $question->copied_from_id,
         ]));
     }
 

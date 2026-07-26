@@ -195,6 +195,8 @@ const props = defineProps({
     topics: Array,
     question_types: Array,
     tags: Array,
+    is_copy: Boolean,
+    original_question_id: [Number, String],
 });
 
 const form = useForm({

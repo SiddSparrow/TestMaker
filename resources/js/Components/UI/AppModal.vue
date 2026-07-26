@@ -1,10 +1,9 @@
 <!--
     Modal padrão. Envolve o Modal.vue existente, que já usa <dialog> +
     showModal() — o navegador já trata Escape, foco preso e trava o scroll
-    do fundo nativamente. Hoje só Modal.vue e Dropdown.vue têm isso; os
-    outros seis modais do app (SubjectsModal, TopicsModal, TagsModal,
-    ExamPreview, ExamConfigEditModal, o modal ad-hoc de Questions/Index) são
-    `<div>` fixos sem nada disso. Este componente passa a ser a base única.
+    do fundo nativamente. Cabeçalho com título e botão de fechar opcionais
+    via prop `title`/`closeable`; use direto o Modal.vue quando o cabeçalho
+    precisar de algo além de título + texto (ex.: ExamPreview).
 -->
 <template>
     <Modal :show="show" :max-width="maxWidth" :closeable="closeable" @close="$emit('close')">

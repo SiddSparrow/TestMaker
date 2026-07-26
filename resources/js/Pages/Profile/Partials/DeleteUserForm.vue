@@ -2,7 +2,7 @@
 import DangerButton from '@/Components/DangerButton.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
-import Modal from '@/Components/Modal.vue';
+import AppModal from '@/Components/UI/AppModal.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { useForm } from '@inertiajs/vue3';
@@ -54,55 +54,47 @@ const closeModal = () => {
 
         <DangerButton @click="confirmUserDeletion">Excluir Conta</DangerButton>
 
-        <Modal :show="confirmingUserDeletion" @close="closeModal">
-            <div class="p-6">
-                <h2
-                    class="text-lg font-medium text-gray-900"
-                >
-                    Tem certeza que deseja excluir sua conta?
-                </h2>
+        <AppModal :show="confirmingUserDeletion" title="Tem certeza que deseja excluir sua conta?" @close="closeModal">
+            <p class="mt-1 text-sm text-gray-600">
+                Depois que sua conta for excluída, todos os seus recursos e
+                dados serão apagados permanentemente. Digite sua senha para
+                confirmar que deseja excluir sua conta definitivamente.
+            </p>
 
-                <p class="mt-1 text-sm text-gray-600">
-                    Depois que sua conta for excluída, todos os seus recursos e
-                    dados serão apagados permanentemente. Digite sua senha para
-                    confirmar que deseja excluir sua conta definitivamente.
-                </p>
+            <div class="mt-6">
+                <InputLabel
+                    for="password"
+                    value="Senha"
+                    class="sr-only"
+                />
 
-                <div class="mt-6">
-                    <InputLabel
-                        for="password"
-                        value="Senha"
-                        class="sr-only"
-                    />
+                <TextInput
+                    id="password"
+                    ref="passwordInput"
+                    v-model="form.password"
+                    type="password"
+                    class="mt-1 block w-3/4"
+                    placeholder="Senha"
+                    @keyup.enter="deleteUser"
+                />
 
-                    <TextInput
-                        id="password"
-                        ref="passwordInput"
-                        v-model="form.password"
-                        type="password"
-                        class="mt-1 block w-3/4"
-                        placeholder="Senha"
-                        @keyup.enter="deleteUser"
-                    />
-
-                    <InputError :message="form.errors.password" class="mt-2" />
-                </div>
-
-                <div class="mt-6 flex justify-end">
-                    <SecondaryButton @click="closeModal">
-                        Cancelar
-                    </SecondaryButton>
-
-                    <DangerButton
-                        class="ms-3"
-                        :class="{ 'opacity-25': form.processing }"
-                        :disabled="form.processing"
-                        @click="deleteUser"
-                    >
-                        Excluir Conta
-                    </DangerButton>
-                </div>
+                <InputError :message="form.errors.password" class="mt-2" />
             </div>
-        </Modal>
+
+            <div class="mt-6 flex justify-end">
+                <SecondaryButton @click="closeModal">
+                    Cancelar
+                </SecondaryButton>
+
+                <DangerButton
+                    class="ms-3"
+                    :class="{ 'opacity-25': form.processing }"
+                    :disabled="form.processing"
+                    @click="deleteUser"
+                >
+                    Excluir Conta
+                </DangerButton>
+            </div>
+        </AppModal>
     </section>
 </template>

@@ -242,6 +242,36 @@ class QuestionTest extends TestCase
         $this->assertSame(2, Question::count());
     }
 
+    /**
+     * QuestionController::edit() now surfaces is_copy/original_question_id
+     * so CopySuccessBanner (previously never fed these props at all) can
+     * tell the user which question a copy came from.
+     */
+    public function test_edit_surfaces_copy_metadata_for_a_duplicated_question(): void
+    {
+        $original = $this->createQuestion(['question_type_id' => $this->multipleChoiceType->id]);
+        $original->alternatives()->create(['content' => 'Única', 'is_correct' => true, 'order' => 1]);
+
+        $this->actingAs($this->user)->post(route('questions.copy', $original));
+        $copy = Question::where('copied_from_id', $original->id)->firstOrFail();
+
+        $response = $this->actingAs($this->user)->get(route('questions.edit', $copy));
+
+        $response->assertInertia(
+            fn ($page) => $page
+                ->where('is_copy', true)
+                ->where('original_question_id', $original->id)
+        );
+
+        $originalResponse = $this->actingAs($this->user)->get(route('questions.edit', $original));
+
+        $originalResponse->assertInertia(
+            fn ($page) => $page
+                ->where('is_copy', false)
+                ->where('original_question_id', null)
+        );
+    }
+
     public function test_bulk_status_archives_only_the_authenticated_users_questions(): void
     {
         $mine = $this->createQuestion(['is_active' => true]);

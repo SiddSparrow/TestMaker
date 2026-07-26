@@ -47,7 +47,8 @@
                               rows="2"
                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 resize-none"
                               :class="{ 'border-red-500': getError(index) }"
-                              :placeholder="getPlaceholder(index)"></textarea>
+                              :placeholder="getPlaceholder(index)"
+                              :aria-label="`Conteúdo da alternativa ${getAlternativeLabel(index)}`"></textarea>
                     <p v-if="getError(index)" 
                        class="mt-1 text-sm text-red-600">
                         {{ getError(index) }}

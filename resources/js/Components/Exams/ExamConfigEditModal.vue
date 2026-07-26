@@ -6,75 +6,69 @@
             <!-- Content -->
             <form @submit.prevent="save" class="space-y-6">
                             <!-- Título -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Título da Prova <span class="text-red-500">*</span>
-                                </label>
-                                <input type="text"
-                                       v-model="localConfig.title"
-                                       class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                       :class="{ 'border-red-500': errors.title }">
-                                <p v-if="errors.title" class="mt-1 text-sm text-red-600">{{ errors.title }}</p>
-                            </div>
+                            <FormField label="Título da Prova" required :error="errors.title" :id="ids.title">
+                                <template #default="{ id }">
+                                    <input type="text" :id="id"
+                                           v-model="localConfig.title"
+                                           class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                           :class="{ 'border-red-500': errors.title }">
+                                </template>
+                            </FormField>
 
                             <!-- Descrição -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Descrição/Instruções
-                                </label>
-                                <textarea v-model="localConfig.description"
-                                          rows="3"
-                                          class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                          placeholder="Adicione instruções para os alunos..."></textarea>
-                            </div>
+                            <FormField label="Descrição/Instruções" :id="ids.description">
+                                <template #default="{ id }">
+                                    <textarea :id="id" v-model="localConfig.description"
+                                              rows="3"
+                                              class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                              placeholder="Adicione instruções para os alunos..."></textarea>
+                                </template>
+                            </FormField>
 
                             <!-- Data e Pontos -->
                             <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                                        Data da Prova
-                                    </label>
-                                    <input type="date"
-                                           v-model="localConfig.exam_date"
-                                           class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                </div>
+                                <FormField label="Data da Prova" :id="ids.examDate">
+                                    <template #default="{ id }">
+                                        <input type="date" :id="id"
+                                               v-model="localConfig.exam_date"
+                                               class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    </template>
+                                </FormField>
 
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                                        Meta de Pontos
-                                    </label>
-                                    <input type="number"
-                                           v-model.number="localConfig.target_total_points"
-                                           min="1"
-                                           class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                </div>
+                                <FormField label="Meta de Pontos" :id="ids.targetPoints">
+                                    <template #default="{ id }">
+                                        <input type="number" :id="id"
+                                               v-model.number="localConfig.target_total_points"
+                                               min="1"
+                                               class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    </template>
+                                </FormField>
                             </div>
 
                             <!-- Cabeçalho -->
                             <div class="border-t border-gray-200 pt-6">
                                 <h4 class="text-sm font-semibold text-gray-900 mb-4">Cabeçalho da Prova</h4>
-                                
+
                                 <div class="space-y-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                                            Nome da Escola/Instituição
-                                        </label>
-                                        <input type="text"
-                                               v-model="localConfig.header_config.school_name"
-                                               class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                               placeholder="Ex: Colégio ABC">
-                                    </div>
+                                    <FormField label="Nome da Escola/Instituição" :id="ids.schoolName">
+                                        <template #default="{ id }">
+                                            <input type="text" :id="id"
+                                                   v-model="localConfig.header_config.school_name"
+                                                   class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                   placeholder="Ex: Colégio ABC">
+                                        </template>
+                                    </FormField>
 
                                     <div class="flex items-center gap-6">
                                         <label class="flex items-center gap-2 cursor-pointer">
-                                            <input type="checkbox" 
+                                            <input type="checkbox"
                                                    v-model="localConfig.header_config.show_date"
                                                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                                             <span class="text-sm text-gray-700">Mostrar data</span>
                                         </label>
 
                                         <label class="flex items-center gap-2 cursor-pointer">
-                                            <input type="checkbox" 
+                                            <input type="checkbox"
                                                    v-model="localConfig.header_config.show_student_info"
                                                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                                             <span class="text-sm text-gray-700">Campos para aluno</span>
@@ -86,20 +80,19 @@
                             <!-- Rodapé -->
                             <div class="border-t border-gray-200 pt-6">
                                 <h4 class="text-sm font-semibold text-gray-900 mb-4">Rodapé da Prova</h4>
-                                
+
                                 <div class="space-y-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                                            Texto Customizado
-                                        </label>
-                                        <input type="text"
-                                               v-model="localConfig.footer_config.custom_text"
-                                               class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                               placeholder="Ex: Boa prova!">
-                                    </div>
+                                    <FormField label="Texto Customizado" :id="ids.footerText">
+                                        <template #default="{ id }">
+                                            <input type="text" :id="id"
+                                                   v-model="localConfig.footer_config.custom_text"
+                                                   class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                   placeholder="Ex: Boa prova!">
+                                        </template>
+                                    </FormField>
 
                                     <label class="flex items-center gap-2 cursor-pointer">
-                                        <input type="checkbox" 
+                                        <input type="checkbox"
                                                v-model="localConfig.footer_config.show_page_number"
                                                class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                                         <span class="text-sm text-gray-700">Mostrar número de página</span>
@@ -125,8 +118,9 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, useId } from 'vue';
 import AppModal from '@/Components/UI/AppModal.vue';
+import FormField from '@/Components/UI/FormField.vue';
 
 const props = defineProps({
     show: Boolean,
@@ -136,6 +130,16 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['update:show', 'update']);
+
+const uid = useId();
+const ids = {
+    title: `exam-config-title-${uid}`,
+    description: `exam-config-description-${uid}`,
+    examDate: `exam-config-date-${uid}`,
+    targetPoints: `exam-config-target-points-${uid}`,
+    schoolName: `exam-config-school-name-${uid}`,
+    footerText: `exam-config-footer-text-${uid}`,
+};
 
 const errors = ref({});
 

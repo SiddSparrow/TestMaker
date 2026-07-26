@@ -44,6 +44,7 @@
                         <input
                             type="text"
                             v-model="form.search"
+                            aria-label="Buscar provas por título ou descrição"
                             placeholder="Buscar por título ou descrição..."
                             class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-200 text-sm"
                         />

@@ -18,19 +18,22 @@
                     <div class="space-y-2">
                         <input type="text"
                                v-model="searchQuery"
+                               aria-label="Buscar questões por enunciado"
                                placeholder="Buscar por enunciado..."
                                class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                        
+
                         <div class="grid grid-cols-2 gap-2">
                             <select v-model="filterSubject"
+                                    aria-label="Filtrar por matéria"
                                     class="px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                                 <option value="">Todas as matérias</option>
                                 <option v-for="subject in subjects" :key="subject.id" :value="subject.id">
                                     {{ subject.name }}
                                 </option>
                             </select>
-                            
+
                             <select v-model="filterDifficulty"
+                                    aria-label="Filtrar por dificuldade"
                                     class="px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
                                 <option value="">Todas dificuldades</option>
                                 <option value="easy">Fácil</option>

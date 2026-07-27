@@ -333,5 +333,5 @@ const deleteExam = () => {
 // aba quanto navegar para outra tela da SPA via <Link> (antes só o
 // beforeunload nativo era tratado; clicar em "Cancelar" ou na navegação do
 // AppLayout com mudanças pendentes não avisava nada).
-useUnsavedChanges(() => hasUnsavedChanges.value && !form.processing);
+useUnsavedChanges(() => hasUnsavedChanges.value);
 </script>

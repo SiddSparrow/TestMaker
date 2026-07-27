@@ -262,7 +262,7 @@ onMounted(() => {
     form.defaults();
 });
 
-useUnsavedChanges(() => form.isDirty && !form.processing);
+useUnsavedChanges(() => form.isDirty);
 
 
 // Verifica se deve mostrar alternativas

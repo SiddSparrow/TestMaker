@@ -150,7 +150,7 @@ const form = useForm({
     tags: [],
 });
 
-useUnsavedChanges(() => form.isDirty && !form.processing);
+useUnsavedChanges(() => form.isDirty);
 
 const selectedTag = ref('');
 

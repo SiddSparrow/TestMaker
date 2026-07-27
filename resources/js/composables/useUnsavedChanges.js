@@ -9,11 +9,12 @@ import { router } from '@inertiajs/vue3';
  * um full reload; com <Link> de volta, esse guard evita perder um enunciado
  * longo por engano.
  *
- * IMPORTANTE: `hasChanges` também dispara na navegação do próprio submit
- * (router.on('before') roda em toda visita Inertia, inclusive form.post do
- * seu botão "Salvar"). Combine sempre com `!form.processing`, senão o
- * usuário recebe um "sair sem salvar?" ao tentar salvar:
- *   useUnsavedChanges(() => form.isDirty && !form.processing)
+ * `router.on('before')` roda em toda visita Inertia, inclusive na do próprio
+ * submit do botão "Salvar" — por isso só intercepta visitas GET (navegação
+ * pra fora da tela). Um form.put/post/patch/delete nunca é bloqueado.
+ * (Não dá pra distinguir isso checando `form.processing`: essa flag só vira
+ * `true` dentro do `onStart` do useForm, que roda DEPOIS deste 'before'
+ * global — então essa checagem nunca pega o próprio submit a tempo.)
  *
  * @param {() => boolean} hasChanges getter reativo
  * @param {string} [message]
@@ -31,6 +32,9 @@ export function useUnsavedChanges(hasChanges, message = 'Você tem alterações 
     onMounted(() => {
         window.addEventListener('beforeunload', onBeforeUnload);
         removeInertiaGuard = router.on('before', (event) => {
+            if (event.detail.visit.method !== 'get') {
+                return;
+            }
             if (hasChanges() && !window.confirm(message)) {
                 event.preventDefault();
             }

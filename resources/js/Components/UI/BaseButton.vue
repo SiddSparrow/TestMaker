@@ -66,6 +66,7 @@ const variantClasses = computed(() => ({
         :disabled="!isLink ? isDisabled : undefined"
         :aria-disabled="isLink && isDisabled ? 'true' : undefined"
         :aria-label="ariaLabel"
+        :title="iconOnly ? ariaLabel : undefined"
         :aria-busy="loading ? 'true' : undefined"
         :class="[
             'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors',

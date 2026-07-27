@@ -1,17 +1,23 @@
 <template>
-    <div class="bg-white rounded-lg shadow-lg border border-gray-200">
+    <component :is="mode === 'modal' ? AppModal : 'div'"
+               v-bind="mode === 'modal'
+                   ? { show: show, title: 'Configurações da Prova', maxWidth: '2xl' }
+                   : { class: 'bg-white rounded-lg shadow-lg border border-gray-200' }"
+               @close="$emit('cancel')">
+        <div :class="mode === 'modal' ? 'max-h-[80vh] overflow-y-auto' : ''">
         <form @submit.prevent="submitConfig">
-        <div class="p-6 space-y-6">
-            <div>
+        <div :class="mode === 'modal' ? 'space-y-6' : 'p-6 space-y-6'">
+            <div v-if="mode === 'inline'">
                 <h2 class="text-2xl font-bold text-gray-900 mb-2">Nova Prova</h2>
                 <p class="text-sm text-gray-600">Preencha o essencial para começar a montar a prova — o resto é opcional e pode ser ajustado depois.</p>
             </div>
+            <p v-else class="text-sm text-gray-600">Edite as informações e configurações da prova.</p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField class="md:col-span-2" label="Título da Prova" required :error="errors.title" v-slot="{ id }">
                     <input :id="id" ref="titleInputRef" type="text"
                            v-model="localConfig.title"
-                           autofocus
+                           :autofocus="mode === 'inline'"
                            placeholder="Ex: Prova de Matemática - 1º Bimestre"
                            class="w-full px-4 py-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                            :class="{ 'border-red-500': errors.title }">
@@ -47,7 +53,7 @@
                  wizard (config de pontos/questões, tópicos, layout) que o
                  builder na prática ignorava quase por completo. Viram um
                  bloco opcional recolhido por padrão. -->
-            <details class="border border-gray-200 rounded-lg" @toggle="advancedOpen = $event.target.open">
+            <details class="border border-gray-200 rounded-lg" :open="mode === 'modal'" @toggle="advancedOpen = $event.target.open">
                 <summary class="cursor-pointer select-none px-4 py-3 font-medium text-gray-700 hover:bg-gray-50 rounded-lg flex items-center gap-2">
                     <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-90': advancedOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -370,23 +376,36 @@
         </div>
 
         <!-- Ações -->
-        <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex items-center justify-end gap-3">
+        <div :class="mode === 'inline'
+            ? 'px-6 py-4 border-t border-gray-200 bg-gray-50 flex items-center justify-end gap-3'
+            : 'pt-6 mt-6 border-t border-gray-200 flex items-center justify-end gap-3'">
             <button @click="$emit('cancel')" type="button"
                     class="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors">
                 Cancelar
             </button>
-            <BaseButton type="submit">Começar a Montar Prova</BaseButton>
+            <BaseButton type="submit">{{ mode === 'inline' ? 'Começar a Montar Prova' : 'Salvar Alterações' }}</BaseButton>
         </div>
         </form>
-    </div>
+        </div>
+    </component>
 </template>
 
 <script setup>
 import { ref, computed, watch, useId } from 'vue';
 import FormField from '@/Components/UI/FormField.vue';
 import BaseButton from '@/Components/UI/BaseButton.vue';
+import AppModal from '@/Components/UI/AppModal.vue';
 
 const props = defineProps({
+    mode: {
+        type: String,
+        default: 'inline', // 'inline' (criação) ou 'modal' (edição, via AppModal)
+        validator: (value) => ['inline', 'modal'].includes(value)
+    },
+    show: {
+        type: Boolean,
+        default: true
+    },
     modelValue: {
         type: Object,
         default: () => ({})
@@ -411,12 +430,12 @@ const ids = {
     difficultyHard: `difficulty-hard-${uid}`,
 };
 
-const advancedOpen = ref(false);
+const advancedOpen = ref(props.mode === 'modal');
 const errors = ref({});
 const titleInputRef = ref(null);
 const mainSubjectSelectRef = ref(null);
 
-const localConfig = ref({
+const defaultConfig = () => ({
     title: '',
     description: '',
     exam_date: '',
@@ -453,9 +472,28 @@ const localConfig = ref({
     footer_config: {
         custom_text: 'Boa prova!',
         show_page_number: true
-    },
+    }
+});
+
+const localConfig = ref({
+    ...defaultConfig(),
     ...props.modelValue
 });
+
+// No modo modal, os dados de origem (props.modelValue = exam) só existem
+// quando o modal é reaberto — reinicializar o formulário toda vez que ele
+// abre, igual ao comportamento antigo do ExamConfigEditModal.
+if (props.mode === 'modal') {
+    watch(() => props.show, (isOpen) => {
+        if (isOpen) {
+            localConfig.value = {
+                ...defaultConfig(),
+                ...props.modelValue
+            };
+            errors.value = {};
+        }
+    });
+}
 
 const availableTopics = computed(() => {
     if (!localConfig.value.main_subject_id) return [];
@@ -495,8 +533,8 @@ const submitConfig = () => {
     }
 
     // Sem isto, um erro no bloco de configurações avançadas (fechado por
-    // padrão) ficava fora da viewport e o usuário nem via por que o botão
-    // "Começar a Montar Prova" não fez nada.
+    // padrão no modo inline) ficava fora da viewport e o usuário nem via
+    // por que o botão de confirmação não fez nada.
     if (errors.value.title) {
         titleInputRef.value?.focus();
     } else if (errors.value.main_subject_id) {

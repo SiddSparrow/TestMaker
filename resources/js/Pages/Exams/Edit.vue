@@ -143,12 +143,14 @@
         </div>
 
         <!-- Config Modal -->
-        <ExamConfigEditModal
-            v-model:show="showConfigModal"
-            :exam="exam"
+        <ExamConfigForm
+            mode="modal"
+            :show="showConfigModal"
+            :model-value="exam"
             :subjects="subjects"
             :topics="topics"
-            @update="handleConfigUpdate"
+            @complete="handleConfigUpdate"
+            @cancel="showConfigModal = false"
         />
 
         <!-- Preview Modal -->
@@ -180,7 +182,7 @@ import { ref, computed, watch } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ExamBuilder from '@/Components/Exams/ExamBuilder.vue';
-import ExamConfigEditModal from '@/Components/Exams/ExamConfigEditModal.vue';
+import ExamConfigForm from '@/Components/Exams/ExamConfigForm.vue';
 import ExamPreview from '@/Components/Exams/ExamPreview.vue';
 import ConfirmDialog from '@/Components/ConfirmDialog.vue';
 import DetailHeader from '@/Components/UI/DetailHeader.vue';
@@ -220,6 +222,9 @@ const form = useForm({
     exam_date: props.exam.exam_date,
     main_subject_id: props.exam.main_subject_id,
     target_total_points: props.exam.target_total_points,
+    target_question_count: props.exam.target_question_count,
+    difficulty_distribution: props.exam.difficulty_distribution || {},
+    topic_distribution: props.exam.topic_distribution || [],
     header_config: props.exam.header_config || {},
     format_config: props.exam.format_config || {},
     footer_config: props.exam.footer_config || {},
@@ -245,6 +250,7 @@ const examDataForPreview = computed(() => ({
     description: form.description,
     exam_date: form.exam_date,
     header_config: form.header_config,
+    format_config: form.format_config,
     footer_config: form.footer_config,
     total_points: currentTotalPoints.value
 }));
@@ -272,8 +278,13 @@ const handleConfigUpdate = (config) => {
     form.title = config.title;
     form.description = config.description;
     form.exam_date = config.exam_date;
+    form.main_subject_id = config.main_subject_id;
     form.target_total_points = config.target_total_points;
+    form.target_question_count = config.target_question_count;
+    form.difficulty_distribution = config.difficulty_distribution;
+    form.topic_distribution = config.topic_distribution;
     form.header_config = config.header_config;
+    form.format_config = config.format_config;
     form.footer_config = config.footer_config;
     hasUnsavedChanges.value = true;
     showConfigModal.value = false;

@@ -475,10 +475,19 @@ const defaultConfig = () => ({
     }
 });
 
-const localConfig = ref({
+// exam_date chega do backend em ISO completo (ex.: "2026-01-07T00:00:00.000000Z",
+// serialização padrão do Carbon), mas <input type="date"> só aceita
+// exatamente "yyyy-MM-dd" — atribuir o valor bruto faz o navegador rejeitar
+// silenciosamente (aviso no console, campo fica vazio).
+const toDateInputValue = (value) => (value ? String(value).slice(0, 10) : '');
+
+const buildLocalConfig = () => ({
     ...defaultConfig(),
-    ...props.modelValue
+    ...props.modelValue,
+    exam_date: toDateInputValue(props.modelValue?.exam_date),
 });
+
+const localConfig = ref(buildLocalConfig());
 
 // No modo modal, os dados de origem (props.modelValue = exam) só existem
 // quando o modal é reaberto — reinicializar o formulário toda vez que ele
@@ -486,10 +495,7 @@ const localConfig = ref({
 if (props.mode === 'modal') {
     watch(() => props.show, (isOpen) => {
         if (isOpen) {
-            localConfig.value = {
-                ...defaultConfig(),
-                ...props.modelValue
-            };
+            localConfig.value = buildLocalConfig();
             errors.value = {};
         }
     });

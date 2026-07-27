@@ -158,13 +158,15 @@ const showPassword = ref(false);
 
         <!-- Register Link -->
         <p class="mt-8 text-center text-sm text-gray-600">
-            Não tem uma conta?
-            <Link
-                :href="route('register')"
+            Se interessou?
+            <a
+                href="https://www.webexpress.net.br/"
+                target="_blank"
+                rel="noopener noreferrer"
                 class="font-medium text-primary-600 hover:text-primary-500 transition-colors"
             >
-                Crie sua conta
-            </Link>
+                Entre em contato e faça um teste
+            </a>
         </p>
     </SplitAuthLayout>
 </template>

@@ -60,8 +60,24 @@
                 </div>
             </DetailHeader>
 
+            <!-- Erro ao salvar -->
+            <div v-if="Object.keys(form.errors).length > 0"
+                 class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r-lg">
+                <div class="flex">
+                    <svg class="w-5 h-5 text-red-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <div class="flex-1">
+                        <p class="text-sm font-medium text-red-800 mb-1">Não foi possível salvar</p>
+                        <ul class="text-sm text-red-700 space-y-1">
+                            <li v-for="(message, field) in form.errors" :key="field">• {{ message }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
             <!-- Status de Mudanças -->
-            <div v-if="hasUnsavedChanges" 
+            <div v-if="hasUnsavedChanges"
                  class="bg-amber-50 border-l-4 border-amber-500 p-4 mb-6 rounded-r-lg">
                 <div class="flex items-center">
                     <svg class="w-5 h-5 text-amber-500 mr-3" fill="currentColor" viewBox="0 0 20 20">

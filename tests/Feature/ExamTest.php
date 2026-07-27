@@ -196,6 +196,55 @@ class ExamTest extends TestCase
     }
 
     /**
+     * BUG found via a real support case: exams.main_subject_id is nullable
+     * in the schema on purpose (onDelete('set null') when the subject is
+     * deleted), but the old validation message was Laravel's generic
+     * "field is required" — and Exams/Edit.vue never rendered form.errors
+     * at all, so a save attempt on an exam whose subject had been deleted
+     * looked like it silently did nothing, forever.
+     */
+    public function test_update_fails_with_a_friendly_message_when_main_subject_is_missing(): void
+    {
+        $exam = Exam::factory()->create(['user_id' => $this->user->id, 'main_subject_id' => null]);
+        $question = $this->createQuestion();
+
+        $payload = [
+            'title' => $exam->title,
+            'main_subject_id' => null,
+            'questions' => [
+                ['question_id' => $question->id, 'order' => 1],
+            ],
+        ];
+
+        $response = $this->actingAs($this->user)->put(route('exams.update', $exam), $payload);
+
+        $response->assertSessionHasErrors([
+            'main_subject_id' => 'Selecione uma matéria principal em "Configurações" antes de salvar.',
+        ]);
+    }
+
+    public function test_update_rejects_a_main_subject_owned_by_another_user(): void
+    {
+        $exam = Exam::factory()->create(['user_id' => $this->user->id, 'main_subject_id' => $this->subject->id]);
+        $question = $this->createQuestion();
+        $other = User::factory()->create();
+        $foreignSubject = Subject::factory()->create(['user_id' => $other->id]);
+
+        $payload = [
+            'title' => $exam->title,
+            'main_subject_id' => $foreignSubject->id,
+            'questions' => [
+                ['question_id' => $question->id, 'order' => 1],
+            ],
+        ];
+
+        $response = $this->actingAs($this->user)->put(route('exams.update', $exam), $payload);
+
+        $response->assertSessionHasErrors('main_subject_id');
+        $this->assertNotEquals($foreignSubject->id, $exam->fresh()->main_subject_id);
+    }
+
+    /**
      * BUG: ExamController::store() validates questions.*.question_id with a
      * plain `exists:questions,id` rule, so a professor can build an exam out
      * of another professor's private questions.

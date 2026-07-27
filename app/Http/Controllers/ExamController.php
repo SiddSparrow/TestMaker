@@ -93,7 +93,7 @@ class ExamController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate($this->examRules());
+        $validated = $request->validate($this->examRules(), $this->examMessages());
 
         $exam = Exam::create([
             'user_id' => auth()->id(),
@@ -202,7 +202,7 @@ class ExamController extends Controller
     {
         $this->authorize('update', $exam);
 
-        $validated = $request->validate($this->examRules());
+        $validated = $request->validate($this->examRules(), $this->examMessages());
 
         $exam->update([
             'title' => $validated['title'],
@@ -645,7 +645,7 @@ class ExamController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'exam_date' => 'nullable|date',
-            'main_subject_id' => 'required|exists:subjects,id',
+            'main_subject_id' => ['required', Rule::exists('subjects', 'id')->where('user_id', auth()->id())],
 
             'header_config' => 'nullable|array',
             'header_config.school_name' => 'nullable|string|max:255',
@@ -678,7 +678,7 @@ class ExamController extends Controller
             'difficulty_distribution.hard' => 'nullable|integer|min:0',
 
             'topic_distribution' => 'nullable|array',
-            'topic_distribution.*.topic_id' => 'required|exists:topics,id',
+            'topic_distribution.*.topic_id' => ['required', Rule::exists('topics', 'id')->where('user_id', auth()->id())],
             'topic_distribution.*.question_count' => 'required|integer|min:1',
 
             'target_total_points' => 'nullable|numeric|min:0',
@@ -691,6 +691,26 @@ class ExamController extends Controller
             ],
             'questions.*.order' => 'required|integer|min:1',
             'questions.*.points_override' => 'nullable|numeric|min:0',
+        ];
+    }
+
+    /**
+     * Mensagens amigáveis para examRules() — sem elas, uma prova sem
+     * main_subject_id (matéria excluída depois de criada, por exemplo — a
+     * FK é nullable de propósito, com onDelete('set null')) falhava a
+     * validação sempre que salva, mas a tela de edição não mostrava erro
+     * nenhum, então parecia que "salvar" simplesmente não fazia nada.
+     */
+    private function examMessages(): array
+    {
+        return [
+            'title.required' => 'Dê um título à prova antes de salvar.',
+            'main_subject_id.required' => 'Selecione uma matéria principal em "Configurações" antes de salvar.',
+            'main_subject_id.exists' => 'A matéria selecionada em "Configurações" não é válida — escolha outra.',
+            'questions.required' => 'Adicione pelo menos uma questão à prova antes de salvar.',
+            'questions.min' => 'Adicione pelo menos uma questão à prova antes de salvar.',
+            'questions.*.question_id.exists' => 'Uma das questões selecionadas não pertence a você ou não existe mais.',
+            'topic_distribution.*.topic_id.exists' => 'Um dos tópicos na distribuição de questões não é válido.',
         ];
     }
 

@@ -25,9 +25,12 @@ const logout = () => {
 // focável por padrão) — usuário de teclado ficava sem indicação de onde
 // o foco estava depois de uma navegação. router.on('navigate') só dispara
 // numa troca de página de verdade (não em toda requisição/reload parcial).
+// `preventScroll` evita que o .focus() role a página até o <main> — como
+// ele vem depois do <header> no HTML (que não é sticky/fixed), sem isso o
+// navbar ficava fora da tela a cada troca de página.
 const mainRef = ref(null);
 router.on('navigate', () => {
-    mainRef.value?.focus();
+    mainRef.value?.focus({ preventScroll: true });
 });
 </script>
 

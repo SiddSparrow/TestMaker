@@ -69,8 +69,10 @@ class DashboardController extends Controller
                 ];
             });
 
-        // CORREÇÃO: Especificar qual tabela tem o user_id
-        $mostUsedSubjects = Question::where('questions.user_id', $userId) // Especificar tabela
+        // A query não filtrava is_active — uma matéria só com questões
+        // arquivadas aparecia no ranking como se tivesse questões utilizáveis.
+        $mostUsedSubjects = Question::where('questions.user_id', $userId)
+            ->where('questions.is_active', true)
             ->join('subjects', 'questions.subject_id', '=', 'subjects.id')
             ->select(
                 'subjects.id',

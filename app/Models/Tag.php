@@ -16,6 +16,7 @@ class Tag extends Model
         'user_id',
         'name',
         'slug',
+        'color',
     ];
 
     public function user(): BelongsTo

@@ -18,6 +18,11 @@
                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     </FormField>
 
+                    <FormField label="Cor" v-slot="{ id }">
+                        <input :id="id" type="color" v-model="form.color"
+                               class="h-10 w-16 rounded border border-gray-300 cursor-pointer">
+                    </FormField>
+
                     <div class="flex gap-2">
                         <BaseButton v-if="editingTag" type="button" variant="secondary" @click="cancelEdit">
                             Cancelar
@@ -57,7 +62,7 @@
                          class="group relative flex items-center justify-between p-4 bg-white border-2 border-gray-200 rounded-lg hover:border-blue-400 hover:shadow-md transition-all">
                         <div class="flex-1 min-w-0 pr-2">
                             <div class="flex items-center gap-2 mb-1">
-                                <svg class="w-4 h-4 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 flex-shrink-0" :style="{ color: tag.color || '#6B7280' }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                                 </svg>
                                 <h5 class="font-semibold text-gray-900 truncate">{{ tag.name }}</h5>
@@ -125,6 +130,7 @@ const deleteMessage = computed(() => {
 
 const form = useForm({
     name: '',
+    color: '#3B82F6',
 });
 
 const filteredTags = computed(() => {
@@ -146,7 +152,7 @@ const generateSlug = (text) => {
 };
 
 const saveTag = () => {
-    const data = { name: form.name, slug: generateSlug(form.name) };
+    const data = { name: form.name, slug: generateSlug(form.name), color: form.color };
 
     if (editingTag.value) {
         form.transform(() => data).put(route('tags.update', editingTag.value.id), {
@@ -166,6 +172,7 @@ const saveTag = () => {
 const editTag = (tag) => {
     editingTag.value = tag;
     form.name = tag.name;
+    form.color = tag.color || '#3B82F6';
 
     formRef.value?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     nextTick(() => firstFieldRef.value?.focus());

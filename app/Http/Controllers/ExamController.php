@@ -137,7 +137,7 @@ class ExamController extends Controller
                     'alternatives' => function ($q) {
                         $q->orderBy('order');
                     },
-                    'tags:id,name,slug',
+                    'tags:id,name,slug,color',
                 ])->orderBy('exam_questions.order');
             },
         ]);
@@ -268,6 +268,11 @@ class ExamController extends Controller
 
         $newExam = $exam->replicate();
         $newExam->title = $exam->title . ' (Cópia)';
+        // replicate() copia user_id do original — funciona hoje porque só o
+        // dono chega até aqui (authorize('view', $exam)), mas fica frágil a
+        // qualquer mudança futura de política de autorização. Redefinir
+        // explicitamente para o usuário autenticado.
+        $newExam->user_id = auth()->id();
         $newExam->is_published = false;
         $newExam->published_at = null;
         $newExam->save();

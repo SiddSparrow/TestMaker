@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tag;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -11,6 +12,8 @@ use Inertia\Inertia;
 
 class TagController extends Controller
 {
+    use AuthorizesRequests;
+
     public function index()
     {
         $tags = Tag::withCount('questions')
@@ -33,12 +36,14 @@ class TagController extends Controller
                 Rule::unique('tags', 'name')->where('user_id', auth()->id()),
             ],
             'slug' => 'nullable|string|max:255',
+            'color' => 'nullable|string|max:7',
         ]);
 
         Tag::create([
             'user_id' => auth()->id(),
             'name' => $validated['name'],
             'slug' => $validated['slug'] ?? Str::slug($validated['name']),
+            'color' => $validated['color'] ?? null,
         ]);
 
         $this->clearQuestionFormCache();
@@ -48,6 +53,8 @@ class TagController extends Controller
 
     public function update(Request $request, Tag $tag)
     {
+        $this->authorize('update', $tag);
+
         $validated = $request->validate([
             'name' => [
                 'required',
@@ -56,11 +63,13 @@ class TagController extends Controller
                 Rule::unique('tags', 'name')->where('user_id', auth()->id())->ignore($tag->id),
             ],
             'slug' => 'nullable|string|max:255',
+            'color' => 'nullable|string|max:7',
         ]);
 
         $tag->update([
             'name' => $validated['name'],
             'slug' => $validated['slug'] ?? Str::slug($validated['name']),
+            'color' => $validated['color'] ?? $tag->color,
         ]);
 
         $this->clearQuestionFormCache();
@@ -70,6 +79,8 @@ class TagController extends Controller
 
     public function destroy(Tag $tag)
     {
+        $this->authorize('delete', $tag);
+
         $tag->delete();
 
         $this->clearQuestionFormCache();

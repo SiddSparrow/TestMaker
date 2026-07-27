@@ -224,6 +224,73 @@ class DocumentTest extends TestCase
     }
 
     /**
+     * The old fallback silently matched ANY unrecognized type string to
+     * "Múltipla Escolha" by name. Now it falls back to matching by slug
+     * (stable, doesn't change if the type's display name is edited) and,
+     * only if that also fails, reports the row as an error instead of
+     * importing it as the wrong type.
+     */
+    public function test_import_questions_reports_an_error_for_an_unrecognized_type(): void
+    {
+        $document = Document::factory()->create(['user_id' => $this->user->id, 'status' => 'completed']);
+        $subject = Subject::factory()->create(['user_id' => $this->user->id]);
+        QuestionType::factory()->create(['name' => 'Múltipla Escolha', 'slug' => 'multipla-escolha']);
+
+        $payload = [
+            'questions' => [
+                [
+                    'statement' => 'Questão com tipo que não existe no banco?',
+                    'type' => 'Tipo Inexistente',
+                    'subject_id' => $subject->id,
+                    'difficulty_level' => 'medium',
+                    'points' => 2,
+                    'alternatives' => [
+                        ['content' => 'A', 'is_correct' => false],
+                        ['content' => 'B', 'is_correct' => true],
+                    ],
+                ],
+            ],
+        ];
+
+        $response = $this->actingAs($this->user)->post(route('documents.import-questions', $document), $payload);
+
+        $response->assertRedirect(route('questions.index'));
+        $response->assertSessionHas('success');
+        $this->assertDatabaseCount('questions', 0);
+    }
+
+    /**
+     * If the type's display name changes (e.g. a seed rename) but its slug
+     * stays put, the import should still resolve the correct type via the
+     * multiple_choice/true_false/essay -> slug fallback map.
+     */
+    public function test_import_questions_matches_type_by_slug_when_name_does_not_match(): void
+    {
+        $document = Document::factory()->create(['user_id' => $this->user->id, 'status' => 'completed']);
+        $subject = Subject::factory()->create(['user_id' => $this->user->id]);
+        QuestionType::factory()->create(['name' => 'Dissertativa Renomeada', 'slug' => 'dissertativa']);
+
+        $payload = [
+            'questions' => [
+                [
+                    'statement' => 'Questão dissertativa extraída pela IA?',
+                    'type' => 'essay',
+                    'subject_id' => $subject->id,
+                    'difficulty_level' => 'medium',
+                    'points' => 2,
+                    'alternatives' => [],
+                ],
+            ],
+        ];
+
+        $response = $this->actingAs($this->user)->post(route('documents.import-questions', $document), $payload);
+
+        $response->assertRedirect(route('questions.index'));
+        $this->assertDatabaseCount('questions', 1);
+        $this->assertDatabaseHas('questions', ['statement' => 'Questão dissertativa extraída pela IA?']);
+    }
+
+    /**
      * Question::clearCache() already runs on Question::create() (model
      * event), which covers the questions_stats_ key. But importQuestions()
      * still needed its own explicit invalidation for that key, since the

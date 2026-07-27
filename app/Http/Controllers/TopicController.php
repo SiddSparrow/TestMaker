@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Subject;
 use App\Models\Topic;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\Rule;
@@ -11,6 +12,8 @@ use Inertia\Inertia;
 
 class TopicController extends Controller
 {
+    use AuthorizesRequests;
+
     public function index()
     {
         $topics = Topic::withCount('questions')
@@ -52,6 +55,8 @@ class TopicController extends Controller
 
     public function update(Request $request, Topic $topic)
     {
+        $this->authorize('update', $topic);
+
         $validated = $request->validate([
             'subject_id' => ['required', Rule::exists('subjects', 'id')->where('user_id', auth()->id())],
             'name' => 'required|string|max:255',
@@ -67,6 +72,8 @@ class TopicController extends Controller
 
     public function destroy(Topic $topic)
     {
+        $this->authorize('delete', $topic);
+
         $topic->delete();
 
         $this->clearQuestionFormCache();

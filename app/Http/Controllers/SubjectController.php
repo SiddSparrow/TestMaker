@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Subject;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
 class SubjectController extends Controller
 {
+    use AuthorizesRequests;
+
     public function index()
     {
         $subjects = Subject::withCount(['topics', 'questions'])
@@ -45,6 +48,8 @@ class SubjectController extends Controller
 
     public function update(Request $request, Subject $subject)
     {
+        $this->authorize('update', $subject);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -60,6 +65,8 @@ class SubjectController extends Controller
 
     public function destroy(Subject $subject)
     {
+        $this->authorize('delete', $subject);
+
         if ($subject->questions()->exists()) {
             return back()->with(
                 'error',

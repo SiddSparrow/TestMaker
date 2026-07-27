@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
@@ -179,18 +180,25 @@ class DocumentController extends Controller
 
         DB::beginTransaction();
         try {
+            // Fallback pra quando a extração manda o identificador em inglês
+            // (multiple_choice/true_false/essay) em vez do nome em PT-BR.
+            $typeSlugMap = [
+                'multiple_choice' => 'multipla-escolha',
+                'true_false' => 'verdadeiro-falso',
+                'essay' => 'dissertativa',
+            ];
+
             foreach ($request->questions as $index => $questionData) {
-                // Verificar tipo de questão
+                // Verificar tipo de questão — primeiro pelo nome (rótulo em
+                // PT-BR, formato padrão da extração), com fallback por slug
+                // (estável) em vez de repetir o mesmo problema com outro nome
+                // hardcoded. Sem tipo correspondente, reporta o erro em vez
+                // de cair silenciosamente em "Múltipla Escolha".
                 $questionType = QuestionType::where('name', $questionData['type'])->first();
+
                 if (!$questionType) {
-                    // Tentar mapear tipos
-                    $typeMap = [
-                        'multiple_choice' => 'Múltipla Escolha',
-                        'true_false' => 'Verdadeiro ou Falso',
-                        'essay' => 'Dissertativa',
-                    ];
-                    $typeName = $typeMap[$questionData['type']] ?? 'Múltipla Escolha';
-                    $questionType = QuestionType::where('name', $typeName)->first();
+                    $slug = $typeSlugMap[$questionData['type']] ?? Str::slug($questionData['type']);
+                    $questionType = QuestionType::where('slug', $slug)->first();
                 }
 
                 if (!$questionType) {

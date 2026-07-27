@@ -46,8 +46,10 @@ router.on('navigate', () => {
                     <div class="flex">
                         <div class="shrink-0 flex items-center">
                             <Link :href="route('dashboard')" class="flex items-center gap-2">
-                                <ApplicationLogo class="block h-8 w-auto fill-current text-gray-800" />
-                                <span class="text-lg font-bold text-gray-800">TestMaker</span>
+                                <ApplicationLogo class="block h-8 w-auto" />
+                                <span class="text-lg font-bold tracking-tight">
+                                    <span class="text-gray-900">test</span><span class="text-primary-600">maker</span>
+                                </span>
                             </Link>
                         </div>
 

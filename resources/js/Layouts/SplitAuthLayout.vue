@@ -12,11 +12,7 @@
             <div class="max-w-md">
                 <!-- Logo -->
                 <div class="flex items-center gap-2.5 mb-12">
-                    <div class="w-9 h-9 rounded-lg border-2 border-primary-600 bg-white flex items-center justify-center">
-                        <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>
+                    <ApplicationLogo class="w-9 h-9" />
                     <span class="text-xl font-bold tracking-tight">
                         <span class="text-gray-900">test</span><span class="text-primary-600">maker</span>
                     </span>
@@ -77,11 +73,7 @@
             <div class="w-full max-w-sm">
                 <!-- Logo (só aparece em telas pequenas, onde o painel some) -->
                 <div class="flex lg:hidden items-center justify-center gap-2 mb-8">
-                    <div class="w-8 h-8 rounded-lg border-2 border-primary-600 bg-white flex items-center justify-center">
-                        <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>
+                    <ApplicationLogo class="w-8 h-8" />
                     <span class="text-lg font-bold tracking-tight">
                         <span class="text-gray-900">test</span><span class="text-primary-600">maker</span>
                     </span>
@@ -99,6 +91,8 @@
 </template>
 
 <script setup>
+import ApplicationLogo from '@/Components/ApplicationLogo.vue';
+
 defineProps({
     title: {
         type: String,

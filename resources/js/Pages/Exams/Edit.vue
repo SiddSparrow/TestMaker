@@ -105,13 +105,8 @@
                             Cancelar
                         </Link>
 
-                        <button @click="showDeleteConfirm = true"
-                                class="inline-flex items-center px-4 py-2 text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 transition-colors">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                            </svg>
-                            Excluir Prova
-                        </button>
+                        <ExamActionBar :exam="exam" :show-preview="false" :show-edit="false" :show-export="false"
+                                       show-delete @delete="showDeleteConfirm = true" />
                     </div>
 
                     <div class="flex items-center gap-3">
@@ -183,6 +178,7 @@ import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ExamBuilder from '@/Components/Exams/ExamBuilder.vue';
 import ExamConfigForm from '@/Components/Exams/ExamConfigForm.vue';
+import ExamActionBar from '@/Components/Exams/ExamActionBar.vue';
 import ExamPreview from '@/Components/Exams/ExamPreview.vue';
 import ConfirmDialog from '@/Components/ConfirmDialog.vue';
 import DetailHeader from '@/Components/UI/DetailHeader.vue';

@@ -38,71 +38,7 @@
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-3">
-                    <button @click="openPreview"
-                            class="inline-flex items-center justify-center px-5 py-2.5 bg-white/20 hover:bg-white/30 text-white font-medium rounded-lg transition-all border border-white/30 hover:border-white/50 group">
-                        <svg class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                        </svg>
-                        Visualizar Prova
-                    </button>
-
-                    <Link :href="route('exams.edit', exam.id)"
-                        class="inline-flex items-center justify-center px-5 py-2.5 bg-white text-blue-600 hover:bg-gray-50 font-medium rounded-lg transition-all border border-white group">
-                        <svg class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                        </svg>
-                        Editar Prova
-                    </Link>
-
-                    <div class="relative" ref="exportMenuRef" @keydown.escape="closeExportMenuAndRefocus">
-                        <button @click="toggleExportMenu"
-                                ref="exportMenuTriggerRef"
-                                aria-haspopup="true"
-                                :aria-expanded="showExportMenu"
-                                class="inline-flex items-center justify-center px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-lg transition-all">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                            </svg>
-                            Exportar
-                        </button>
-
-                        <!-- Dropdown de Exportação -->
-                        <div v-show="showExportMenu"
-                            role="menu"
-                            class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-10">
-                            <div class="py-1">
-                                <button @click="exportPDF(false)" role="menuitem"
-                                        class="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                    <svg class="w-4 h-4 mr-3 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd"/>
-                                    </svg>
-                                    Exportar PDF
-                                </button>
-                                <button @click="exportPDF(true)" role="menuitem"
-                                        class="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                    <svg class="w-4 h-4 mr-3 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd"/>
-                                    </svg>
-                                    PDF com Gabarito
-                                </button>
-                                <button @click="exportDOCX(false)" role="menuitem"
-                                        class="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                    <svg class="w-4 h-4 mr-3 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd"/>
-                                    </svg>
-                                    Exportar DOCX
-                                </button>
-                                <button @click="exportDOCX(true)" role="menuitem"
-                                        class="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                    <svg class="w-4 h-4 mr-3 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd"/>
-                                    </svg>
-                                    DOCX com Gabarito
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    <ExamActionBar :exam="exam" on-gradient @preview="openPreview" />
                 </div>
             </div>
         </DetailHeader>
@@ -280,23 +216,8 @@
                     Voltar para Provas
                 </Link>
                 
-                <div class="flex gap-3">
-                    <button @click="showDeleteConfirm = true"
-                            class="inline-flex items-center px-4 py-2.5 text-red-600 hover:bg-red-50 border border-red-200 rounded-lg transition-colors">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                        </svg>
-                        Excluir Prova
-                    </button>
-                    
-                    <Link :href="route('exams.edit', exam.id)"
-                          class="inline-flex items-center px-5 py-2.5 bg-blue-600 text-white hover:bg-blue-700 font-medium rounded-lg transition-colors">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                        </svg>
-                        Editar Prova
-                    </Link>
-                </div>
+                <ExamActionBar :exam="exam" :show-preview="false" :show-export="false" show-delete
+                               @delete="showDeleteConfirm = true" />
             </div>
         </div>
 
@@ -324,15 +245,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ExamPreview from '@/Components/Exams/ExamPreview.vue';
+import ExamActionBar from '@/Components/Exams/ExamActionBar.vue';
 import ConfirmDialog from '@/Components/ConfirmDialog.vue';
 import DetailHeader from '@/Components/UI/DetailHeader.vue';
-import { useFileDownload } from '@/composables/useFileDownload';
-
-const { download } = useFileDownload();
 
 const props = defineProps({
     exam: Object,
@@ -344,9 +263,7 @@ const props = defineProps({
 
 // Estados
 const showPreview = ref(false);
-const showExportMenu = ref(false);
-const exportMenuRef = ref(null);
-const exportMenuTriggerRef = ref(null);
+const showDeleteConfirm = ref(false);
 
 // Computed
 const subjectsCount = computed(() => {
@@ -368,40 +285,7 @@ const openPreview = () => {
     showPreview.value = true;
 };
 
-const toggleExportMenu = () => {
-    showExportMenu.value = !showExportMenu.value;
-};
-
-const exportPDF = (withAnswers = false) => {
-    download(route('exams.export.pdf', { exam: props.exam.id, with_answers: withAnswers ? 1 : 0 }));
-    showExportMenu.value = false;
-};
-
-const exportDOCX = (withAnswers = false) => {
-    download(route('exams.export.docx', { exam: props.exam.id, with_answers: withAnswers ? 1 : 0 }));
-    showExportMenu.value = false;
-};
-
-const showDeleteConfirm = ref(false);
-
 const deleteExam = () => {
     router.delete(route('exams.destroy', props.exam.id));
 };
-
-// Fechar menu de exportação ao clicar fora — precisa ser removido no unmount,
-// senão o listener se acumula a cada visita SPA a esta página. Usa a ref do
-// container (não um seletor de classe) para não quebrar se o CSS mudar.
-const closeExportMenuOnOutsideClick = (e) => {
-    if (exportMenuRef.value && !exportMenuRef.value.contains(e.target)) {
-        showExportMenu.value = false;
-    }
-};
-
-const closeExportMenuAndRefocus = () => {
-    showExportMenu.value = false;
-    exportMenuTriggerRef.value?.focus();
-};
-
-onMounted(() => document.addEventListener('click', closeExportMenuOnOutsideClick));
-onBeforeUnmount(() => document.removeEventListener('click', closeExportMenuOnOutsideClick));
 </script>

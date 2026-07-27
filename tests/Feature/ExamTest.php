@@ -196,6 +196,37 @@ class ExamTest extends TestCase
     }
 
     /**
+     * BUG found via a real support case: the browser's request payload had
+     * header_config/footer_config as JSON-encoded strings instead of nested
+     * objects (root cause on the frontend unconfirmed), which failed the
+     * `nullable|array` rule with no visibility into why. The controller now
+     * decodes these fields if they arrive as valid JSON strings before
+     * validating, so a save isn't blocked by this serialization quirk.
+     */
+    public function test_update_accepts_config_fields_sent_as_json_strings(): void
+    {
+        $exam = Exam::factory()->create(['user_id' => $this->user->id, 'main_subject_id' => $this->subject->id]);
+        $question = $this->createQuestion();
+
+        $payload = [
+            'title' => $exam->title,
+            'main_subject_id' => $this->subject->id,
+            'header_config' => json_encode(['school_name' => 'Escola Integrada', 'show_date' => true]),
+            'footer_config' => json_encode(['custom_text' => 'Atenção às questões interdisciplinares!']),
+            'questions' => [
+                ['question_id' => $question->id, 'order' => 1],
+            ],
+        ];
+
+        $response = $this->actingAs($this->user)->put(route('exams.update', $exam), $payload);
+
+        $response->assertSessionHasNoErrors();
+        $response->assertRedirect(route('exams.show', $exam));
+        $this->assertSame('Escola Integrada', $exam->fresh()->header_config['school_name']);
+        $this->assertSame('Atenção às questões interdisciplinares!', $exam->fresh()->footer_config['custom_text']);
+    }
+
+    /**
      * BUG found via a real support case: exams.main_subject_id is nullable
      * in the schema on purpose (onDelete('set null') when the subject is
      * deleted), but the old validation message was Laravel's generic

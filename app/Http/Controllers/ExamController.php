@@ -93,6 +93,8 @@ class ExamController extends Controller
      */
     public function store(Request $request)
     {
+        $this->decodeJsonConfigFields($request);
+
         $validated = $request->validate($this->examRules(), $this->examMessages());
 
         $exam = Exam::create([
@@ -201,6 +203,8 @@ class ExamController extends Controller
     public function update(Request $request, Exam $exam)
     {
         $this->authorize('update', $exam);
+
+        $this->decodeJsonConfigFields($request);
 
         $validated = $request->validate($this->examRules(), $this->examMessages());
 
@@ -701,6 +705,36 @@ class ExamController extends Controller
      * validação sempre que salva, mas a tela de edição não mostrava erro
      * nenhum, então parecia que "salvar" simplesmente não fazia nada.
      */
+    /**
+     * header_config/format_config/footer_config/difficulty_distribution/
+     * topic_distribution às vezes chegam como string JSON em vez de
+     * array/objeto — visto num caso real de suporte (payload capturado no
+     * DevTools mostrava esses campos como string escapada), sem que o
+     * front-end mostrasse nenhum indício de por quê. Em vez de bloquear o
+     * usuário atrás de "field must be an array", decodifica aqui antes de
+     * validar; se não for JSON válido, a validação normal continua
+     * rejeitando com a mensagem apropriada.
+     */
+    private function decodeJsonConfigFields(Request $request): void
+    {
+        $fields = ['header_config', 'format_config', 'footer_config', 'difficulty_distribution', 'topic_distribution'];
+
+        $merge = [];
+        foreach ($fields as $field) {
+            $value = $request->input($field);
+            if (is_string($value)) {
+                $decoded = json_decode($value, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $merge[$field] = $decoded;
+                }
+            }
+        }
+
+        if (!empty($merge)) {
+            $request->merge($merge);
+        }
+    }
+
     private function examMessages(): array
     {
         return [

@@ -210,6 +210,12 @@ router.on('navigate', () => {
                     <p class="text-xs text-gray-500 mt-1">
                         Sistema de gerenciamento de questões e provas
                     </p>
+                    <p class="text-xs text-gray-400 mt-1">
+                        Desenvolvido por
+                        <a href="https://www.webexpress.net.br/" target="_blank" rel="noopener noreferrer" class="hover:text-primary-600 transition-colors">
+                            WebExpress
+                        </a>
+                    </p>
                 </div>
             </div>
         </footer>

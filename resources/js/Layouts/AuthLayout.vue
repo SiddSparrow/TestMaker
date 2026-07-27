@@ -27,6 +27,12 @@
                 <p class="text-xs text-gray-500">
                     &copy; {{ new Date().getFullYear() }} TestMaker. Sistema de gestão educacional.
                 </p>
+                <p class="text-xs text-gray-400 mt-1">
+                    Desenvolvido por
+                    <a href="https://www.webexpress.net.br/" target="_blank" rel="noopener noreferrer" class="hover:text-primary-600 transition-colors">
+                        WebExpress
+                    </a>
+                </p>
             </div>
         </div>
     </div>

@@ -85,6 +85,13 @@
                 <div class="mt-8">
                     <slot />
                 </div>
+
+                <p class="mt-8 text-center text-xs text-gray-400">
+                    Desenvolvido por
+                    <a href="https://www.webexpress.net.br/" target="_blank" rel="noopener noreferrer" class="hover:text-primary-600 transition-colors">
+                        WebExpress
+                    </a>
+                </p>
             </div>
         </div>
     </div>
